@@ -6,28 +6,9 @@ class chowChooserEngine {
 	
 	function __construct() {
 		
-		// pseudo code time
 		/*
 		
-		if no action is defined, we're either going to the welcome page or the view order page depending on a key being present or not.
-		
-		First we check for an action var existing
-		
-		Then we check of an order key var existing
-		
-		if no action key and no order key, then we go to welcome page
-		if no order key but action key, perform action
-		if no action but order key, go to view page
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		New pseudo code now that I'm in better shape:
+		Pseudo code:
 		
 		1. Ways a user can access ChowChooser
 			A. From visiting the base url
@@ -74,8 +55,8 @@ class chowChooserEngine {
 			- User with an order key and actions goes to process, then view (if orderKey Exists and actionKey exists) yes to both
 			- Other case: if an user provides an action with no order key (no orderKey, actionKey != startNewOrder) send them to welcome page and say no key specified
 			
-		$orderKeyExists = if(key_exists("orderKey", $_GET))
-		$actionKeyExists = if(key_exists("action", $_GET))
+		$orderKeyExists = key_exists("orderKey", $_GET);
+		$actionKeyExists = key_exists("action", $_GET);
 			
 		if(!$orderKeyExists && !$actionKeyExists) {
 			// no action or orderKey means we're going to the welcome page
@@ -105,34 +86,48 @@ class chowChooserEngine {
 			
 		*/
 		
-		if (!key_exists("orderKey", $_GET)) {
-			// this is a basic welcome page to help people get a new order started or join an order
-			$this->welcome();
-		} elseif (key_exists("action", $_GET)) {
-			// here's where we'll handle different actions which load different pages
-			if ($_GET["action"] == "start_new") {
-				// this is for setting up new orders
-				$this->start_new_order();
-			}
+		$orderKeyExists = key_exists("orderKey", $_GET);
+		$actionKeyExists = key_exists("action", $_GET);
 			
+		if(!$orderKeyExists && !$actionKeyExists) {
+			// no action or orderKey means we're going to the welcome page
+			$this->welcome();
+		} else if ($orderKeyExists && !$actionKeyExists) {
+			// orderKey exists but no actionKey mean swe're going to the view order page
+			$this->view_order($_GET["orderKey"]);
+		} else if ($actionKeyExists) {
+			// if we have an action key, we're going to now check if it's value is start_new:
+				if ($_GET["action"] == "start_new") {
+					// if it is, we're going to generate an orderKey and make a new order, then direct user to view that order
+					$this->start_new_order();
+				} else {
+					// if it is not, we're going to check for an orderKey
+					if ($orderKeyExists) {
+						$this->handleOrderActions();
+						// here we handle actions for the order
+					} else {
+						// we cannot handle actions without an order key, show welcome / error page
+					}
+				}
+				
+				
 		} else {
-			$this->view_order();
-		}
+			// for debug's sake we'll make an error page that we can only reach when all other checks fail in case we've borked logic
+		}	
 	}
 	
 	function welcome() {
-		echo $this->generate_key();
+		//echo $this->generate_key();
 		
-		//echo $this->load_template("welcome");
+		echo $this->load_template("welcome");
 	}
 	
-	function view_order() {
-		echo "This is our view function! We're looking at order " . $_GET["orderKey"] . "!\n";
+	function view_order($orderKey) {
+		echo "This is our view function! We're looking at order " . $orderKey . "!\n";
 	}
 	
 	function start_new_order() {
-		
-		echo "here's our key: " . $this->generate_key();
+		echo $this->view_order($this->generate_key());
 	}
 	
 	function generate_key() {
@@ -140,7 +135,7 @@ class chowChooserEngine {
 		return md5($KEY_SALT.md5(date("Y-m-d h:i:sa")));
 	}
 	
-	function load_template($fileName, $thingsToReplace) {
+	function load_template($fileName) { #we'll need to add array handling as second parameter here
 		$fileLocation = "templates/" . $fileName . ".html";
 		$file = fopen($fileLocation, "r") or die("Could not load file!");
 		$contents = fread($file, filesize($fileLocation));
