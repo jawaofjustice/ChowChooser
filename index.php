@@ -55,34 +55,7 @@ class chowChooserEngine {
 			- User with an order key and actions goes to process, then view (if orderKey Exists and actionKey exists) yes to both
 			- Other case: if an user provides an action with no order key (no orderKey, actionKey != startNewOrder) send them to welcome page and say no key specified
 			
-		$orderKeyExists = key_exists("orderKey", $_GET);
-		$actionKeyExists = key_exists("action", $_GET);
-			
-		if(!$orderKeyExists && !$actionKeyExists) {
-			// no action or orderKey means we're going to the welcome page
-			$this->welcome();
-		} else if ($orderKeyExists && !$actionKeyExists) {
-			// orderKey exists but no actionKey mean swe're going to the view order page
-			$this->view_order();
-		} else if ($actionKeyExists) {
-			// if we have an action key, we're going to now check if it's value is start_new:
-				if ($_GET["action"] == "start_new") {
-					// if it is, we're going to generate an orderKey and make a new order, then direct user to view that order
-					$this->start_new_order();
-				} else {
-					// if it is not, we're going to check for an orderKey
-					if ($orderKeyExists) {
-						$this->handleOrderActions();
-						// here we handle actions for the order
-					} else {
-						// we cannot handle actions without an order key, show welcome / error page
-					}
-				}
-				
-				
-		} else {
-			// for debug's sake we'll make an error page that we can only reach when all other checks fail in case we've borked logic
-		}	
+	
 			
 		*/
 		
