@@ -1,0 +1,12 @@
+database for chowchooser:
+
+stuff to store: 
+	- lobby  // this is a lobby for an order to be placed at an establishment, not a vote for which establishment
+		- lobby_id
+		- access_key
+		
+	- food items
+		-id
+		-item description
+		-price
+		-lobby_id (relates to order table)
