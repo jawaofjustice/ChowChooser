@@ -67,10 +67,10 @@ class chowChooserEngine {
 			$this->welcome();
 		} else if ($orderKeyExists && !$actionKeyExists) {
 			// orderKey exists but no actionKey mean swe're going to the view order page
-			$this->view_order($_GET["orderKey"]);
+			$this->view_order($_GET['orderKey']);
 		} else if ($actionKeyExists) {
 			// if we have an action key, we're going to now check if it's value is start_new:
-				if ($_GET["action"] == "start_new") {
+				if ($_GET['action'] == "start_new") {
 					// if it is, we're going to generate an orderKey and make a new order, then direct user to view that order
 					$this->start_new_order();
 				} else {
@@ -90,9 +90,8 @@ class chowChooserEngine {
 	}
 	
 	function welcome() {
-		//echo $this->generate_key();
-		
-		echo $this->load_template("welcome");
+		$swapArray['testMessage'] = "This is a message to swap into our template.";
+		echo $this->load_template("welcome", $swapArray);
 	}
 	
 	function view_order($orderKey) {
@@ -105,13 +104,21 @@ class chowChooserEngine {
 	
 	function generate_key() {
 		global $KEY_SALT;
-		return md5($KEY_SALT.md5(date("Y-m-d h:i:sa")));
+		return md5($KEY_SALT.md5(date("Y-m-d h:i:sa"))); # the string after this date function is just specifying a format for how the date will output
 	}
 	
-	function load_template($fileName) { #we'll need to add array handling as second parameter here
+	function load_template($fileName, $swapArray = null) {
 		$fileLocation = "templates/" . $fileName . ".html";
 		$file = fopen($fileLocation, "r") or die("Could not load file!");
 		$contents = fread($file, filesize($fileLocation));
+		
+		// now we're going to iterate through our $swapArray to replace any {{tags}} in the template
+		
+		if ($swapArray != null) {
+			foreach ($swapArray as $key => $value) {
+				$contents = str_replace("{{".$key."}}", $value, $contents);
+			}
+		}
 		return $contents;
 	}
 	
