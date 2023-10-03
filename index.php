@@ -89,13 +89,20 @@ class chowChooserEngine {
 		}	
 	}
 	
-	function welcome() {
-		$swapArray['testMessage'] = "This is a message to swap into our template.";
+	function welcome($warning = null) {
+		$swapArray['testMessage'] = "This is a message to swap into our template."; // this will replace the tag {{testMessage}} in the template welcome.html
+		$swapArray['warningMessage'] = "" . $warning == "" ? "" : $warning . "<br /><br />";
 		echo $this->load_template("welcome", $swapArray);
 	}
 	
 	function view_order($orderKey) {
-		echo "This is our view function! We're looking at order " . $orderKey . "!\n";
+		if($orderKey == "") { // if the user presses "join" with no key entered, this will put them back to the welcome page with a warning
+			$warning = "You must supply a lobby code to join a lobby!";
+			$this->welcome($warning);
+		} else {
+			echo "<a href=\"?\"><input type=\"button\" value=\"Back\" /></a><br /><br />";
+			echo "This is our view function! We're looking at order " . $orderKey . "!\n";
+		}
 	}
 	
 	function start_new_order() {
