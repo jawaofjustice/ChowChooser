@@ -1,0 +1,3 @@
+To add this, run the following command (it'll ask for your root password):
+
+	mysql -u root -p < UserSetup.sql

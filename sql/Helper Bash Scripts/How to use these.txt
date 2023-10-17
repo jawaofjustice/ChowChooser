@@ -1,0 +1,12 @@
+Place these files in ~/bin, you'll need to reload your bash to get them to work as commands.
+
+Make sure you edit chowchoosersqldump to have the correct path you'd like to store your SQL dumps to.
+
+Access the chowchooser mysql database:
+	chowchoosermysql
+
+Create a new database dump:
+	chowchoosersqldump
+
+Load a database dump into your database:
+	chowchoosermysql < {Name of dump file}

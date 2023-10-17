@@ -1,0 +1,2 @@
+#!/bin/bash
+mysql -u 'chowChooserAdmin2' -p$CHOWCHOOSER_P -D 'chow_chooser'
