@@ -138,10 +138,18 @@ class chowChooserEngine {
 			//echo "<br>";
 			//echo $foodItems[1]->price;
 			//$foodItems['foodItemsLength'] = (string) count($foodItems) + 1;
-			echo $this->load_view_order("view_order", $foodItems);
-			
-			
-		}
+
+         $foodItemsString = "";
+
+         // now we're going to iterate through our $swapArray to replace any {{tags}} in the template
+         if ($foodItems != null) {
+            foreach ($foodItems as $i) {
+               $foodItemsString .= "<tr><td>".$i->description."</td><td>".$i->price."</td></tr>";
+            }
+         }
+
+         echo $this->load_template("view_order", ["foodItemsString" => $foodItemsString]);
+      }
 	}
 	
 	function start_new_order() {
@@ -168,23 +176,6 @@ class chowChooserEngine {
 		return $contents;
 	}
 
-	function load_view_order($fileName, $foodItems = null) {
-		$fileLocation = "templates/" . $fileName . ".html";
-		$file = fopen($fileLocation, "r") or die("Could not load file!");
-		$contents = fread($file, filesize($fileLocation));
-		
-		$foodItemsString = "";
-
-		// now we're going to iterate through our $swapArray to replace any {{tags}} in the template
-		if ($foodItems != null) {
-			foreach ($foodItems as $i) {
-				$foodItemsString .= "<tr><td>".$i->description."</td><td>".$i->price."</td></tr>";
-			}
-		}
-		$contents = str_replace("{{foodItemsString}}", $foodItemsString, $contents);
-		return $contents;
-	}
-	
 	function handle_order_actions() {
 		echo "this is where we handle in-order actions!";
 	}
