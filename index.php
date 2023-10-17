@@ -32,7 +32,10 @@ class FoodItem {
 class chowChooserEngine {
 	
 	function __construct() {
+		$this->db = $this->setup_database_connection();
 		
+		// uncomment the following line to see results of example query - sorry it breaks page formatting!
+		//$this->example_query();
 		
 		$orderKeyExists = key_exists("orderKey", $_GET);
 		$actionKeyExists = key_exists("action", $_GET);
@@ -126,6 +129,25 @@ class chowChooserEngine {
 
 	function handle_order_actions() {
 		echo "this is where we handle in-order actions!";
+	}
+	
+	function setup_database_connection() {
+		$pass = getenv('CHOWCHOOSER_P');
+		$mysqli = new mysqli("localhost","chowChooserAdmin",$pass,"chow_chooser");
+
+		if ($mysqli -> connect_errno) {
+		  echo "Failed to connect to MySQL: " . $mysqli -> connect_error;
+		  exit();
+		}
+		return $mysqli;
+	}
+	
+	function example_query() {
+		$response = $this->db->query("describe lobbies;");
+		$results = $response->fetch_assoc();
+		
+		// printing the array of results, or we can foreach loop through them
+		echo "Here's our db results: ".print_r($results);
 	}
 }
 
