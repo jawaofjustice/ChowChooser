@@ -1,0 +1,27 @@
+You'll first want to make sure to add the environmental variable:
+
+	CHOWCHOOSER_P = OexDTUj@xd#^3CZm
+
+Then, install the chowChooser admin user following the instructions in the User Setup folder.
+
+Next, install the bash helper scripts following the instructions in the Helper Bash SCripts folder.
+
+After that, load the latest chow_chooser.backup.{Date}.sql database dump.
+
+Finally, you'll need to add the password to your envvars file for Apache. You should be able to find this under:
+
+	For Linux:
+		/etc/apache2
+	
+	For Windows:
+		C:\Program Files\Apache
+		
+Just append this line to the end of your file:
+
+	export CHOWCHOOSER_P=OexDTUj@xd#^3CZm
+	
+And finally reload apache:
+
+	sudo service apache2 restart
+
+Don't worry about sharing this pass to the repo for now, we'll take a more secure route in a later version.

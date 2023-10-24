@@ -1,0 +1,26 @@
+body {
+	margin: 0px;
+	padding: 0px;
+}
+
+table {
+	margin: 10px auto 0px auto;
+	border: 1px solid black;
+	text-align: center;
+	border-spacing: 0px;
+}
+
+td {
+	vertical-align: baseline;
+	padding: 4px;
+}
+
+th {
+	background-color: #ddd;
+	padding: 4px;
+}
+
+.warningMessage {
+	color: red;
+	font-weight: bold;
+}
