@@ -1,36 +1,59 @@
 <?php
-class chowChooserEngine {
+require_once "classes/FoodItem.php";
+require_once "classes/User.php";
+require_once "classes/Database.php";
+
+class ChowChooserEngine {
 	
 	function __construct() {
-		$this->db = $this->setup_database_connection();
+		$this->db = Database::connect();
 		
 		// uncomment the following line to see results of example query - sorry it breaks page formatting!
 		//$this->example_query();
 		
-		$orderKeyExists = key_exists("orderKey", $_GET);
-		$actionKeyExists = key_exists("action", $_GET);
+		$orderKeyExists = key_exists("orderKey", $_POST);
+		$actionKeyExists = key_exists("action", $_POST);
 			
 		if(!$orderKeyExists && !$actionKeyExists) {
 			// no action or orderKey means we're going to the welcome page
 			$this->welcome();
 		} else if ($orderKeyExists && !$actionKeyExists) {
 			// orderKey exists but no actionKey mean swe're going to the view order page
-			$this->view_order($_GET['orderKey']);
+			$this->view_order($_POST['orderKey']);
 		} else if ($actionKeyExists) {
 			// if we have an action key, we're going to now check if it's value is start_new:
-				if ($_GET['action'] == "start_new") {
-					// if it is, we're going to generate an orderKey and make a new order, then direct user to view that order
-					$this->start_new_order();
-				} else {
-					// if it is not, we're going to check for an orderKey
-					if ($orderKeyExists) {
-						$this->handle_order_actions();
-						// here we handle actions for the order
-					} else {
-						// we cannot handle actions without an order key, show welcome / error page
-					}
+				switch ($_POST['action']) {
+					case "start_new": 
+							// if it is, we're going to generate an orderKey and make a new order, then direct user to view that order
+							$this->start_new_order();
+						break;
+					case "createUser":
+							$user = new User;
+							echo $user->createUser();
+						break;
+					case "editUser":
+							echo $user->editUser();
+						break;
+					case "resetPassword":
+							echo $user->resetPassword();
+						break;
+					case "login":
+							$user = new User;
+							echo $user->login();
+						break;
+					case "logout":
+							echo $user->logout();
+						break;
+					default: 
+						// if it is not, we're going to check for an orderKey
+						if ($orderKeyExists) {
+							$this->handle_order_actions();
+							// here we handle actions for the order
+						} else {
+							// we cannot handle actions without an order key, show welcome / error page
+							echo "this is an error page :(";
+						}
 				}
-				
 				
 		} else {
 			// for debug's sake we'll make an error page that we can only reach when all other checks fail in case we've borked logic
@@ -40,6 +63,7 @@ class chowChooserEngine {
 	function welcome($warning = null) {
 		$swapArray['testMessage'] = "This is a message to swap into our template."; // this will replace the tag {{testMessage}} in the template welcome.html
 		$swapArray['warningMessage'] = "" . $warning == "" ? "" : $warning . "<br /><br />";
+		$swapArray['loginForm'] = $this->load_template("loginForm"); //using load template to insert a subtemplate
 		echo $this->load_template("welcome", $swapArray);
 	}
 	
@@ -101,16 +125,6 @@ class chowChooserEngine {
 		echo "this is where we handle in-order actions!";
 	}
 	
-	function setup_database_connection() {
-		$pass = getenv('CHOWCHOOSER_P');
-		$mysqli = new mysqli("localhost","chowChooserAdmin",$pass,"chow_chooser");
-
-		if ($mysqli -> connect_errno) {
-		  echo "Failed to connect to MySQL: " . $mysqli -> connect_error;
-		  exit();
-		}
-		return $mysqli;
-	}
 	
 	function example_query() {
 		$response = $this->db->query("describe lobbies;");

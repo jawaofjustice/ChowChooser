@@ -24,3 +24,45 @@ th {
 	color: red;
 	font-weight: bold;
 }
+
+.loginHolder {
+	margin: 2px 8px;
+	padding: 4px 8px;
+	border: 1px solid #888;
+	float: right;
+	border-radius: 4px;
+}
+
+.loginTitle{
+	font-size: 20px;
+	text-align: center;
+	margin: 0px 0px;
+}
+
+.login > form > label {
+	width: 70px;
+	display: inline-block;
+	text-align: right;
+}
+
+.login > form > input[type=text], .login > form > input[type=password] {
+	margin-top: 2px;
+	width: 200px;
+}
+
+.login > form > input[type=submit] {
+	margin: 0px auto;
+	display: block;
+	width: 134px;
+}
+
+.loginFormDivider {
+	text-align: center;
+	width: 100%;
+}
+
+.swapFormButton {
+	margin: 0px auto;
+	display: block;
+	width: 134px;
+}
