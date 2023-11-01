@@ -1,10 +1,3 @@
-<script type="text/javascript" language="javascript">
-	function swapLoginForms() {
-
-		document.getElementById("login").style.display = document.getElementById("login").style.display == "" ? "none" : "";
-		document.getElementById("createAccount").style.display = document.getElementById("createAccount").style.display == "" ? "none" : "";
-	}
-</script>
 <div class="login" id="login">
 	<form action="" method="post" >
 		<h3 class="loginTitle">Login</h3>
@@ -15,31 +8,7 @@
 		<label for="password">Password:</label>
 		<input type="password" name="password" id="password"/><br />
 		<input type="hidden" name="action" value="login" />
-		<input type="submit" />
-		<div class="loginFormDivider">
-			 - or - <br />
-			 <h3 class="loginTitle">Need to make an account?</h3>
-		</div>
-		
-		<input type="button" value="Create an Account" class="swapFormButton" onClick="swapLoginForms()" />
-	</form>
-</div>
-<div class="login" id="createAccount" style="display: none;">
-	<form action="" method="post" >
-		<h3 class="loginTitle">Create Your Account</h3>
-		
-		<label for="email">Email:</label>
-		<input type="text" name="email" id="email" /><br />
-		
-		<label for="password">Password:</label>
-		<input type="password" name="password" id="password"/><br />
-		<input type="hidden" name="action" value="createUser" />
-		<input type="submit" />
-		<div class="loginFormDivider">
-			 - or - 
-			 <h3 class="loginTitle">Already have an account?</h3>
-		</div>
-		
-		<input type="button" value="Login" class="swapFormButton" onClick="swapLoginForms()" />
+		<input type="submit" id="login" value="Log in" style="display: inline" />
+		<input type="submit" id="createAccount" value="Create account" style="display: inline" />
 	</form>
 </div>
