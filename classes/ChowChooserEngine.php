@@ -29,7 +29,7 @@ class ChowChooserEngine {
 						break;
 					case "createUser":
 							$user = new User;
-							echo $user->createUser();
+							echo $user->createUser($_POST['email'], $_POST['password']);
 						break;
 					case "editUser":
 							echo $user->editUser();
@@ -39,7 +39,7 @@ class ChowChooserEngine {
 						break;
 					case "login":
 							$user = new User;
-							echo $user->login();
+							echo $user->login($_POST['email'], $_POST['password']);
 						break;
 					case "logout":
 							echo $user->logout();
