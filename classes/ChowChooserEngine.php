@@ -3,6 +3,7 @@ require_once "classes/FoodItem.php";
 require_once "classes/User.php";
 require_once "classes/Database.php";
 
+#[AllowDynamicProperties]
 class ChowChooserEngine {
 	
 	function __construct() {
@@ -13,10 +14,25 @@ class ChowChooserEngine {
 		
 		$orderKeyExists = key_exists("orderKey", $_POST);
 		$actionKeyExists = key_exists("action", $_POST);
-			
+
+		if (isset($_POST['login'])) {
+         $user = new User;
+         $user->login($_POST['email'], $_POST['password']);
+		} else if (isset($_POST['createUser'])) {
+         $user = new User;
+         $user->createUser($_POST['email'], $_POST['password']);
+		} else if (isset($_POST['logout'])) {
+         // trying to logout through a User method wasn't working,
+         // this is fine anyway
+         session_unset();
+		}
+
 		if(!$orderKeyExists && !$actionKeyExists) {
 			// no action or orderKey means we're going to the welcome page
 			$this->welcome();
+      } else if (isset($_POST['login'])) {
+         $user = new User;
+         $user->login($_POST['email'], $_POST['password']);
 		} else if ($orderKeyExists && !$actionKeyExists) {
 			// orderKey exists but no actionKey mean swe're going to the view order page
 			$this->view_order($_POST['orderKey']);
@@ -27,19 +43,11 @@ class ChowChooserEngine {
 							// if it is, we're going to generate an orderKey and make a new order, then direct user to view that order
 							$this->start_new_order();
 						break;
-					case "createUser":
-							$user = new User;
-							echo $user->createUser($_POST['email'], $_POST['password']);
-						break;
 					case "editUser":
 							echo $user->editUser();
 						break;
 					case "resetPassword":
 							echo $user->resetPassword();
-						break;
-					case "login":
-							$user = new User;
-							echo $user->login($_POST['email'], $_POST['password']);
 						break;
 					case "logout":
 							echo $user->logout();
@@ -62,6 +70,12 @@ class ChowChooserEngine {
 	
 	function welcome($warning = null) {
 		$swapArray['testMessage'] = "This is a message to swap into our template."; // this will replace the tag {{testMessage}} in the template welcome.html
+      
+      // tests session
+      if (isset($_SESSION['id'])) {
+         $swapArray['testMessage'] .= $_SESSION['id'];
+      }
+
 		$swapArray['warningMessage'] = "" . $warning == "" ? "" : $warning . "<br /><br />";
 		$swapArray['loginForm'] = $this->load_template("loginForm"); //using load template to insert a subtemplate
 		echo $this->load_template("welcome", $swapArray);
@@ -124,7 +138,6 @@ class ChowChooserEngine {
 	function handle_order_actions() {
 		echo "this is where we handle in-order actions!";
 	}
-	
 	
 	function example_query() {
 		$response = $this->db->query("describe lobbies;");
