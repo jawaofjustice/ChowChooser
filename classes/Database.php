@@ -15,7 +15,7 @@ class Database {
 		return $this;
 	}
 
-   public function getUserIdWithCredentials($email, $password): int|null {
+   public function getUserFromCredentials($email, $password): User|null {
       // when creating an account, we're only concerned with finding
       // accounts with the inputted email (emails should be unique)
       if (is_null($password)) {
@@ -37,11 +37,11 @@ class Database {
          return null;
       }
 
-      return $user['id'];
+      return new User($user['id'], $user['email']);
    }
 
 	function createUser($email, $password): void {
-      $id = $this->getUserIdWithCredentials($email, null);
+      $id = $this->getUserFromCredentials($email, null);
       if (!is_null($id)) {
          echo "Cannot create account: user already exists with this email.";
          return;

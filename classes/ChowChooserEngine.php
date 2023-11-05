@@ -13,24 +13,22 @@ class ChowChooserEngine {
 		// uncomment the following line to see results of example query - sorry it breaks page formatting!
 		//$this->example_query();
 
-		if (isset($_POST['login'])) {
-         $id = $this->db->getUserIdWithCredentials($_POST['email'], $_POST['password']);
-         if (is_null($id)) {
-            echo "Failed to log in: incorrect credentials";
+      if (isset($_POST['login'])) {
+         $user = $this->db->getUserFromCredentials($_POST['email'], $_POST['password']);
+         if (is_null($user)) {
+            echo "Failed to log in: invalid credentials";
             $this->welcome();
             return;
          }
-         // doesn't return anything,
-         // just updates the persistent session
-         $_SESSION['userId'] = $id;
-
-      } else if (isset($_POST['createUser'])) {
-         $user = new User;
-         $this->db->createUser($_POST['email'], $_POST['password']);
-
-		} else if (isset($_POST['logout'])) {
+         $_SESSION['user'] = $user;
+         // TODO ↓ will redirect to the "View Lobbies" page probably
+         $this->welcome();
+         return;
+      } else if (isset($_POST['logout'])) {
          session_unset();
-		}
+      } else if (isset($_POST['createUser'])) {
+         $this->db->createUser($_POST['email'], $_POST['password']);
+      }
 		
 		$orderKeyExists = key_exists("orderKey", $_POST);
 		$actionKeyExists = key_exists("action", $_POST);
@@ -56,9 +54,6 @@ class ChowChooserEngine {
 					case "resetPassword":
 							echo $user->resetPassword();
 						break;
-					case "logout":
-							echo $user->logout();
-						break;
 					default: 
 						// if it is not, we're going to check for an orderKey
 						if ($orderKeyExists) {
@@ -81,11 +76,11 @@ class ChowChooserEngine {
 		$swapArray['warningMessage'] = "" . $warning == "" ? "" : $warning . "<br /><br />";
 
       // login form changes to logout form if user is logged in
-      if (!isset($_SESSION['userId'])) {
+      if (!isset($_SESSION['user'])) {
          $swapArray['loginLogoutForm'] = $this->load_template("loginForm");
       } else {
          $swapArray['loginLogoutForm'] = $this->load_template("logoutForm");
-         $swapArray['userId'] = $_SESSION['userId'];
+         $swapArray['userId'] = $_SESSION['user']->getId();
       }
 
 		echo $this->load_template("welcome", $swapArray);
