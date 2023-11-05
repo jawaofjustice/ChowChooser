@@ -3,39 +3,46 @@ require_once "classes/FoodItem.php";
 require_once "classes/User.php";
 require_once "classes/Database.php";
 
-#[AllowDynamicProperties]
 class ChowChooserEngine {
+
+   private Database $db;
 	
 	function __construct() {
-		$this->db = Database::connect();
+		$this->db = new Database();
 		
 		// uncomment the following line to see results of example query - sorry it breaks page formatting!
 		//$this->example_query();
+
+		if (isset($_POST['login'])) {
+         $id = $this->db->getUserIdWithCredentials($_POST['email'], $_POST['password']);
+         if (is_null($id)) {
+            echo "Failed to log in: incorrect credentials";
+            $this->welcome();
+            return;
+         }
+         // doesn't return anything,
+         // just updates the persistent session
+         $_SESSION['userId'] = $id;
+
+      } else if (isset($_POST['createUser'])) {
+         $user = new User;
+         $this->db->createUser($_POST['email'], $_POST['password']);
+
+		} else if (isset($_POST['logout'])) {
+         session_unset();
+		}
 		
 		$orderKeyExists = key_exists("orderKey", $_POST);
 		$actionKeyExists = key_exists("action", $_POST);
 
-		if (isset($_POST['login'])) {
-         $user = new User;
-         $user->login($_POST['email'], $_POST['password']);
-		} else if (isset($_POST['createUser'])) {
-         $user = new User;
-         $user->createUser($_POST['email'], $_POST['password']);
-		} else if (isset($_POST['logout'])) {
-         // trying to logout through a User method wasn't working,
-         // this is fine anyway
-         session_unset();
-		}
-
 		if(!$orderKeyExists && !$actionKeyExists) {
 			// no action or orderKey means we're going to the welcome page
 			$this->welcome();
-      } else if (isset($_POST['login'])) {
-         $user = new User;
-         $user->login($_POST['email'], $_POST['password']);
+
 		} else if ($orderKeyExists && !$actionKeyExists) {
 			// orderKey exists but no actionKey mean swe're going to the view order page
 			$this->view_order($_POST['orderKey']);
+
 		} else if ($actionKeyExists) {
 			// if we have an action key, we're going to now check if it's value is start_new:
 				switch ($_POST['action']) {
@@ -71,13 +78,16 @@ class ChowChooserEngine {
 	function welcome($warning = null) {
 		$swapArray['testMessage'] = "This is a message to swap into our template."; // this will replace the tag {{testMessage}} in the template welcome.html
       
-      // tests session
-      if (isset($_SESSION['id'])) {
-         $swapArray['testMessage'] .= $_SESSION['id'];
+		$swapArray['warningMessage'] = "" . $warning == "" ? "" : $warning . "<br /><br />";
+
+      // login form changes to logout form if user is logged in
+      if (!isset($_SESSION['userId'])) {
+         $swapArray['loginLogoutForm'] = $this->load_template("loginForm");
+      } else {
+         $swapArray['loginLogoutForm'] = $this->load_template("logoutForm");
+         $swapArray['userId'] = $_SESSION['userId'];
       }
 
-		$swapArray['warningMessage'] = "" . $warning == "" ? "" : $warning . "<br /><br />";
-		$swapArray['loginForm'] = $this->load_template("loginForm"); //using load template to insert a subtemplate
 		echo $this->load_template("welcome", $swapArray);
 	}
 	
@@ -124,16 +134,17 @@ class ChowChooserEngine {
 		$fileLocation = "templates/" . $fileName . ".html";
 		$file = fopen($fileLocation, "r") or die("Could not load file!");
 		$contents = fread($file, filesize($fileLocation));
-		
-		// now we're going to iterate through our $swapArray to replace any {{tags}} in the template
-		
-		if ($swapArray != null) {
-			foreach ($swapArray as $key => $value) {
-				$contents = str_replace("{{".$key."}}", $value, $contents);
-			}
-		}
-		return $contents;
-	}
+
+      if ($swapArray == null) {
+         return $contents;
+      }
+
+      foreach ($swapArray as $key => $value) {
+         $contents = str_replace("{{".$key."}}", $value, $contents);
+      }
+
+      return $contents;
+   }
 
 	function handle_order_actions() {
 		echo "this is where we handle in-order actions!";
