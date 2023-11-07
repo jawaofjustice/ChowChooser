@@ -134,6 +134,10 @@ class ChowChooserEngine {
 
    function open_view_lobbies_page(): void {
       $swapArray['userId'] = $_SESSION['user']->getId();
+      // TODO getUsersLobbies returns an array of Lobby instances, and
+      // I call some printLobbies($arrayOfLobbies) function
+      // for easy customization of display and stuff
+      $this->db->getUsersLobbies($_SESSION['user']->getId());
       echo $this->load_template("view_lobbies", $swapArray);
       return;
    }
