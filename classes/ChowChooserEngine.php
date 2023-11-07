@@ -1,13 +1,22 @@
 <?php
+require_once "classes/Database.php";
 require_once "classes/FoodItem.php";
 require_once "classes/User.php";
-require_once "classes/Database.php";
 
 class ChowChooserEngine {
 
    private Database $db;
 	
 	function __construct() {
+
+      // direct user to the welcome page if user
+      // isn't logged in and isn't actively trying to log in,
+      // such as when visiting the site for the first time
+      if (empty($_SESSION) && !isset($_POST['login'])) {
+         $this->welcome();
+         return;
+      }
+
 		$this->db = new Database();
 		
 		// uncomment the following line to see results of example query - sorry it breaks page formatting!
@@ -21,13 +30,20 @@ class ChowChooserEngine {
             return;
          }
          $_SESSION['user'] = $user;
-         // TODO ↓ will redirect to the "View Lobbies" page probably
-         $this->welcome();
+         $this->open_view_lobbies_page();
          return;
       } else if (isset($_POST['logout'])) {
          session_unset();
-      } else if (isset($_POST['createUser'])) {
-         $this->db->createUser($_POST['email'], $_POST['password']);
+      } else if (isset($_POST['createAccount'])) {
+         $this->db->createAccount($_POST['email'], $_POST['password']);
+      }
+
+      // direct user to View Lobbies page if they are
+      // logged in and have not submitted an action,
+      // such as when they log in -> close the tab -> open the tab
+      if (array_key_exists('user', $_SESSION)) {
+         $this->open_view_lobbies_page();
+         return;
       }
 		
 		$orderKeyExists = key_exists("orderKey", $_POST);
@@ -115,7 +131,13 @@ class ChowChooserEngine {
          echo $this->load_template("view_order", ["foodItemsString" => $foodItemsString]);
       }
 	}
-	
+
+   function open_view_lobbies_page(): void {
+      $swapArray['userId'] = $_SESSION['user']->getId();
+      echo $this->load_template("view_lobbies", $swapArray);
+      return;
+   }
+
 	function start_new_order() {
 		echo $this->view_order($this->generate_key());
 	}

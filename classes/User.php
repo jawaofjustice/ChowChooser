@@ -12,7 +12,7 @@ class User {
 		$this->db = new Database();
 	}
 
-   public function getID(): int {
+   public function getId(): int {
       return $this->id;
    }
 
@@ -28,10 +28,6 @@ class User {
 		return "this is resetting a password";
 	}
 
-   public static function login($email, $password) {
-      echo "Yeah";
-   }
-	
 }
 
 ?>
