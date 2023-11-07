@@ -30,7 +30,7 @@ class ChowChooserEngine {
 				return;
 			}
 			$_SESSION['user'] = $user;
-			$this->open_view_lobbies_page();
+			$this->main_menu();
 			return;
 		} else if (isset($_POST['logout'])) {
 			session_unset();
@@ -42,7 +42,7 @@ class ChowChooserEngine {
 		// logged in and have not submitted an action,
 		// such as when they log in -> close the tab -> open the tab
 		if (array_key_exists('user', $_SESSION)) {
-			$this->open_view_lobbies_page();
+			$this->main_menu();
 			return;
 		}
 
@@ -132,7 +132,7 @@ class ChowChooserEngine {
 		}
 	}
 
-	function open_view_lobbies_page(): void {
+	function main_menu(): void {
 		$swapArray['userId'] = $_SESSION['user']->getId();
 		// TODO getUsersLobbies returns an array of Lobby instances, and
 		// I call some printLobbies($arrayOfLobbies) function
