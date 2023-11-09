@@ -1,0 +1,4 @@
+#!/bin/bash 
+now=`echo $(date +"%Y_%m_%d_%X") | tr : .`
+file=$HOME"/Projects/wcc/ChowChooser/sql/chow_chooser.backup.$now.sql"
+mysqldump -u 'chowChooserAdmin' --password=$CHOWCHOOSER_P --no-tablespaces --add-drop-database --databases 'chow_chooser' > "$file"
