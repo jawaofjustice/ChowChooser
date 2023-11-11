@@ -22,6 +22,11 @@ class ChowChooserEngine {
 		// uncomment the following line to see results of example query - sorry it breaks page formatting!
 		//$this->example_query();
 
+		if(isset($_GET['gotolobby'])) {
+			$this->test();
+			return;
+		}
+
 		if (isset($_POST['login'])) {
 			$user = $this->db->getUserFromCredentials($_POST['email'], $_POST['password']);
 			if (is_null($user)) {
@@ -63,13 +68,16 @@ class ChowChooserEngine {
 				case "start_new": 
 					// if it is, we're going to generate an orderKey and make a new order, then direct user to view that order
 					$this->start_new_order();
-				break;
+					break;
 				case "editUser":
 					echo $user->editUser();
-				break;
+					break;
 				case "resetPassword":
 					echo $user->resetPassword();
-				break;
+					break;
+				case "test":
+					$this->test();
+					break;
 				default: 
 				// if it is not, we're going to check for an orderKey
 				if ($orderKeyExists) {
@@ -99,6 +107,7 @@ class ChowChooserEngine {
 			$swapArray['userId'] = $_SESSION['user']->getId();
 		}
 
+		//echo getenv('CHOWCHOOSER_P');
 		echo $this->load_template("welcome", $swapArray);
 	}
 
@@ -134,11 +143,20 @@ class ChowChooserEngine {
 
 	function main_menu(): void {
 		$swapArray['userId'] = $_SESSION['user']->getId();
+		$swapArray['lobbies'] = "a long string of html";
+
+		$lobbyString = "";
+
+		//for() {
+		//	$lobbyString .= '<form action="" method="post">
+		//	<input type="hidden" name="lobbyid" value="'.
+		//}
 		// TODO getUsersLobbies returns an array of Lobby instances, and
 		// I call some printLobbies($arrayOfLobbies) function
 		// for easy customization of display and stuff
 		$this->db->getUsersLobbies($_SESSION['user']->getId());
-		echo $this->load_template("view_lobbies", $swapArray);
+		
+		echo $this->load_template("main_menu", $swapArray);
 		return;
 	}
 
@@ -178,5 +196,11 @@ class ChowChooserEngine {
 		// printing the array of results, or we can foreach loop through them
 		echo "Here's our db results: ".print_r($results);
 	}
+
+	function test() {
+		$swapArray["test"] = $_POST['lobbyid'];
+		echo $this->load_template("lobby_completed", $swapArray);
+	}
+
 }
 ?>

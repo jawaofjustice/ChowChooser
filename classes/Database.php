@@ -2,17 +2,20 @@
 
 class Database {
 
-	private mysqli $mysqli;
+	private \mysqli $mysqli;
 
 	function __construct() {
+		
 		$pass = getenv('CHOWCHOOSER_P');
+		$pass = "devTeam2023!";
+		
 		$this->mysqli = new mysqli("localhost","chowChooserAdmin",$pass,"chow_chooser");
 
 		if ($this->mysqli->connect_errno) {
 			echo "Failed to connect to MySQL: " . $this->mysqli->connect_error;
 			exit();
 		}
-		return $this;
+		//return $this;
 	}
 
 	public function getUserFromCredentials(string $email, string $password): User|null {

@@ -8,6 +8,16 @@
 	<body>
 		<h1>Hello, User {{userId}}!</h1>
 		<p>You are looking at the "View Lobbies" page!</p>
+
+		{{lobbies}}
+
+		<a href="index.php?gotolobby=something">Test lobby</a>
+
+		<form action="" method="post">
+			<input type="hidden" name="lobbyid" value="1"/>
+			<input type="submit" name="gotolobby" id="test" value="Test Button" style="display: inline" />
+		</form>
+		
 		<div class="logout" id="logout">
 			<form action="" method="post">
 				<input type="submit" name="logout" id="logout" value="Log out" style="display: inline" />
