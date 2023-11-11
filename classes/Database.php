@@ -18,6 +18,12 @@ class Database {
 		//return $this;
 	}
 
+	public function __get($property) {
+		if (property_exists($this, $property)) {
+            return $this->$property;
+        }
+	}
+
 	public function getUserFromCredentials(string $email, string $password): User|null {
 		// when creating an account, we're only concerned with finding
 		// accounts with the inputted email (emails should be unique)
@@ -42,7 +48,7 @@ class Database {
 
 	public function getUsersLobbies(int $id) {
 		/* $statement = $this->mysqli->prepare("select * from lobby as l inner join lobby_user as lu on l.id = lu.lobby_id where lu.user_id = (?)"); */
-		$statement = $this->mysqli->prepare("select * from lobby where lobby.admin_id = (?)");
+        $statement = $this->mysqli->prepare("select * from lobby where lobby.admin_id = (?)");
 		$statement->bind_param('s', $id);
 		$statement->execute();
 		/* $lobbies = mysqli_fetch_assoc($statement->get_result()); */
