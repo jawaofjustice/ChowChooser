@@ -24,15 +24,6 @@ class ChowChooserEngine {
 		// uncomment the following line to see results of example query - sorry it breaks page formatting!
 		//$this->example_query();
 
-		if(isset($_GET['showlobby'])) {
-			if($_GET['showlobby'] == 'back') {
-				$this->main_menu();
-				return;
-			}
-			$this->view_lobby();
-			return;
-		}
-
 		if (isset($_POST['login'])) {
 			$user = User::getUserFromCredentials($_POST['email'], $_POST['password']);
 			if (is_null($user)) {
@@ -81,7 +72,7 @@ class ChowChooserEngine {
 
 		} else if ($actionKeyExists) {
 			// if we have an action key, we're going to now check if it's value is start_new:
-			switch ($_POST['action']) {
+			switch ($actionKey) {
 				case "start_new": 
 					// if it is, we're going to generate an orderKey and make a new order, then direct user to view that order
 					$this->start_new_order();
@@ -92,6 +83,14 @@ class ChowChooserEngine {
 				case "resetPassword":
 					echo $user->resetPassword();
 					break;
+				case "showlobby":
+					//lobby id will be passed in _GET['lobby']
+					$this->view_lobby();
+					break;
+				case "main":
+					//easy way to navigate to main menu
+					$this->main_menu();
+					break;
 				default: 
 				// if it is not, we're going to check for an orderKey
 				if ($orderKeyExists) {
@@ -99,6 +98,7 @@ class ChowChooserEngine {
 					// here we handle actions for the order
 				} else {
 					// we cannot handle actions without an order key, show welcome / error page
+					echo $_POST['action'].'<br>'.$_GET['action'].'<br>';
 					echo "this is an error page :(";
 				}
 			}
@@ -207,9 +207,9 @@ class ChowChooserEngine {
 
 	function view_lobby() {
 
-		$swapArray['lobbyId'] = $_GET['showlobby'];
+		$swapArray['lobbyId'] = $_GET['lobby'];
 		
-		$lobby = Lobby::getLobbyFromDatabase($_GET['showlobby']);
+		$lobby = Lobby::getLobbyFromDatabase($_GET['lobby']);
 
 		$swapArray['votingEndTime'] = $lobby->getVotingEndTime();
 		$swapArray['orderingEndTime'] = $lobby->getOrderingEndTime();
