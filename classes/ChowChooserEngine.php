@@ -34,7 +34,7 @@ class ChowChooserEngine {
 		}
 
 		if (isset($_POST['login'])) {
-			$user = $this->db->getUserFromCredentials($_POST['email'], $_POST['password']);
+			$user = User::getUserFromCredentials($_POST['email'], $_POST['password']);
 			if (is_null($user)) {
 				echo "Failed to log in: invalid credentials";
 				$this->welcome();
