@@ -77,11 +77,11 @@ class ChowChooserEngine {
 
 		} else if ($orderKeyExists && !$actionKeyExists) {
 			// orderKey exists but no actionKey mean swe're going to the view order page
-			$this->view_order($_POST['orderKey']);
+			$this->view_order($orderKey);
 
 		} else if ($actionKeyExists) {
 			// if we have an action key, we're going to now check if it's value is start_new:
-			switch ($_POST['action']) {
+			switch ($actionKey) {
 				case "start_new": 
 					// if it is, we're going to generate an orderKey and make a new order, then direct user to view that order
 					$this->start_new_order();
