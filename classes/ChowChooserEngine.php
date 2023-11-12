@@ -49,16 +49,27 @@ class ChowChooserEngine {
 			$this->db->createAccount($_POST['email'], $_POST['password']);
 		}
 
+		
+
+		$orderKey = "";
+		$actionKey = "";
+		$orderKeyExists = key_exists("orderKey", $_POST) || key_exists("orderKey", $_GET);
+		$actionKeyExists = key_exists("action", $_POST) || key_exists("action", $_GET);
+
+		if ($orderKeyExists) {
+			$orderKey = key_exists("orderKey", $_POST) ? $_POST['orderKey'] : $_GET['orderKey'];
+		}
+		if ($actionKeyExists) {
+			$actionKey = key_exists("action", $_POST) ? $_POST['action'] : $_GET['action'];
+		}
+		
 		// direct user to View Lobbies page if they are
 		// logged in and have not submitted an action,
 		// such as when they log in -> close the tab -> open the tab
-		if (array_key_exists('user', $_SESSION)) {
+		if (array_key_exists('user', $_SESSION) && !$actionKeyExists) {
 			$this->main_menu();
 			return;
 		}
-
-		$orderKeyExists = key_exists("orderKey", $_POST);
-		$actionKeyExists = key_exists("action", $_POST);
 
 		if(!$orderKeyExists && !$actionKeyExists) {
 			// no action or orderKey means we're going to the welcome page
