@@ -2,11 +2,11 @@
 require_once "classes/Database.php";
 require_once "classes/FoodItem.php";
 require_once "classes/User.php";
+require_once "classes/Order.php";
 
 class ChowChooserEngine {
 
-	private Database $db;
-
+	
 	function __construct() {
 
 		// direct user to the welcome page if user
@@ -38,38 +38,55 @@ class ChowChooserEngine {
 			$this->db->createAccount($_POST['email'], $_POST['password']);
 		}
 
+		
+		$orderKey = "";
+		$actionKey = "";
+		$orderKeyExists = key_exists("orderKey", $_POST) || key_exists("orderKey", $_GET);
+		$actionKeyExists = key_exists("action", $_POST) || key_exists("action", $_GET);
+
+		if ($orderKeyExists) {
+			$orderKey = key_exists("orderKey", $_POST) ? $_POST['orderKey'] : $_GET['orderKey'];
+		}
+		if ($actionKeyExists) {
+			$actionKey = key_exists("action", $_POST) ? $_POST['action'] : $_GET['action'];
+		}
+		
 		// direct user to View Lobbies page if they are
 		// logged in and have not submitted an action,
 		// such as when they log in -> close the tab -> open the tab
-		if (array_key_exists('user', $_SESSION)) {
+		if (array_key_exists('user', $_SESSION) && !$actionKeyExists) {
 			$this->main_menu();
 			return;
 		}
-
-		$orderKeyExists = key_exists("orderKey", $_POST);
-		$actionKeyExists = key_exists("action", $_POST);
-
 		if(!$orderKeyExists && !$actionKeyExists) {
 			// no action or orderKey means we're going to the welcome page
 			$this->welcome();
 
 		} else if ($orderKeyExists && !$actionKeyExists) {
 			// orderKey exists but no actionKey mean swe're going to the view order page
-			$this->view_order($_POST['orderKey']);
+			$this->view_order($orderKey);
 
 		} else if ($actionKeyExists) {
 			// if we have an action key, we're going to now check if it's value is start_new:
-			switch ($_POST['action']) {
+			switch ($actionKey) {
 				case "start_new": 
 					// if it is, we're going to generate an orderKey and make a new order, then direct user to view that order
 					$this->start_new_order();
-				break;
+					break;
 				case "editUser":
 					echo $user->editUser();
-				break;
+					break;
 				case "resetPassword":
 					echo $user->resetPassword();
-				break;
+					break;
+				case "viewPlaceOrderSample":
+					$order = new Order();
+					$order->viewAddOrderItem();
+					break;
+				case "processAddOrderItem":
+					$order = new Order();
+					$order->processAddOrderItem();
+					break;
 				default: 
 				// if it is not, we're going to check for an orderKey
 				if ($orderKeyExists) {
@@ -151,7 +168,7 @@ class ChowChooserEngine {
 		return md5($KEY_SALT.md5(date("Y-m-d h:i:sa"))); # the string after this date function is just specifying a format for how the date will output
 	}
 
-	function load_template($fileName, $swapArray = null) {
+	public static function load_template($fileName, $swapArray = null) {
 		$fileLocation = "templates/" . $fileName . ".html";
 		$file = fopen($fileLocation, "r") or die("Could not load file!");
 		$contents = fread($file, filesize($fileLocation));
@@ -167,9 +184,6 @@ class ChowChooserEngine {
 		return $contents;
 	}
 
-	function handle_order_actions() {
-		echo "this is where we handle in-order actions!";
-	}
 
 	function example_query() {
 		$response = $this->db->query("describe lobbies;");

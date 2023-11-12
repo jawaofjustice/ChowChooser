@@ -27,7 +27,6 @@ class User {
 	function resetPassword() {
 		return "this is resetting a password";
 	}
-
 }
 
 ?>

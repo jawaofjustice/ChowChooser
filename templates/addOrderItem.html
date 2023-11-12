@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" type="text/css" href="style.css" />
+		<title>ChowChooser - {{pageTitle}}</title>
+	</head>
+	<body>
+
+		{{loginLogoutForm}}
+
+		<table>
+			<tr>
+				<th colspan="2">					
+					{{pageTitle}}
+					<br />
+				</th>
+			</tr>
+			
+			<tr>
+				<td colspan="2">
+					<span class="warningMessage">{{warningMessage}}</span>
+					
+				</td>
+			</tr>
+			
+			<tr>
+				<td>
+					<table>
+						<tr>
+							<th>
+								your order so far
+							</th>
+						</tr>
+						<tr>
+							<td>
+								{{existingOrderItems}}
+							</td>
+						</tr>
+					</table>
+					
+				</td>
+				<td>
+					<form action="index.php" method="post">
+						<input type="hidden" name="action" value="processAddOrderItem" />
+						<table>
+							<tr>
+								<th>
+									Select something to add to your order
+								</th>
+							</tr>
+							<tr>
+								<td>
+									
+									{{listOfItemsToSelectFrom}}
+									
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<input type="submit" value="Submit" />
+									
+								</td>
+							</tr>
+						</table>
+					</form>
+				</td>
+			</tr>
+		</table>
+		
+	</body>
+</html>
