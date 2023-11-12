@@ -1,0 +1,54 @@
+﻿Main Menu
+
+
+-Access database to display lobbies associated with user
+        -Generate these as links
+-Button that takes you to lobby creation
+
+
+Create Lobby
+
+
+-At some point on this page, the lobby code will be generated 
+-Date/time input for voting time
+        -Option to skip voting?
+-Date/time input for ordering time
+-Access to database to populate list of restaurants (later might be api call)
+-Way to search/add restaurants
+-Submit button that takes you to “Invite Participants” page
+-This button will write to database
+
+
+
+
+Invite Participants
+
+
+-Input field/button to add participants
+-Submit button that takes you to the newly created lobby
+        -This button will send the emails with links
+-Potential loading page if the emails take long?
+
+
+View Lobby (Voting)
+
+
+-Pull from database to access/display votes
+-Displays restaurants ordered by number of votes
+-Voting system (to be updated after meeting)
+-Timer that shows when voting is over
+
+
+View Lobby (Ordering)
+
+
+-Header that shows what restaurant was picked
+-Displays your current order
+-Option to edit order if one has been made
+-Button to place order
+
+
+Place Order
+
+
+To be figured out depending on restaurant data/api responses

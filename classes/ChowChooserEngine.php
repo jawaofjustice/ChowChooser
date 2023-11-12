@@ -2,6 +2,8 @@
 require_once "classes/Database.php";
 require_once "classes/FoodItem.php";
 require_once "classes/User.php";
+require_once "classes/Lobby.php";
+require_once "classes/Restaurant.php";
 
 class ChowChooserEngine {
 
@@ -21,6 +23,15 @@ class ChowChooserEngine {
 
 		// uncomment the following line to see results of example query - sorry it breaks page formatting!
 		//$this->example_query();
+
+		if(isset($_GET['showlobby'])) {
+			if($_GET['showlobby'] == 'back') {
+				$this->main_menu();
+				return;
+			}
+			$this->view_lobby();
+			return;
+		}
 
 		if (isset($_POST['login'])) {
 			$user = User::getUserFromCredentials($_POST['email'], $_POST['password']);
@@ -63,13 +74,13 @@ class ChowChooserEngine {
 				case "start_new": 
 					// if it is, we're going to generate an orderKey and make a new order, then direct user to view that order
 					$this->start_new_order();
-				break;
+					break;
 				case "editUser":
 					echo $user->editUser();
-				break;
+					break;
 				case "resetPassword":
 					echo $user->resetPassword();
-				break;
+					break;
 				default: 
 				// if it is not, we're going to check for an orderKey
 				if ($orderKeyExists) {
@@ -99,6 +110,7 @@ class ChowChooserEngine {
 			$swapArray['userId'] = $_SESSION['user']->getId();
 		}
 
+		//echo getenv('CHOWCHOOSER_P');
 		echo $this->load_template("welcome", $swapArray);
 	}
 
@@ -134,11 +146,14 @@ class ChowChooserEngine {
 
 	function main_menu(): void {
 		$swapArray['userId'] = $_SESSION['user']->getId();
+		$swapArray['lobbies'] = "a long string of html that will represent the lobbies the user is in";
+
 		// TODO getUsersLobbies returns an array of Lobby instances, and
 		// I call some printLobbies($arrayOfLobbies) function
 		// for easy customization of display and stuff
 		$this->db->getUsersLobbies($_SESSION['user']->getId());
-		echo $this->load_template("view_lobbies", $swapArray);
+		
+		echo $this->load_template("main_menu", $swapArray);
 		return;
 	}
 
@@ -178,5 +193,67 @@ class ChowChooserEngine {
 		// printing the array of results, or we can foreach loop through them
 		echo "Here's our db results: ".print_r($results);
 	}
+
+	function view_lobby() {
+
+		$swapArray['lobbyId'] = $_GET['showlobby'];
+		
+		$lobby = new Lobby($this->db);
+		$lobby->getLobbyFromDatabase($_GET['showlobby']);
+
+		$swapArray['votingEndTime'] = $lobby->getVotingEndTime();
+		$swapArray['orderingEndTime'] = $lobby->getOrderingEndTime();
+
+		switch ($lobby->getStatusId()) {
+			case '1':
+				//Lobby status: VOTING
+
+				//$restaurant = new Restaurant($this->db);
+				//$restaurant->getRestaurantFromDatabase(1);
+				//$swapArray['restaurants'] = $restaurant->name;
+				/*
+				$restaurantArray = $lobby->getRestaurants();
+				foreach ($restaurantArray as $i) {
+					$restaurant = new Restaurant($this->db);
+					$restaurant->getRestaurantFromDatabase($i['restaurant_id']);
+					$restaurants[] = $restaurant;
+				}
+				print_r($restaurants);
+				*/
+				$restaurantsSwapValue = '';
+
+				$restaurantArray = $lobby->getRestaurants();
+				foreach ($restaurantArray as $i) {
+					//print_r($i['restaurant_id']);
+					$restaurant = new Restaurant($this->db);
+					$restaurant->getRestaurantFromDatabase($i['restaurant_id']);
+
+					$restaurantsSwapValue .= '<li>'.$restaurant->name.'</li>';
+					//echo '<br>';
+					//echo $restaurant->name;
+					//echo '<br>';
+				}
+				//echo $restaurantsSwapValue;
+				$swapArray['restaurants'] = $restaurantsSwapValue;
+
+				echo $this->load_template('lobby_voting', $swapArray);
+				break;
+			case '2':
+				//Lobby status: ORDERING
+				echo $this->load_template('lobby_ordering', $swapArray);
+				break;
+			case '3':
+				//Lobby status: COMPLETED
+				echo $this->load_template("lobby_completed", $swapArray);
+				break;
+			default:
+				//TODO actually handle this error
+				echo 'statusId = '.$lobby->getStatusId().'. It should not reach this point';
+				break;
+			}
+		//echo 'id: '.$lobby->getId().' admin: '.$lobby->getAdminId().' name: '.$lobby->getName().' status: '.$lobby->getStatusId();
+		
+	}
+
 }
 ?>

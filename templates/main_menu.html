@@ -8,6 +8,13 @@
 	<body>
 		<h1>Hello, User {{userId}}!</h1>
 		<p>You are looking at the "View Lobbies" page!</p>
+
+		{{lobbies}}<br><br>
+
+		<a href="index.php?showlobby=1">Test lobby status 1</a><br>
+		<a href="index.php?showlobby=2">Test lobby status 2</a><br>
+		<a href="index.php?showlobby=3">Test lobby status 3</a><br>
+		
 		<div class="logout" id="logout">
 			<form action="" method="post">
 				<input type="submit" name="logout" id="logout" value="Log out" style="display: inline" />
