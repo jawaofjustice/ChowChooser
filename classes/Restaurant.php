@@ -32,9 +32,6 @@ class Restaurant {
 
         return new Restaurant($db, $restaurantArray['id'], $restaurantArray['name']);
 
-        $this->id = $restaurantArray['id'];
-        $this->name = $restaurantArray['name'];
-
     }
 
 }
