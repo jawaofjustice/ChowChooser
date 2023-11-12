@@ -35,6 +35,18 @@ class Lobby {
         $this->status_id = $lobbyArray['status_id'];
 
     }
+
+    public function getRestaurants(): Array {
+        $statement = $this->db->mysqli->prepare('select restaurant_id from lobby_restaurant where lobby_restaurant.lobby_id = (?)');
+        $statement->bind_param('s', $this->id);
+        $statement->execute();
+
+        foreach ($statement->get_result() as $restaurant) {
+            $restaurants[] = $restaurant;
+        }
+
+        return $restaurants;
+    }
     
     public function getId() {
         return $this->id;

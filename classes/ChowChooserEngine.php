@@ -3,6 +3,7 @@ require_once "classes/Database.php";
 require_once "classes/FoodItem.php";
 require_once "classes/User.php";
 require_once "classes/Lobby.php";
+require_once "classes/Restaurant.php";
 
 class ChowChooserEngine {
 
@@ -206,6 +207,35 @@ class ChowChooserEngine {
 		switch ($lobby->getStatusId()) {
 			case '1':
 				//Lobby status: VOTING
+
+				//$restaurant = new Restaurant($this->db);
+				//$restaurant->getRestaurantFromDatabase(1);
+				//$swapArray['restaurants'] = $restaurant->name;
+				/*
+				$restaurantArray = $lobby->getRestaurants();
+				foreach ($restaurantArray as $i) {
+					$restaurant = new Restaurant($this->db);
+					$restaurant->getRestaurantFromDatabase($i['restaurant_id']);
+					$restaurants[] = $restaurant;
+				}
+				print_r($restaurants);
+				*/
+				$restaurantsSwapValue = '';
+
+				$restaurantArray = $lobby->getRestaurants();
+				foreach ($restaurantArray as $i) {
+					//print_r($i['restaurant_id']);
+					$restaurant = new Restaurant($this->db);
+					$restaurant->getRestaurantFromDatabase($i['restaurant_id']);
+
+					$restaurantsSwapValue .= '<li>'.$restaurant->name.'</li>';
+					//echo '<br>';
+					//echo $restaurant->name;
+					//echo '<br>';
+				}
+				//echo $restaurantsSwapValue;
+				$swapArray['restaurants'] = $restaurantsSwapValue;
+
 				echo $this->load_template('lobby_voting', $swapArray);
 				break;
 			case '2':
@@ -218,7 +248,7 @@ class ChowChooserEngine {
 				break;
 			default:
 				//TODO actually handle this error
-				echo 'there is something messed up. It should not reach this point';
+				echo 'statusId = '.$lobby->getStatusId().'. It should not reach this point';
 				break;
 			}
 		//echo 'id: '.$lobby->getId().' admin: '.$lobby->getAdminId().' name: '.$lobby->getName().' status: '.$lobby->getStatusId();
