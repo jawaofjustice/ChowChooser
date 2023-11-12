@@ -49,7 +49,7 @@ class ChowChooserEngine {
 			$this->db->createAccount($_POST['email'], $_POST['password']);
 		}
 
-		//single comment
+		
 
 		$orderKey = "";
 		$actionKey = "";
@@ -209,8 +209,7 @@ class ChowChooserEngine {
 
 		$swapArray['lobbyId'] = $_GET['showlobby'];
 		
-		$lobby = new Lobby($this->db);
-		$lobby->getLobbyFromDatabase($_GET['showlobby']);
+		$lobby = Lobby::getLobbyFromDatabase($_GET['showlobby']);
 
 		$swapArray['votingEndTime'] = $lobby->getVotingEndTime();
 		$swapArray['orderingEndTime'] = $lobby->getOrderingEndTime();
@@ -236,8 +235,7 @@ class ChowChooserEngine {
 				$restaurantArray = $lobby->getRestaurants();
 				foreach ($restaurantArray as $i) {
 					//print_r($i['restaurant_id']);
-					$restaurant = new Restaurant($this->db);
-					$restaurant->getRestaurantFromDatabase($i['restaurant_id']);
+					$restaurant = Restaurant::getRestaurantFromDatabase($i['restaurant_id']);
 
 					$restaurantsSwapValue .= '<li>'.$restaurant->name.'</li>';
 					//echo '<br>';

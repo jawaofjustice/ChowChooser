@@ -11,31 +11,30 @@ class Lobby {
     private $status_id;
 
     //, $id, $admin_id, $name, $status_id
-    function __construct($db) {
+    function __construct($db, $id, $admin_id, $name, $votingEndTime, $orderingEndTime, $status_id) {
         $this->db = new Database();
-        //$this->id = $id;
-        //$this->admin_id = $admin_id;
-        //$this->name = $name;
-        //$this->status_id = $status_id;
+        $this->id = $id;
+        $this->admin_id = $admin_id;
+        $this->name = $name;
+        $this->votingEndTime = $votingEndTime;
+        $this->orderingEndTime = $orderingEndTime;
+        $this->status_id = $status_id;
     }
 
-    public function getLobbyFromDatabase(int $id) {
+    public static function getLobbyFromDatabase(int $id) {
+        $db = new Database();
 
-        $statement = $this->db->mysqli->prepare("select * from lobby where lobby.id = (?)");
+        $statement = $db->mysqli->prepare("select * from lobby where lobby.id = (?)");
 		$statement->bind_param('s', $id);
 		$statement->execute();
 
         $lobbyArray = mysqli_fetch_assoc($statement->get_result());
 
-        $this->id = $lobbyArray['id'];
-        $this->admin_id = $lobbyArray['admin_id'];
-        $this->name = $lobbyArray['name'];
-        $this->votingEndTime = $lobbyArray['voting_end_time'];
-        $this->orderingEndTime = $lobbyArray['ordering_end_time'];
-        $this->status_id = $lobbyArray['status_id'];
+        return new Lobby($db, $lobbyArray['id'], $lobbyArray['admin_id'], $lobbyArray['name'], $lobbyArray['voting_end_time'], $lobbyArray['ordering_end_time'], $lobbyArray['status_id']);
 
     }
 
+    //returns an array of arrays containing [restartant_id=?]
     public function getRestaurants(): Array {
         $statement = $this->db->mysqli->prepare('select restaurant_id from lobby_restaurant where lobby_restaurant.lobby_id = (?)');
         $statement->bind_param('s', $this->id);

@@ -6,8 +6,10 @@ class Restaurant {
     private $id;
     private $name;
 
-    public function __construct(Database $db) {
+    public function __construct(Database $db, $id, $name) {
         $this->db = $db;
+        $this->id = $id;
+        $this->name = $name;
     }
 
     public function __get($property) {
@@ -20,13 +22,15 @@ class Restaurant {
       //  return $this->name;
     //}
 
-    public function getRestaurantFromDatabase(int $id) {
-
-        $statement = $this->db->mysqli->prepare("select * from restaurant where restaurant.id = (?)");
+    public static function getRestaurantFromDatabase(int $id) {
+        $db = new Database();
+        $statement = $db->mysqli->prepare("select * from restaurant where restaurant.id = (?)");
 		$statement->bind_param('s', $id);
 		$statement->execute();
 
         $restaurantArray = mysqli_fetch_assoc($statement->get_result());
+
+        return new Restaurant($db, $restaurantArray['id'], $restaurantArray['name']);
 
         $this->id = $restaurantArray['id'];
         $this->name = $restaurantArray['name'];
