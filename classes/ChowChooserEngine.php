@@ -284,11 +284,11 @@ class ChowChooserEngine {
 
       // TODO consider for null voting end time
       if (empty($name) || empty($votingEndTime) || empty($orderingEndTime)) {
-         // redirect to main menu,
-         // as per POST-Redirect-GET design pattern
-         header("Location: ".$_SERVER['PHP_SELF']."?action=createLobby");
-         echo "One or more fields empty: could not create lobby";
-         return;
+         $swapArray['errorMsg'] = "Please enter data in all fields.";
+         echo $this->load_template("create_lobby", $swapArray);
+         // do not return to calling function, we have already
+         // handled all page logic
+         exit();
       }
 
       Lobby::createLobbyInDatabase($_POST["lobbyName"], $_POST["votingEndTime"], $_POST["orderingEndTime"]);
