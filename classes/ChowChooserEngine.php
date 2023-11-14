@@ -203,7 +203,7 @@ class ChowChooserEngine {
 
 
 	function example_query() {
-		$response = $this->db->query("describe lobbies;");
+		$response = $this->db->query("describe lobby;");
 		$results = $response->fetch_assoc();
 
 		// printing the array of results, or we can foreach loop through them
