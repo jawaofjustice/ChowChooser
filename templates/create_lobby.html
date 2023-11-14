@@ -12,17 +12,36 @@
 		<h1>Create a lobby</h1>
       <span id="errorMsg" style="color: red">{{errorMsg}}</span>
       <br>
-		<form action="" method="post">
-			<input type="hidden" name="createLobbyFormSubmitted" value="1" />
-			<label for="lobbyName">Lobby name</label>
-			<input id="lobbyName" name="lobbyName" type="text" />
-			<br>
-			<label for="votingEndTime">Voting time limit</label>
-			<input id="votingEndTime" name="votingEndTime" type="datetime-local" />
-			<br>
-			<label for="orderingEndTime">Ordering time limit</label>
-			<input id="orderingEndTime" name="orderingEndTime" type="datetime-local" />
-			<br>
-			<input type="submit" name="createLobby" id="submitLobbyForm" value="Create lobby" />
-		</form>
+      <form action="" method="post">
+         <input type="hidden" name="formSubmitted" value="1" />
+         <label for="lobbyName">Lobby name</label>
+         <input id="lobbyName" name="lobbyName" type="text" />
+         <br>
+         <label for="skipVoting">Skip voting phase</label>
+         <!-- "Skip voting" logic is inside the <script> element -->
+         <input id="skipVoting" name="skipVoting" type="checkbox" />
+         <br>
+         <label for="votingEndTime">Voting time limit</label>
+         <input id="votingEndTime" name="votingEndTime" type="datetime-local" />
+         <br>
+         <label for="orderingEndTime">Ordering time limit</label>
+         <input id="orderingEndTime" name="orderingEndTime" type="datetime-local" />
+         <br>
+         <input type="submit" name="createLobby" id="submitLobbyForm" value="Create lobby" />
+      </form>
 </html>
+<script>
+// this script enables/disables the "Voting end time" input
+// based on the status of the "Skip voting" checkbox
+
+const skipVoting = document.getElementById('skipVoting');
+const votingEndTime = document.getElementById('votingEndTime');
+
+skipVoting.addEventListener('change', function() {
+   if (this.checked) {
+      votingEndTime.disabled = true;
+   } else {
+      votingEndTime.disabled = false;
+   }
+});
+</script>
