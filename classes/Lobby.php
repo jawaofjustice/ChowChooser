@@ -101,8 +101,8 @@ class Lobby {
       $statement = $db->mysqli->prepare("
          insert into lobby
          (name, voting_end_time, ordering_end_time, admin_id, status_id) values
-         ( (?), (?), (?), (?), 1 );");
-      $statement->bind_param('sssi', $lobbyName, $votingEndTime, $orderingEndTime, $admin_id);
+         ( (?), (?), (?), (?), (?) );");
+      $statement->bind_param('sssii', $lobbyName, $votingEndTime, $orderingEndTime, $admin_id, $status_id);
 
       $statement->execute();
    }
