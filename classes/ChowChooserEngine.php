@@ -289,7 +289,7 @@ class ChowChooserEngine {
 
 		// if "skip voting" is enabled, then the voting end time is allowed to be null.
 		// if "skip voting" is disabled, voting end time must not be null
-		$votingFieldsAreValid = key_exists("skipVoting", $_POST) ? !empty($_POST['votingEndTime']) : !is_null($votingEndTime);
+		$votingFieldsAreValid = key_exists("skipVoting", $_POST) ? !empty($votingEndTime) : !is_null($votingEndTime);
 
 		if (empty($lobbyName) || $votingFieldsAreValid || empty($orderingEndTime)) {
 			// reload the "create lobby" form with an error message
