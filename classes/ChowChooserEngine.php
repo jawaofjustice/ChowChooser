@@ -89,6 +89,18 @@ class ChowChooserEngine {
 				case "editUser":
 					echo $user->editUser();
 					break;
+				case "createLobby":
+					if (isset($_POST['formSubmitted'])) {
+						$this->create_lobby();
+						// redirect to main menu as per POST-Redirect-GET
+						// design pattern in order to prevent duplicate
+						// form requests on refresh
+						header("Location: ".$_SERVER['PHP_SELF']);
+						break;
+					}
+					// user is navigating to the page, hasn't submitted the form
+					echo $this->load_template("create_lobby", ["errorMsg" => ""]);
+					break;
 				case "resetPassword":
 					echo $user->resetPassword();
 					break;
@@ -263,7 +275,35 @@ class ChowChooserEngine {
 				break;
 			}
 		//echo 'id: '.$lobby->getId().' admin: '.$lobby->getAdminId().' name: '.$lobby->getName().' status: '.$lobby->getStatusId();
-		
+
+	}
+
+	private function create_lobby() {
+		$lobbyName = $_POST["lobbyName"];
+		$doSkipVoting = empty($_POST["skipVoting"]);
+		$orderingEndTime = $_POST["orderingEndTime"];
+
+		// the voting end time is null if "skip voting" is enabled, which means
+		// the voting end time key is not sent in $_POST
+		$votingEndTime = key_exists('votingEndTime', $_POST) ? $_POST['votingEndTime'] : null;
+
+		// if "skip voting" is enabled, then the voting end time is allowed to be null.
+		// if "skip voting" is disabled, voting end time must not be null
+		$votingFieldsAreValid = key_exists("skipVoting", $_POST) ? !empty($votingEndTime) : !is_null($votingEndTime);
+
+		if (empty($lobbyName) || $votingFieldsAreValid || empty($orderingEndTime)) {
+			// reload the "create lobby" form with an error message
+			echo $this->load_template("create_lobby", ["errorMsg" => "Please enter data in all fields."]);
+			// do not return to calling function, we have already
+			// handled all page logic
+			exit();
+		}
+
+		Lobby::createLobbyInDatabase(
+			$lobbyName,
+			$votingEndTime,
+			$orderingEndTime
+		);
 	}
 
 }

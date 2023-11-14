@@ -8,7 +8,6 @@ class Database {
 	function __construct() {
 		
 		$pass = getenv('CHOWCHOOSER_P');
-		$pass = "devTeam2023!";
 		
 		$this->mysqli = new mysqli("localhost","chowChooserAdmin",$pass,"chow_chooser");
 
