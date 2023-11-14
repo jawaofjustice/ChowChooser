@@ -88,6 +88,17 @@ class Lobby {
         $this->status = $status;
      }
 
+	public static function createLobbyInDatabase(string $lobbyName, $votingEndTime, $orderingEndTime) {
+		$db = new Database();
+		$admin_id = $_SESSION['user']->getId();
+		$statement = $db->mysqli->prepare("
+			insert into lobby
+			(name, voting_end_time, ordering_end_time, admin_id, status_id) values
+			( (?), (?), (?), (?), 1 );");
+		$statement->bind_param('sssi', $lobbyName, $votingEndTime, $orderingEndTime, $admin_id);
+		$statement->execute();
+	}
+
 }
 
 ?>

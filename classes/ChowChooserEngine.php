@@ -89,6 +89,17 @@ class ChowChooserEngine {
 				case "editUser":
 					echo $user->editUser();
 					break;
+            case "createLobby":
+               if (isset($_POST['createLobbyFormSubmitted'])) {
+                  $this->create_lobby();
+                  // redirect to main menu,
+                  // as per POST-Redirect-GET design pattern
+                  header("Location: ".$_SERVER['PHP_SELF']);
+                  break;
+               }
+               $swapArray['errorMsg'] = "";
+					echo $this->load_template("create_lobby", $swapArray);
+					break;
 				case "resetPassword":
 					echo $user->resetPassword();
 					break;
@@ -265,6 +276,23 @@ class ChowChooserEngine {
 		//echo 'id: '.$lobby->getId().' admin: '.$lobby->getAdminId().' name: '.$lobby->getName().' status: '.$lobby->getStatusId();
 		
 	}
+
+   private function create_lobby() {
+      $name = $_POST["lobbyName"];
+      $votingEndTime = $_POST["votingEndTime"];
+      $orderingEndTime = $_POST["orderingEndTime"];
+
+      // TODO consider for null voting end time
+      if (empty($name) || empty($votingEndTime) || empty($orderingEndTime)) {
+         // redirect to main menu,
+         // as per POST-Redirect-GET design pattern
+         header("Location: ".$_SERVER['PHP_SELF']."?action=createLobby");
+         echo "One or more fields empty: could not create lobby";
+         return;
+      }
+
+      Lobby::createLobbyInDatabase($_POST["lobbyName"], $_POST["votingEndTime"], $_POST["orderingEndTime"]);
+   }
 
 }
 ?>
