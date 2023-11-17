@@ -262,7 +262,11 @@ class ChowChooserEngine {
 				echo $this->load_template('lobby_voting', $swapArray);
 				break;
 			case '2':
-				//Lobby status: ORDERING
+
+                // get a user's orders
+                $orders = Order::getOrdersFromUserId($_SESSION['user']->getId());
+
+                $swapArray['lobbyName'] = $lobby->getName();
 				echo $this->load_template('lobby_ordering', $swapArray);
 				break;
 			case '3':
