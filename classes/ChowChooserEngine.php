@@ -263,12 +263,21 @@ class ChowChooserEngine {
 				echo $this->load_template('lobby_voting', $swapArray);
 				break;
 			case '2':
+            $orders = Order::getOrdersFromUserAndLobby(
+               $_SESSION['user']->getId(), $lobby->getId()
+            );
 
-                // get a user's orders
-                $orders = Order::getOrdersFromUserId($_SESSION['user']->getId());
+            $orderDisplay = "<ul>";
+            foreach ($orders as $order) {
+               $food = FoodItem::getFoodItemFromId($order->getFoodId());
+               $orderDisplay .= "<li>".$order->quantity." ".$food->name."</li>";
+            }
+            $orderDisplay .= "</ul>";
 
-                $swapArray['lobbyName'] = $lobby->getName();
-				echo $this->load_template('lobby_ordering', $swapArray);
+            $swapArray['orderItems'] = $orderDisplay;
+
+            $swapArray['lobbyName'] = $lobby->getName();
+            echo $this->load_template('lobby_ordering', $swapArray);
 				break;
 			case '3':
 				//Lobby status: COMPLETED
