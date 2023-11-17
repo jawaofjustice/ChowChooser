@@ -49,8 +49,6 @@ class ChowChooserEngine {
 			$this->db->createAccount($_POST['email'], $_POST['password']);
 		}
 
-		
-
 		$orderKey = "";
 		$actionKey = "";
 		$orderKeyExists = key_exists("orderKey", $_POST) || key_exists("orderKey", $_GET);
@@ -169,13 +167,14 @@ class ChowChooserEngine {
 
 	function main_menu(): void {
 		$swapArray['userId'] = $_SESSION['user']->getId();
-		$swapArray['lobbies'] = "a long string of html that will represent the lobbies the user is in";
 
-		// TODO getUsersLobbies returns an array of Lobby instances, and
-		// I call some printLobbies($arrayOfLobbies) function
-		// for easy customization of display and stuff
-		$this->db->getUsersLobbies($_SESSION['user']->getId());
+		// TODO: Display more information about the lobby within the link
+		// If the user is an admin, display that (maybe as a star next to their userID)
+		// The status table contains information that may be helpful
+		$all_user_lobbies=$this->db->getUsersLobbies($_SESSION['user']->getId());
 		
+		$swapArray['lobbies'] = $all_user_lobbies;
+
 		echo $this->load_template("main_menu", $swapArray);
 		return;
 	}
