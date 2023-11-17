@@ -267,19 +267,19 @@ class ChowChooserEngine {
                $_SESSION['user']->getId(), $lobby->getId()
             );
 
-            $orderDisplay = "<ul>";
+            $orderDisplay = '<table style="text-align: left"><th>Quantity</th><th>Food</th><th>Order price</th>';
             $totalPrice = 0.0;
             foreach ($orders as $order) {
                $food = FoodItem::getFoodItemFromId($order->getFoodId());
                $orderPrice = $food->price * $order->quantity;
                $totalPrice += $orderPrice;
-               $orderDisplay .= "<li>"
-                  .$order->quantity." "
-                  .$food->name." "
-                  .$orderPrice
-                  ."</li>";
+               $orderDisplay .= "<tr><td>"
+                  .$order->quantity."</td><td>"
+                  .$food->name."</td><td>"
+                  .$orderPrice."</td>"
+                  ."</tr>";
             }
-            $orderDisplay .= "</ul>";
+            $orderDisplay .= "</table>";
 
             $swapArray['orderItems'] = $orderDisplay;
             $swapArray['lobbyName'] = $lobby->getName();
