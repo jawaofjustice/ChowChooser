@@ -268,15 +268,22 @@ class ChowChooserEngine {
             );
 
             $orderDisplay = "<ul>";
+            $totalPrice = 0.0;
             foreach ($orders as $order) {
                $food = FoodItem::getFoodItemFromId($order->getFoodId());
-               $orderDisplay .= "<li>".$order->quantity." ".$food->name."</li>";
+               $orderPrice = $food->price * $order->quantity;
+               $totalPrice += $orderPrice;
+               $orderDisplay .= "<li>"
+                  .$order->quantity." "
+                  .$food->name." "
+                  .$orderPrice
+                  ."</li>";
             }
             $orderDisplay .= "</ul>";
 
             $swapArray['orderItems'] = $orderDisplay;
-
             $swapArray['lobbyName'] = $lobby->getName();
+            $swapArray['totalPrice'] = $totalPrice;
             echo $this->load_template('lobby_ordering', $swapArray);
 				break;
 			case '3':
