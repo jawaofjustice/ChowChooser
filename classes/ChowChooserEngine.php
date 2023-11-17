@@ -4,6 +4,7 @@ require_once "classes/FoodItem.php";
 require_once "classes/User.php";
 require_once "classes/Lobby.php";
 require_once "classes/Restaurant.php";
+require_once "classes/Order.php";
 
 class ChowChooserEngine {
 
