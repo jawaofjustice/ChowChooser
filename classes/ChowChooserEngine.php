@@ -286,12 +286,11 @@ class ChowChooserEngine {
 		// the voting end time key is not sent in $_POST
 		$votingEndTime = key_exists('votingEndTime', $_POST) ? $_POST['votingEndTime'] : null;
 
-		// if "skip voting" is enabled, then the voting end time is allowed to be null.
-		// if "skip voting" is disabled, voting end time must not be null
-		$votingFieldsAreValid = key_exists("skipVoting", $_POST) ? !empty($votingEndTime) : !is_null($votingEndTime);
-
-		if (empty($lobbyName) || $votingFieldsAreValid || empty($orderingEndTime)) {
-			// reload the "create lobby" form with an error message
+      // error message appears if:
+      // (1) lobby name is empty
+      // (2) voting end time is empty WHILE user did not elect to skip voting
+      // (3) ordering end time is empty
+		if (empty($lobbyName) || (is_null($votingEndTime) && !key_exists('skipVoting', $_POST)) || empty($orderingEndTime)) {
 			echo $this->load_template("create_lobby", ["errorMsg" => "Please enter data in all fields."]);
 			// do not return to calling function, we have already
 			// handled all page logic
