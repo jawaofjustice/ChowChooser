@@ -82,6 +82,13 @@ class Order {
       return $orders;
    }
 
+   public static function deleteOrderById(int $id): void {
+      $db = new Database();
+      $statement = $db->mysqli->prepare("delete from order_item where id = (?);");
+      $statement->bind_param('i', $id);
+      $statement->execute();
+   }
+
 }
 
 ?>

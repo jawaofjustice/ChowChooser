@@ -97,7 +97,9 @@ class ChowChooserEngine {
 					echo $user->resetPassword();
 					break;
 				case "showlobby":
-					//lobby id will be passed in _GET['lobby']
+               if (isset($_POST['deleteOrderRequest'])) {
+                  Order::deleteOrderById($_POST['orderId']);
+               }
 					$this->view_lobby();
 					break;
 				case "main":
@@ -275,9 +277,18 @@ class ChowChooserEngine {
                   .$order->quantity."</td><td>"
                   .$food->name."</td><td>"
                   .$orderPrice."</td>"
-                  ."</tr>";
+                  .'<td><form action="" method="post">
+                  <input type="hidden" name="deleteOrderRequest" value="SO TRUE" />
+                  <input type="hidden" name="orderId" value="'.$order->id.'" />
+                  <input name="deleteOrder" type="submit" value="Delete"/>
+                  </form></td></tr>';
             }
             $orderDisplay .= "</table>";
+
+            // saves if/else indentation, even if it overwrites previous work
+            if (empty($orders)) {
+               $orderDisplay = "<p>You have no orders in this lobby!</p>";
+            }
 
             $swapArray['orderItems'] = $orderDisplay;
             $swapArray['lobbyName'] = $lobby->getName();
