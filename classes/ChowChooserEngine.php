@@ -25,15 +25,6 @@ class ChowChooserEngine {
 		// uncomment the following line to see results of example query - sorry it breaks page formatting!
 		//$this->example_query();
 
-		if(isset($_GET['showlobby'])) {
-			if($_GET['showlobby'] == 'back') {
-				$this->main_menu();
-				return;
-			}
-			$this->view_lobby();
-			return;
-		}
-
 		if (isset($_POST['login'])) {
 			$user = User::getUserFromCredentials($_POST['email'], $_POST['password']);
 			if (is_null($user)) {
@@ -105,6 +96,14 @@ class ChowChooserEngine {
 				case "resetPassword":
 					echo $user->resetPassword();
 					break;
+				case "showlobby":
+					//lobby id will be passed in _GET['lobby']
+					$this->view_lobby();
+					break;
+				case "main":
+					//easy way to navigate to main menu
+					$this->main_menu();
+					break;
 				default: 
 				// if it is not, we're going to check for an orderKey
 				if ($orderKeyExists) {
@@ -112,6 +111,7 @@ class ChowChooserEngine {
 					// here we handle actions for the order
 				} else {
 					// we cannot handle actions without an order key, show welcome / error page
+					echo $_POST['action'].'<br>'.$_GET['action'].'<br>';
 					echo "this is an error page :(";
 				}
 			}
@@ -220,10 +220,9 @@ class ChowChooserEngine {
 
 	function view_lobby() {
 
-		$swapArray['lobbyId'] = $_GET['showlobby'];
+		$swapArray['lobbyId'] = $_GET['lobby'];
 		
-		$lobby = new Lobby($this->db);
-		$lobby->getLobbyFromDatabase($_GET['showlobby']);
+		$lobby = Lobby::getLobbyFromDatabase($_GET['lobby']);
 
 		$swapArray['votingEndTime'] = $lobby->getVotingEndTime();
 		$swapArray['orderingEndTime'] = $lobby->getOrderingEndTime();
@@ -249,8 +248,7 @@ class ChowChooserEngine {
 				$restaurantArray = $lobby->getRestaurants();
 				foreach ($restaurantArray as $i) {
 					//print_r($i['restaurant_id']);
-					$restaurant = new Restaurant($this->db);
-					$restaurant->getRestaurantFromDatabase($i['restaurant_id']);
+					$restaurant = Restaurant::getRestaurantFromDatabase($i['restaurant_id']);
 
 					$restaurantsSwapValue .= '<li>'.$restaurant->name.'</li>';
 					//echo '<br>';
