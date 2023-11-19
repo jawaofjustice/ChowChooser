@@ -1,10 +1,12 @@
 <?php
 class FoodItem {
-    private $description;
+	 private $id;
+    private $name;
     private $price;
 
-    public function __construct($description, $price) {
-        $this->description = $description;
+    public function __construct($id, $name, $price) {
+        $this->id = $id;
+        $this->name = $name;
         $this->price = $price;
     }
 
@@ -21,7 +23,18 @@ class FoodItem {
     }
 
 	public function __toString() {
-		return $this->description.",".$this->price;
+		return $this->name.",".$this->price;
+	}
+
+	public static function getFoodItemFromId(int $id): FoodItem {
+		$db = new Database();
+		$statement = $db->mysqli->prepare("select * from food where id = (?)");
+		$statement->bind_param('i', $id);
+		$statement->execute();
+		$food = mysqli_fetch_assoc($statement->get_result());
+		$name = $food['name'];
+		$price = $food['price'];
+		return new FoodItem($id, $name, $price);
 	}
 
 }
