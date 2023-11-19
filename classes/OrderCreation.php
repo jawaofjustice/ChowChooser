@@ -7,7 +7,7 @@
 //~ -Add button for food item
 //~ -Submit button takes you back to view lobby and writes to database
 
-class Order {
+class OrderCreation {
 
 	function __construct($lobbyId) {
 		$this->db = Database::connect();
@@ -113,10 +113,10 @@ class Order {
 	}
 	
 	function buildMenu() {
-		// first check for our filters and build an array
+		//~ // first check for our filters and build an array
 		//~ $searchFilterSuffix = "";
 		//~ $bindParamsSuffix = "";
-		//~ $bindParamsValuesSuffix = array();
+		//~ $bindParamsValuesSuffix = array($this->lobbyId);
 		//~ if(isset($_POST['searchText'])) {
 			//~ echo "This search text was submitted: " . $_POST['searchText'];
 			//~ $searchFilterSuffix .= " and (";
@@ -131,7 +131,6 @@ class Order {
 		
 		//~ echo "Search Suffix: " . $searchFilterSuffix;
 		
-		//~ echo "Our array of actual values for our search looks like: " . print_r( ,1);
 		
 		//queries for food offered by this restaurant
 		//~ $queryString = "select 
@@ -146,9 +145,12 @@ class Order {
 		//~ $query = $this->db->prepare($queryString);
 		//~ echo "Our bind params list looks like: " . 'i'.$bindParamsSuffix;
 		//~ echo "<br /><br />Our query string looks like: " . $queryString."<br /><br />";
-		//~ $bindParams = array($this->lobbyId, $bindParamsValuesSuffix);
-		//~ $query->bind_param('i'.$bindParamsSuffix, $bindParams);
-							
+		//~ echo "Our array of actual values for our search looks like: " . print_r($bindParamsValuesSuffix ,1);
+		
+		//~ $query->bind_param('i'.$bindParamsSuffix, $bindParamsValuesSuffix);
+		
+				
+				/// end test stuff			
 		$queryString = "select 
 							f.*
 							from lobby_restaurant lb

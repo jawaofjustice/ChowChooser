@@ -2,7 +2,7 @@
 require_once "classes/Database.php";
 require_once "classes/FoodItem.php";
 require_once "classes/User.php";
-require_once "classes/Order.php";
+require_once "classes/OrderCreation.php";
 require_once "classes/Lobby.php";
 require_once "classes/Restaurant.php";
 
@@ -93,15 +93,15 @@ class ChowChooserEngine {
 					break;
 				case "viewPlaceOrderSample":
 					$lobbyId = 1;
-					$order = new Order($lobbyId);
+					$order = new OrderCreation($lobbyId);
 					$order->viewAddOrderItem();
 					break;
 				case "processAddOrderItem":
-					$order = new Order($lobbyId);
+					$order = new OrderCreation($lobbyId);
 					$order->processAddOrderItem();
 					break;
 				case "processRemoveOrderItem":
-					$order = new Order($lobbyId);
+					$order = new OrderCreation($lobbyId);
 					$order->processRemoveOrderItem();
 					break;
 
