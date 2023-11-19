@@ -92,23 +92,24 @@ class ChowChooserEngine {
 					echo $user->resetPassword();
 					break;
 				case "viewPlaceOrderSample":
-					$order = new Order();
+					$lobbyId = 1;
+					$order = new Order($lobbyId);
 					$order->viewAddOrderItem();
 					break;
 				case "processAddOrderItem":
-					$order = new Order();
+					$order = new Order($lobbyId);
 					$order->processAddOrderItem();
+					break;
+				case "processRemoveOrderItem":
+					$order = new Order($lobbyId);
+					$order->processRemoveOrderItem();
 					break;
 
 				default: 
-				// if it is not, we're going to check for an orderKey
-				if ($orderKeyExists) {
-					$this->handle_order_actions();
-					// here we handle actions for the order
-				} else {
+
 					// we cannot handle actions without an order key, show welcome / error page
 					echo "this is an error page :(";
-				}
+				
 			}
 
 		} else {

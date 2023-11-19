@@ -15,12 +15,17 @@
 					{{pageTitle}}
 					<br />
 				</th>
+				
 			</tr>
 			
 			<tr>
 				<td colspan="2">
 					<span class="warningMessage">{{warningMessage}}</span>
-					
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					{{lobbyInfo}}
 				</td>
 			</tr>
 			
@@ -40,30 +45,30 @@
 					</table>
 					
 				</td>
-				<td>
-					<form action="index.php" method="post">
-						<input type="hidden" name="action" value="processAddOrderItem" />
-						<table>
-							<tr>
-								<th>
-									Select something to add to your order
-								</th>
-							</tr>
-							<tr>
-								<td>
-									
-									{{listOfItemsToSelectFrom}}
-									
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<input type="submit" value="Submit" />
-									
-								</td>
-							</tr>
-						</table>
-					</form>
+			<td>
+					<table>
+						<tr>
+							<th>
+								Select something to add to your order
+							</th>
+						</tr>
+						<tr>
+							<td>
+								<form action="?" method="post">
+									<label for="searchText"> Search for an item here: </label></br >
+									<input type="text" name="searchText" id="searchText">
+									<input type="hidden" name="action" value="viewPlaceOrderSample" />
+								</form>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								
+								{{menuList}}
+								
+							</td>
+						</tr>
+					</table>
 				</td>
 			</tr>
 		</table>
