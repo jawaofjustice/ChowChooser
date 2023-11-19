@@ -22,13 +22,25 @@ class OrderCreation {
 		
 		$swapArray['pageTitle'] = "Add an item to your order!";	
 		$swapArray['loginLogoutForm'] = ChowChooserEngine::load_template("logoutForm");
-		$swapArray['userId'] = $this->lobbyId;
+		$swapArray['userId'] = $this->userId;
 		$swapArray['warningMessage'] = "This is a sample warning message!";
 		$swapArray['lobbyInfo'] = $this->getLobbyInfo();
 		$swapArray['menuList'] = $this->buildMenu();
 		$swapArray['existingOrderItems'] = $this->buildCurrentOrder();
 		$swapArray['testOutput'] = $this->getCountOfOrderItem(1, 2);
+		$swapArray['searchResultsHeader'] = $this->buildSearchResultHeader();
+		$swapArray['lobbyId'] = $this->lobbyId;
 		echo ChowChooserEngine::load_template("addOrderItem", $swapArray);
+	}
+	
+	function buildSearchResultHeader() {
+		$output = "";
+		
+		if(isset($_POST['searchText'])) {
+			$output .= "<br />Results for search \"" . $_POST['searchText'] . "\": <br />";
+		}
+		
+		return $output;
 	}
 	
 	function buildCurrentOrder() {
@@ -113,44 +125,26 @@ class OrderCreation {
 	}
 	
 	function buildMenu() {
-		//~ // first check for our filters and build an array
-		//~ $searchFilterSuffix = "";
-		//~ $bindParamsSuffix = "";
-		//~ $bindParamsValuesSuffix = array($this->lobbyId);
-		//~ if(isset($_POST['searchText'])) {
-			//~ echo "This search text was submitted: " . $_POST['searchText'];
-			//~ $searchFilterSuffix .= " and (";
-			//~ $terms = explode(" ", $_POST['searchText']);
-			//~ foreach ($terms as $t) {
-				//~ $searchFilterSuffix .= " f.name like (?) or";
-				//~ $bindParamsSuffix .= "s";
-				//~ array_push($bindParamsValuesSuffix, "%".$t."%");
-			//~ }
-			//~ $searchFilterSuffix = substr($searchFilterSuffix, 0, -3).");";
-		//~ }
+		// first check for our filters and build an array
+		$searchFilterSuffix = "";
+		$bindParamsSuffix = "";
+		$bindParamsValuesSuffix = array($this->lobbyId);
+		if(isset($_POST['searchText'])) {
+			//echo "This search text was submitted: " . $_POST['searchText'];
+			$searchFilterSuffix .= " and (";
+			$terms = explode(" ", $_POST['searchText']);
+			foreach ($terms as $t) {
+				$searchFilterSuffix .= " f.name like (?) or";
+				$bindParamsSuffix .= "s";
+				array_push($bindParamsValuesSuffix, "%".$t."%");
+			}
+			$searchFilterSuffix = substr($searchFilterSuffix, 0, -3).");";
+		}
 		
-		//~ echo "Search Suffix: " . $searchFilterSuffix;
+		//echo "Search Suffix: " . $searchFilterSuffix;
 		
 		
-		//queries for food offered by this restaurant
-		//~ $queryString = "select 
-							//~ f.*
-							//~ from lobby_restaurant lb
-							//~ left join restaurant r
-								//~ on lb.restaurant_id = r.id
-							//~ left join food f 
-								//~ on r.id = f.restaurant_id
-							//~ where lb.lobby_id = (?) " . $searchFilterSuffix;
-							
-		//~ $query = $this->db->prepare($queryString);
-		//~ echo "Our bind params list looks like: " . 'i'.$bindParamsSuffix;
-		//~ echo "<br /><br />Our query string looks like: " . $queryString."<br /><br />";
-		//~ echo "Our array of actual values for our search looks like: " . print_r($bindParamsValuesSuffix ,1);
-		
-		//~ $query->bind_param('i'.$bindParamsSuffix, $bindParamsValuesSuffix);
-		
-				
-				/// end test stuff			
+		//~ //queries for food offered by this restaurant
 		$queryString = "select 
 							f.*
 							from lobby_restaurant lb
@@ -158,32 +152,45 @@ class OrderCreation {
 								on lb.restaurant_id = r.id
 							left join food f 
 								on r.id = f.restaurant_id
-							where lb.lobby_id = (?) ";
+							where lb.lobby_id = (?) " . $searchFilterSuffix;
+							
 		$query = $this->db->prepare($queryString);
+		//~ echo "Our bind params list looks like: " . 'i'.$bindParamsSuffix;
+		//~ echo "<br /><br />Our query string looks like: " . $queryString."<br /><br />";
+		//~ echo "Our array of actual values for our search looks like: " . print_r($bindParamsValuesSuffix ,1);
 		
-		$query->bind_param('i', $this->lobbyId);
+		$query->bind_param('i'.$bindParamsSuffix, ...$bindParamsValuesSuffix);
 		
+				
 		
 		$query->execute();
 		$response = $query->get_result();
 		
 		//
-		
-		
-		
 		$output = "";
-		$i = 0;
-		foreach ($response as $r) {
-			$i++;
-			//$output .= "Result " . $i . ": " . print_r($r, 1). "<br />";
-			$swap['menuItemId'] = "menuItem". $i;
-			$swap['menuItemContents'] = $r['name'] . " - $" . $r['price'];
-			$swap['foodId'] = $r['id'];
-			$swap['lobbyId'] = $this->lobbyId;
+		if(mysqli_num_rows($response) > 0) {
 			
+			$i = 0;
+			foreach ($response as $r) {
+				$i++;
+				//$output .= "Result " . $i . ": " . print_r($r, 1). "<br />";
+				$swap['menuItemId'] = "menuItem". $i;
+				$swap['menuItemContents'] = $r['name'] . " - $" . $r['price'];
+				$swap['foodId'] = $r['id'];
+				$swap['lobbyId'] = $this->lobbyId;
+				
 
-			$output .= ChowChooserEngine::load_template('menuItem', $swap);
+				$output .= ChowChooserEngine::load_template('menuItem', $swap);
+			}
+		} else {
+			if (isset($_POST['searchText'])) {
+				$output .= "Your search for \"" . $_POST['searchText'] . "\" found no results!";
+			} else {
+				$output .= "There are no food items available from this restaurant!";
+			}
+			
 		}
+		
 		return $output;
 	}
 	

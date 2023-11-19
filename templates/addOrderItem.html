@@ -58,6 +58,13 @@
 									<label for="searchText"> Search for an item here: </label></br >
 									<input type="text" name="searchText" id="searchText">
 									<input type="hidden" name="action" value="viewPlaceOrderSample" />
+									<input type="hidden" name="lobbyId" value="{{lobbyId}}" />
+									<input type="submit" value="Search" />
+									
+									<a href="?action=viewPlaceOrderSample&lobbyId={{lobbyId}}">
+										<input type="button" value="Reset Search" />
+									</a>
+									{{searchResultsHeader}}
 								</form>
 							</td>
 						</tr>
