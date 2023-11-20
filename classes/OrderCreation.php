@@ -10,7 +10,9 @@
 class OrderCreation {
 
 	function __construct($lobbyId) {
-		$this->db = Database::connect();
+		//$this->db = Database::connect();
+		$db = new Database();
+		$this->db = $db->mysqli;
 		$this->lobbyId = $lobbyId; // for testing purposes
 		$this->userId = $_SESSION['user']->getId();
 		
