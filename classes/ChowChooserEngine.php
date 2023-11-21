@@ -171,9 +171,6 @@ class ChowChooserEngine {
 	function main_menu(): void {
 		$swapArray['userId'] = $_SESSION['user']->getId();
 
-		// TODO: Display more information about the lobby within the link
-		// If the user is an admin, display that (maybe as a star next to their userID)
-		// The status table contains information that may be helpful
 		$all_user_lobbies=$this->db->getUsersLobbies($_SESSION['user']->getId());
 		
 		$swapArray['lobbies'] = $all_user_lobbies;
