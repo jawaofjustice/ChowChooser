@@ -32,12 +32,14 @@ class Database {
 
 		/* $lobbies = mysqli_fetch_assoc($statement->get_result()); */
 		foreach ($statement->get_result() as $lobby) {
-			// Append each lobby to a list of lobbies for the user
 			// If the user is the lobby admin, put a star after their user ID
 			if ($lobby['admin_id']==$lobby['user_id'])
-				$all_user_lobbies.='<a href="index.php?action=showlobby&lobby="'.$lobby['id'].">".$lobby['name']."</a>"." User: ".$lobby['username']."* Status: ".$lobby['description']."<br>";
-			else 
-				$all_user_lobbies.='<a href="index.php?action=showlobby&lobby="'.$lobby['id'].">".$lobby['name']."</a>"." User: ".$lobby['username']." Status: ".$lobby['description']."<br>";
+				$adminIcon = "*";
+			else
+				$adminIcon = "";
+
+			// Append each lobby to a list of lobbies for the user
+			$all_user_lobbies.='<a href="index.php?action=showlobby&lobby='.$lobby['id'].'">'.$lobby['name']."</a>"." User: ".$lobby['username'].$adminIcon." Status: ".$lobby['description']."<br>";
 		}
 
 		return $all_user_lobbies;
