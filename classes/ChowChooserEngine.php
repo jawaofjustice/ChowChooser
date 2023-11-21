@@ -8,7 +8,7 @@ require_once "classes/Restaurant.php";
 require_once "classes/Order.php";
 
 class ChowChooserEngine {
-
+	public $db;
 	
 	function __construct() {
 
