@@ -29,7 +29,6 @@ class OrderCreation {
 		$swapArray['lobbyInfo'] = $this->getLobbyInfo();
 		$swapArray['menuList'] = $this->buildMenu();
 		$swapArray['existingOrderItems'] = $this->buildCurrentOrder();
-		$swapArray['testOutput'] = $this->getCountOfOrderItem(1, 2);
 		$swapArray['searchResultsHeader'] = $this->buildSearchResultHeader();
 		$swapArray['lobbyId'] = $this->lobbyId;
 		echo ChowChooserEngine::load_template("addOrderItem", $swapArray);
