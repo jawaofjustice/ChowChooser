@@ -8,6 +8,9 @@
 //~ -Submit button takes you back to view lobby and writes to database
 
 class OrderCreation {
+	public $db;
+	public $lobbyId;
+	public $userId;
 
 	function __construct($lobbyId) {
 		//$this->db = Database::connect();
