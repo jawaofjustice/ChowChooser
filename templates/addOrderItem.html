@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" type="text/css" href="style.css" />
+		<title>ChowChooser - {{pageTitle}}</title>
+	</head>
+	<body>
+
+		{{loginLogoutForm}}
+
+		<table>
+			<tr>
+				<th colspan="2">					
+					{{pageTitle}}
+					<br />
+				</th>
+				
+			</tr>
+			
+			<tr>
+				<td colspan="2">
+					<span class="warningMessage">{{warningMessage}}</span>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					{{lobbyInfo}}
+				</td>
+			</tr>
+			
+			<tr>
+				<td>
+					<table>
+						<tr>
+							<th>
+								your order so far
+							</th>
+						</tr>
+						<tr>
+							<td>
+								{{existingOrderItems}}
+							</td>
+						</tr>
+					</table>
+					
+				</td>
+			<td>
+					<table>
+						<tr>
+							<th>
+								Select something to add to your order
+							</th>
+						</tr>
+						<tr>
+							<td>
+								<form action="?" method="post">
+									<label for="searchText"> Search for an item here: </label></br >
+									<input type="text" name="searchText" id="searchText">
+									<input type="hidden" name="action" value="viewPlaceOrderSample" />
+									<input type="hidden" name="lobbyId" value="{{lobbyId}}" />
+									<input type="submit" value="Search" />
+									
+									<a href="?action=viewPlaceOrderSample&lobbyId={{lobbyId}}">
+										<input type="button" value="Reset Search" />
+									</a>
+									{{searchResultsHeader}}
+								</form>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								
+								{{menuList}}
+								
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+		
+	</body>
+</html>
