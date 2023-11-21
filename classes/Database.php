@@ -2,7 +2,7 @@
 require_once "classes/Credentials.php";
 
 class Database {
-	
+  
 	function __construct() {
 		$this->mysqli = new mysqli("localhost","chowChooserAdmin",Credentials::pass(),"chow_chooser");
 		if ($this->mysqli->connect_errno) {
@@ -22,11 +22,16 @@ class Database {
         $statement = $this->mysqli->prepare("select * from lobby where lobby.admin_id = (?)");
 		$statement->bind_param('s', $id);
 		$statement->execute();
+
+		$all_user_lobbies="";
+
 		/* $lobbies = mysqli_fetch_assoc($statement->get_result()); */
 		foreach ($statement->get_result() as $lobby) {
-			print_r($lobby);
-			echo "<br>";
+			// Append each lobby to a list of lobbies for the user
+			$all_user_lobbies.='<a href="index.php?action=showlobby&lobby="'.$lobby['id'].">".$lobby['name']."</a><br>";
 		}
+
+		return $all_user_lobbies;
 	}
 }
 
