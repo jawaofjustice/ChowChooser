@@ -4,7 +4,8 @@ require_once "classes/Credentials.php";
 class Database {
   
 	function __construct() {
-		$this->mysqli = new mysqli("localhost","chowChooserAdmin",Credentials::pass(),"chow_chooser");
+		$creds = new Credentials();
+		$this->mysqli = new mysqli($creds->host,$creds->username,$creds->password,$creds->database);
 		if ($this->mysqli->connect_errno) {
 			echo "Failed to connect to MySQL: " . $this->mysqli->connect_error;
 			exit();
