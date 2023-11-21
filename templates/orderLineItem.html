@@ -1,0 +1,14 @@
+
+<div id="{{orderLineItemId}}" class="orderLineItem">
+	<a href="?action=processAddOrderItem&foodId={{foodId}}&lobbyId={{lobbyId}}">
+		<div class="addLineItemButton">
+			+
+		</div>
+	</a>
+	{{orderLineItemContents}}
+	<a href="?action=processRemoveOrderItem&foodId={{foodId}}&lobbyId={{lobbyId}}">
+		<div class="removeLineItemButton">
+			-
+		</div>
+	</a>
+</div>

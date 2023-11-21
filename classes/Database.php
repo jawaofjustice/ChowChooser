@@ -1,22 +1,16 @@
 <?php
+require_once "classes/Credentials.php";
 
 class Database {
-
-	public mysqli $mysqli;
-
+  
 	function __construct() {
-		
-		$pass = getenv('CHOWCHOOSER_P');
-		
-		$this->mysqli = new mysqli("localhost","chowChooserAdmin",$pass,"chow_chooser");
-
+		$this->mysqli = new mysqli("localhost","chowChooserAdmin",Credentials::pass(),"chow_chooser");
 		if ($this->mysqli->connect_errno) {
 			echo "Failed to connect to MySQL: " . $this->mysqli->connect_error;
 			exit();
 		}
-		//return $this;
 	}
-
+	
 	public function __get($property) {
 		if (property_exists($this, $property)) {
             return $this->$property;
@@ -39,7 +33,6 @@ class Database {
 
 		return $all_user_lobbies;
 	}
-
 }
 
 ?>

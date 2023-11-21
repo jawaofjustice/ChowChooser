@@ -2,14 +2,14 @@
 require_once "classes/Database.php";
 require_once "classes/FoodItem.php";
 require_once "classes/User.php";
+require_once "classes/OrderCreation.php";
 require_once "classes/Lobby.php";
 require_once "classes/Restaurant.php";
 require_once "classes/Order.php";
 
 class ChowChooserEngine {
 
-	private Database $db;
-
+	
 	function __construct() {
 
 		// direct user to the welcome page if user
@@ -94,6 +94,19 @@ class ChowChooserEngine {
 				case "resetPassword":
 					echo $user->resetPassword();
 					break;
+				case "viewPlaceOrderSample":
+					$lobbyId = 1;
+					$order = new OrderCreation($lobbyId);
+					$order->viewAddOrderItem();
+					break;
+				case "processAddOrderItem":
+					$order = new OrderCreation($lobbyId);
+					$order->processAddOrderItem();
+					break;
+				case "processRemoveOrderItem":
+					$order = new OrderCreation($lobbyId);
+					$order->processRemoveOrderItem();
+					break;
 				case "showlobby":
                if (isset($_POST['deleteOrderRequest'])) {
                   Order::deleteOrderById($_POST['orderId']);
@@ -105,15 +118,11 @@ class ChowChooserEngine {
 					$this->main_menu();
 					break;
 				default: 
-				// if it is not, we're going to check for an orderKey
-				if ($orderKeyExists) {
-					$this->handle_order_actions();
-					// here we handle actions for the order
-				} else {
+
 					// we cannot handle actions without an order key, show welcome / error page
 					echo $_POST['action'].'<br>'.$_GET['action'].'<br>';
 					echo "this is an error page :(";
-				}
+				
 			}
 
 		} else {
@@ -191,7 +200,7 @@ class ChowChooserEngine {
 		return md5($KEY_SALT.md5(date("Y-m-d h:i:sa"))); # the string after this date function is just specifying a format for how the date will output
 	}
 
-	function load_template($fileName, $swapArray = null) {
+	public static function load_template($fileName, $swapArray = null) {
 		$fileLocation = "templates/" . $fileName . ".html";
 		$file = fopen($fileLocation, "r") or die("Could not load file!");
 		$contents = fread($file, filesize($fileLocation));
@@ -207,12 +216,9 @@ class ChowChooserEngine {
 		return $contents;
 	}
 
-	function handle_order_actions() {
-		echo "this is where we handle in-order actions!";
-	}
 
 	function example_query() {
-		$response = $this->db->query("describe lobbies;");
+		$response = $this->db->query("describe lobby;");
 		$results = $response->fetch_assoc();
 
 		// printing the array of results, or we can foreach loop through them

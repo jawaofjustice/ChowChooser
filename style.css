@@ -66,3 +66,75 @@ th {
 	display: block;
 	width: 134px;
 }
+
+
+.menuItem {
+	text-decoration: none;
+}
+
+.menuItem > div{
+	border: 2px solid #666;
+	width: 400px;
+	height: 60px;
+	font-size: 24px;
+	line-height: 60px;
+	margin-bottom: 4px;
+	border-radius: 4px;
+	color: black;
+}
+
+.menuItem > div:hover{
+	border: 2px solid #666;
+	width: 400px;
+	height: 60px;
+	font-size: 24px;
+	line-height: 60px;
+	margin-bottom: 4px;
+	border-radius: 4px;
+	background-color: #666;
+	color: white;
+	
+}
+
+
+.orderLineItem{
+	border: 2px solid #666;
+	width: 600px;
+	height: 60px;
+	font-size: 24px;
+	line-height: 60px;
+	margin-bottom: 4px;
+	border-radius: 4px;
+	color: black;
+	
+}
+
+.orderLineItem > a {
+	text-decoration: none;
+}
+
+.addLineItemButton {
+	width: 40px;
+	#border: 1px solid red;
+	display: inline-block;
+	text-decoration: none;
+	float: right;
+	background-color: #ddd;
+	color: black;
+}
+
+.addLineItemButton:hover, .removeLineItemButton:hover {
+	background-color: #666;
+	color: white;
+}
+
+.removeLineItemButton {
+	width: 40px;
+	#border: 1px solid red;
+	display: inline-block;
+	text-decoration: none;
+	float: left;
+	background-color: #ddd;
+	color: black;
+}
+
