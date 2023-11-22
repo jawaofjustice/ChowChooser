@@ -86,8 +86,8 @@ class OrderCreation {
 				$output .= ChowChooserEngine::load_template('orderLineItem', $swap);
 			}
 			$output .= "<br /> Subtotal: $" . $subtotal;
-			$output .= "<br /> Taxes: $" . round($subtotal * 0.06, 2);
-			$output .= "<br /> Total: $" . round($subtotal * 1.06, 2);
+			$output .= "<br /> Taxes: $" . number_format(round($subtotal * 0.06, 2), 2);
+			$output .= "<br /> Total: $" . number_format(round($subtotal * 1.06, 2), 2);
 			
 		} else {
 			$output .= "You current have no items in your order!";
