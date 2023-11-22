@@ -95,16 +95,15 @@ class ChowChooserEngine {
 					echo $user->resetPassword();
 					break;
 				case "viewPlaceOrderSample":
-					$lobbyId = 1;
-					$order = new OrderCreation($lobbyId);
+					$order = new OrderCreation($_GET['lobbyId']);
 					$order->viewAddOrderItem();
 					break;
 				case "processAddOrderItem":
-					$order = new OrderCreation($lobbyId);
+					$order = new OrderCreation($_GET['lobbyId']);
 					$order->processAddOrderItem();
 					break;
 				case "processRemoveOrderItem":
-					$order = new OrderCreation($lobbyId);
+					$order = new OrderCreation($_GET['lobbyId']);
 					$order->processRemoveOrderItem();
 					break;
 				case "showlobby":
@@ -225,7 +224,6 @@ class ChowChooserEngine {
 	function view_lobby() {
 
 		$swapArray['lobbyId'] = $_GET['lobby'];
-		
 		$lobby = Lobby::getLobbyFromDatabase($_GET['lobby']);
 
 		$swapArray['votingEndTime'] = $lobby->getVotingEndTime();
@@ -295,6 +293,8 @@ class ChowChooserEngine {
             $swapArray['orderItems'] = $orderDisplay;
             $swapArray['lobbyName'] = $lobby->getName();
             $swapArray['totalPrice'] = $totalPrice;
+            // required for placing orders
+            $swapArray['lobbyId'] = $lobby->getId();
             echo $this->load_template('lobby_ordering', $swapArray);
 				break;
 			case '3':

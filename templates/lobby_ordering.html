@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html>
 	<head>
-      <title>Lobby {{lobbyName}}</title>
+		<title>Lobby {{lobbyName}}</title>
 	</head>
 	<body>
-			<h1 id="heading1">Lobby {{lobbyName}} is in the Ordering phase!</h1>
-      <div>
+		<h1 id="heading1">Lobby {{lobbyName}} is in the Ordering phase!</h1>
+		<div>
 			<ul id="orderItems">
-			    {{orderItems}}
+				{{orderItems}}
 			</ul>
 
-         <p>Total price: ${{totalPrice}}</p>
-      </div>
-      <a href="?action=start_new"><input type="button" value="Place a new order" /></a>
-      <br>
-      <a href="?showlobby=back"><input type="button" value="Main Menu" /></a>
+			<p>Total price: ${{totalPrice}}</p>
+		</div>
+		<a href="?action=viewPlaceOrderSample&lobbyId={{lobbyId}}"><input type="button" value="Edit your order" /></a>
+		<br>
+		<a href="?showlobby=back"><input type="button" value="Main Menu" /></a>
 	</body>
 </html>

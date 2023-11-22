@@ -271,7 +271,7 @@ class OrderCreation {
 		}
 		
 		//$this->viewAddOrderItem();
-		header('Location: ?action=viewPlaceOrderSample');
+		header('Location: ?action=viewPlaceOrderSample&lobbyId='.$lobbyId);
 
 	}
 	
@@ -315,7 +315,7 @@ class OrderCreation {
 		}
 		
 		//$this->viewAddOrderItem();
-		header('Location: ?action=viewPlaceOrderSample');
+		header('Location: ?action=viewPlaceOrderSample&lobbyId='.$lobbyId);
 
 	}
 
