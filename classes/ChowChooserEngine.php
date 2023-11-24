@@ -4,6 +4,7 @@ require_once "classes/FoodItem.php";
 require_once "classes/User.php";
 require_once "classes/Lobby.php";
 require_once "classes/Restaurant.php";
+require_once "classes/Vote.php";
 
 class ChowChooserEngine {
 
@@ -90,6 +91,11 @@ class ChowChooserEngine {
 				case "main":
 					//easy way to navigate to main menu
 					$this->main_menu();
+					break;
+				case "vote":
+					$user = $_SESSION['user'];
+					Vote::toggleVote($user->getId(), $_GET['restaurantId'], $_GET['lobby']);
+					$this->view_lobby();
 					break;
 				default: 
 				// if it is not, we're going to check for an orderKey
@@ -210,56 +216,63 @@ class ChowChooserEngine {
 		$swapArray['lobbyId'] = $_GET['lobby'];
 		
 		$lobby = Lobby::getLobbyFromDatabase($_GET['lobby']);
+		$user = $_SESSION['user'];
 
 		$swapArray['votingEndTime'] = $lobby->getVotingEndTime();
 		$swapArray['orderingEndTime'] = $lobby->getOrderingEndTime();
 
 		switch ($lobby->getStatusId()) {
+			
 			case '1':
 				//Lobby status: VOTING
-
-				//$restaurant = new Restaurant($this->db);
-				//$restaurant->getRestaurantFromDatabase(1);
-				//$swapArray['restaurants'] = $restaurant->name;
 				/*
-				$restaurantArray = $lobby->getRestaurants();
-				foreach ($restaurantArray as $i) {
-					$restaurant = new Restaurant($this->db);
-					$restaurant->getRestaurantFromDatabase($i['restaurant_id']);
-					$restaurants[] = $restaurant;
-				}
-				print_r($restaurants);
+				HTML TABLE ROW FORMAT
+
+				<form action="?action=vote&lobby=1&restaurantId=1" method="post">
+					<input type="submit" value="Hardcoded value for looby=1$restaurantId=1"/>
+				</form>
 				*/
-				$restaurantsSwapValue = '';
+
+				$tableContentSwapValue = '';
 
 				$restaurantArray = $lobby->getRestaurants();
 				foreach ($restaurantArray as $i) {
-					//print_r($i['restaurant_id']);
 					$restaurant = Restaurant::getRestaurantFromDatabase($i['restaurant_id']);
 
-					$restaurantsSwapValue .= '<li>'.$restaurant->name.'</li>';
-					//echo '<br>';
-					//echo $restaurant->name;
-					//echo '<br>';
+					if(Vote::getUsersVote($user->getId(), $lobby->getId()) == $restaurant->id) {
+						$hasVoted = ' style="background-color: red;" ';
+					} else {
+						$hasVoted = ' ';
+					}
+
+					$tableContentSwapValue .= '<tr><td>'.$restaurant->name.'</td><td><form action="?action=vote&lobby='.$lobby->getId().
+						'&restaurantId='.$restaurant->id.'" method="post"><input type="submit"'.$hasVoted.'value="Vote for '.$restaurant->name.'"/></form></td><td>Votes: '.
+							Vote::getVotesForRestaurant($restaurant->id, $lobby->getId()).'</td></tr>';
+
 				}
-				//echo $restaurantsSwapValue;
-				$swapArray['restaurants'] = $restaurantsSwapValue;
+
+				$swapArray['tableContent'] = $tableContentSwapValue;
 
 				echo $this->load_template('lobby_voting', $swapArray);
 				break;
+
 			case '2':
 				//Lobby status: ORDERING
 				echo $this->load_template('lobby_ordering', $swapArray);
 				break;
+
 			case '3':
 				//Lobby status: COMPLETED
 				echo $this->load_template("lobby_completed", $swapArray);
 				break;
+
 			default:
 				//TODO actually handle this error
 				echo 'statusId = '.$lobby->getStatusId().'. It should not reach this point';
 				break;
+
 			}
+
 		//echo 'id: '.$lobby->getId().' admin: '.$lobby->getAdminId().' name: '.$lobby->getName().' status: '.$lobby->getStatusId();
 		
 	}
