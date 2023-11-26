@@ -96,16 +96,15 @@ class ChowChooserEngine {
 					echo $user->resetPassword();
 					break;
 				case "viewPlaceOrderSample":
-					$lobbyId = 1;
-					$order = new OrderCreation($lobbyId);
+					$order = new OrderCreation($_GET['lobbyId']);
 					$order->viewAddOrderItem();
 					break;
 				case "processAddOrderItem":
-					$order = new OrderCreation($lobbyId);
+					$order = new OrderCreation($_GET['lobbyId']);
 					$order->processAddOrderItem();
 					break;
 				case "processRemoveOrderItem":
-					$order = new OrderCreation($lobbyId);
+					$order = new OrderCreation($_GET['lobbyId']);
 					$order->processRemoveOrderItem();
 					break;
 				case "showlobby":
@@ -231,7 +230,6 @@ class ChowChooserEngine {
 	function view_lobby() {
 
 		$swapArray['lobbyId'] = $_GET['lobby'];
-		
 		$lobby = Lobby::getLobbyFromDatabase($_GET['lobby']);
 		$user = $_SESSION['user'];
 
@@ -279,14 +277,14 @@ class ChowChooserEngine {
             );
 
             $orderDisplay = '<table style="text-align: left"><th>Quantity</th><th>Food</th><th>Order price</th>';
-            $totalPrice = 0.0;
+            $subtotal = 0.0;
             foreach ($orders as $order) {
                $food = FoodItem::getFoodItemFromId($order->getFoodId());
                $orderPrice = $food->price * $order->quantity;
-               $totalPrice += $orderPrice;
+               $subtotal += $orderPrice;
                $orderDisplay .= "<tr><td>"
                   .$order->quantity."</td><td>"
-                  .$food->name."</td><td>"
+                  .$food->name."</td><td>$"
                   .$orderPrice."</td>"
                   .'<td><form action="" method="post">
                   <input type="hidden" name="deleteOrderRequest" value="SO TRUE" />
@@ -303,7 +301,11 @@ class ChowChooserEngine {
 
             $swapArray['orderItems'] = $orderDisplay;
             $swapArray['lobbyName'] = $lobby->getName();
-            $swapArray['totalPrice'] = $totalPrice;
+            $swapArray['subtotal'] = $subtotal;
+            $swapArray['taxes'] = number_format(round($subtotal * 0.06, 2), 2);
+            $swapArray['totalPrice'] = number_format(round($subtotal * 1.06, 2), 2);
+            // required for placing orders
+            $swapArray['lobbyId'] = $lobby->getId();
             echo $this->load_template('lobby_ordering', $swapArray);
 				break;
 

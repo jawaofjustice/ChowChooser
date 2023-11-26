@@ -6,9 +6,6 @@
 		<title>ChowChooser - {{pageTitle}}</title>
 	</head>
 	<body>
-
-		{{loginLogoutForm}}
-
 		<table>
 			<tr>
 				<th colspan="2">					
@@ -55,7 +52,7 @@
 						<tr>
 							<td>
 								<form action="?" method="post">
-									<label for="searchText"> Search for an item here: </label></br >
+									<label for="searchText"> Search for an item here: </label></a >
 									<input type="text" name="searchText" id="searchText">
 									<input type="hidden" name="action" value="viewPlaceOrderSample" />
 									<input type="hidden" name="lobbyId" value="{{lobbyId}}" />
@@ -79,6 +76,9 @@
 				</td>
 			</tr>
 		</table>
-		
+
+		<br>
+		<a href="?action=showlobby&lobby={{lobbyId}}"><input type="button" value="Back to lobby" /></a>
+
 	</body>
 </html>
