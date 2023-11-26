@@ -29,9 +29,47 @@ class Lobby {
 		$statement->execute();
 
         $lobbyArray = mysqli_fetch_assoc($statement->get_result());
+        
+        //Create new lobby object
+        $lobby = new Lobby($db, $lobbyArray['id'], $lobbyArray['admin_id'], $lobbyArray['name'], $lobbyArray['voting_end_time'], $lobbyArray['ordering_end_time'], $lobbyArray['status_id']);
 
-        return new Lobby($db, $lobbyArray['id'], $lobbyArray['admin_id'], $lobbyArray['name'], $lobbyArray['voting_end_time'], $lobbyArray['ordering_end_time'], $lobbyArray['status_id']);
+        //Make timestamp and date format
+        date_default_timezone_set('America/New_York');
+        $date = date('Y-m-d H:i:s');
+        //echo($date);
 
+        //Check if current time is over voting end time
+        if(new DateTime($date) > new DateTime($lobby->getVotingEndTime())) {
+
+            //Check if current time is over ordering end time
+            if(new DateTime($date) > new DateTime($lobby->getOrderingEndTime())) {
+                //This lobby is completed
+                $lobby->setStatusId(3);
+            } else {
+                //in ordering phase
+                $lobby->setStatusId(2);
+            }
+
+        } else {
+            //in voting phase
+            $lobby->setStatusId(1);
+        }
+
+        //Check whether the status_id in the database is correct or not
+        if($lobby->getStatusId() != $lobbyArray['status_id']) {
+
+            $statusId = $lobby->getStatusId();
+            $id = $lobby->getId();
+
+            //Update the row in the database
+            $statement = $db->mysqli->prepare('UPDATE lobby SET status_id = (?) WHERE id = (?)');
+            $statement->bind_param('ii', $statusId, $id);
+            $statement->execute();
+
+        }
+
+        return $lobby;
+        
     }
 
     //returns an array of arrays containing [restartant_id=?]
@@ -83,9 +121,24 @@ class Lobby {
         $this->name = $name;
      }
 
-     public function setStatus($status) {
-        $this->status = $status;
-     }
+   public static function createLobbyInDatabase(
+      string $lobbyName,
+      string|null $votingEndTime,
+      string $orderingEndTime
+   ): void {
+      $db = new Database();
+      // skip to "ordering" status if skipping the voting phase
+      $status_id = is_null($votingEndTime) ? 2 : 1;
+      $admin_id = $_SESSION['user']->getId();
+
+      $statement = $db->mysqli->prepare("
+         insert into lobby
+         (name, voting_end_time, ordering_end_time, admin_id, status_id) values
+         ( (?), (?), (?), (?), (?) );");
+      $statement->bind_param('sssii', $lobbyName, $votingEndTime, $orderingEndTime, $admin_id, $status_id);
+
+      $statement->execute();
+   }
 
 }
 

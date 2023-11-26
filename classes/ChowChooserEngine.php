@@ -2,14 +2,15 @@
 require_once "classes/Database.php";
 require_once "classes/FoodItem.php";
 require_once "classes/User.php";
+require_once "classes/OrderCreation.php";
 require_once "classes/Lobby.php";
 require_once "classes/Restaurant.php";
 require_once "classes/Vote.php";
+require_once "classes/Order.php";
 
 class ChowChooserEngine {
-
-	private Database $db;
-
+	public $db;
+	
 	function __construct() {
 
 		// direct user to the welcome page if user
@@ -41,8 +42,6 @@ class ChowChooserEngine {
 			$this->db->createAccount($_POST['email'], $_POST['password']);
 		}
 
-		
-
 		$orderKey = "";
 		$actionKey = "";
 		$orderKeyExists = key_exists("orderKey", $_POST) || key_exists("orderKey", $_GET);
@@ -69,7 +68,7 @@ class ChowChooserEngine {
 
 		} else if ($orderKeyExists && !$actionKeyExists) {
 			// orderKey exists but no actionKey mean swe're going to the view order page
-			$this->view_order($_POST['orderKey']);
+			$this->view_order($orderKey);
 
 		} else if ($actionKeyExists) {
 			// if we have an action key, we're going to now check if it's value is start_new:
@@ -81,11 +80,38 @@ class ChowChooserEngine {
 				case "editUser":
 					echo $user->editUser();
 					break;
+				case "createLobby":
+					if (isset($_POST['formSubmitted'])) {
+						$this->create_lobby();
+						// redirect to main menu as per POST-Redirect-GET
+						// design pattern in order to prevent duplicate
+						// form requests on refresh
+						header("Location: ".$_SERVER['PHP_SELF']);
+						break;
+					}
+					// user is navigating to the page, hasn't submitted the form
+					echo $this->load_template("create_lobby", ["errorMsg" => ""]);
+					break;
 				case "resetPassword":
 					echo $user->resetPassword();
 					break;
+				case "viewPlaceOrderSample":
+					$lobbyId = 1;
+					$order = new OrderCreation($lobbyId);
+					$order->viewAddOrderItem();
+					break;
+				case "processAddOrderItem":
+					$order = new OrderCreation($lobbyId);
+					$order->processAddOrderItem();
+					break;
+				case "processRemoveOrderItem":
+					$order = new OrderCreation($lobbyId);
+					$order->processRemoveOrderItem();
+					break;
 				case "showlobby":
-					//lobby id will be passed in _GET['lobby']
+               if (isset($_POST['deleteOrderRequest'])) {
+                  Order::deleteOrderById($_POST['orderId']);
+               }
 					$this->view_lobby();
 					break;
 				case "main":
@@ -98,15 +124,11 @@ class ChowChooserEngine {
 					$this->view_lobby();
 					break;
 				default: 
-				// if it is not, we're going to check for an orderKey
-				if ($orderKeyExists) {
-					$this->handle_order_actions();
-					// here we handle actions for the order
-				} else {
+
 					// we cannot handle actions without an order key, show welcome / error page
 					echo $_POST['action'].'<br>'.$_GET['action'].'<br>';
 					echo "this is an error page :(";
-				}
+				
 			}
 
 		} else {
@@ -163,13 +185,11 @@ class ChowChooserEngine {
 
 	function main_menu(): void {
 		$swapArray['userId'] = $_SESSION['user']->getId();
-		$swapArray['lobbies'] = "a long string of html that will represent the lobbies the user is in";
 
-		// TODO getUsersLobbies returns an array of Lobby instances, and
-		// I call some printLobbies($arrayOfLobbies) function
-		// for easy customization of display and stuff
-		$this->db->getUsersLobbies($_SESSION['user']->getId());
+		$all_user_lobbies=$this->db->getUsersLobbies($_SESSION['user']->getId());
 		
+		$swapArray['lobbies'] = $all_user_lobbies;
+
 		echo $this->load_template("main_menu", $swapArray);
 		return;
 	}
@@ -183,7 +203,7 @@ class ChowChooserEngine {
 		return md5($KEY_SALT.md5(date("Y-m-d h:i:sa"))); # the string after this date function is just specifying a format for how the date will output
 	}
 
-	function load_template($fileName, $swapArray = null) {
+	public static function load_template($fileName, $swapArray = null) {
 		$fileLocation = "templates/" . $fileName . ".html";
 		$file = fopen($fileLocation, "r") or die("Could not load file!");
 		$contents = fread($file, filesize($fileLocation));
@@ -199,12 +219,9 @@ class ChowChooserEngine {
 		return $contents;
 	}
 
-	function handle_order_actions() {
-		echo "this is where we handle in-order actions!";
-	}
 
 	function example_query() {
-		$response = $this->db->query("describe lobbies;");
+		$response = $this->db->query("describe lobby;");
 		$results = $response->fetch_assoc();
 
 		// printing the array of results, or we can foreach loop through them
@@ -257,8 +274,37 @@ class ChowChooserEngine {
 				break;
 
 			case '2':
-				//Lobby status: ORDERING
-				echo $this->load_template('lobby_ordering', $swapArray);
+            $orders = Order::getOrdersFromUserAndLobby(
+               $_SESSION['user']->getId(), $lobby->getId()
+            );
+
+            $orderDisplay = '<table style="text-align: left"><th>Quantity</th><th>Food</th><th>Order price</th>';
+            $totalPrice = 0.0;
+            foreach ($orders as $order) {
+               $food = FoodItem::getFoodItemFromId($order->getFoodId());
+               $orderPrice = $food->price * $order->quantity;
+               $totalPrice += $orderPrice;
+               $orderDisplay .= "<tr><td>"
+                  .$order->quantity."</td><td>"
+                  .$food->name."</td><td>"
+                  .$orderPrice."</td>"
+                  .'<td><form action="" method="post">
+                  <input type="hidden" name="deleteOrderRequest" value="SO TRUE" />
+                  <input type="hidden" name="orderId" value="'.$order->id.'" />
+                  <input name="deleteOrder" type="submit" value="Delete"/>
+                  </form></td></tr>';
+            }
+            $orderDisplay .= "</table>";
+
+            // saves if/else indentation, even if it overwrites previous work
+            if (empty($orders)) {
+               $orderDisplay = "<p>You have no orders in this lobby!</p>";
+            }
+
+            $swapArray['orderItems'] = $orderDisplay;
+            $swapArray['lobbyName'] = $lobby->getName();
+            $swapArray['totalPrice'] = $totalPrice;
+            echo $this->load_template('lobby_ordering', $swapArray);
 				break;
 
 			case '3':
@@ -274,7 +320,34 @@ class ChowChooserEngine {
 			}
 
 		//echo 'id: '.$lobby->getId().' admin: '.$lobby->getAdminId().' name: '.$lobby->getName().' status: '.$lobby->getStatusId();
-		
+
+	}
+
+	private function create_lobby() {
+		$lobbyName = $_POST["lobbyName"];
+		$doSkipVoting = empty($_POST["skipVoting"]);
+		$orderingEndTime = $_POST["orderingEndTime"];
+
+		// the voting end time is null if "skip voting" is enabled, which means
+		// the voting end time key is not sent in $_POST
+		$votingEndTime = key_exists('votingEndTime', $_POST) ? $_POST['votingEndTime'] : null;
+
+      // error message appears if:
+      // (1) lobby name is empty
+      // (2) voting end time is empty WHILE user did not elect to skip voting
+      // (3) ordering end time is empty
+		if (empty($lobbyName) || (is_null($votingEndTime) && !key_exists('skipVoting', $_POST)) || empty($orderingEndTime)) {
+			echo $this->load_template("create_lobby", ["errorMsg" => "Please enter data in all fields."]);
+			// do not return to calling function, we have already
+			// handled all page logic
+			exit();
+		}
+
+		Lobby::createLobbyInDatabase(
+			$lobbyName,
+			$votingEndTime,
+			$orderingEndTime
+		);
 	}
 
 }
