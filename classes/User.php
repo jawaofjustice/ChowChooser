@@ -28,7 +28,7 @@ class User {
 		return "this is resetting a password";
 	}
 
-	public static function getUserFromDatabase(string $email, string $password = null): User|null {
+	public static function getUserFromCredentials(string $email, string $password = null): User|null {
 		$db = new Database();
 		if (is_null($password)) {
 			// when creating an account, we're only concerned with finding
@@ -51,15 +51,23 @@ class User {
 		return new User($user['id'], $user['email'], $db);
 	}
 
-	public static function createUserInDatabase(string $email, string $password): User|null {
+	public static function createUserInDatabase(string $email, string $password, string $username): User|null {
       $db = new Database();
-		$emailAlreadyExists = !is_null(User::getUserFromDatabase($email));
+		$emailAlreadyExists = !is_null(User::getUserFromCredentials($email));
 		if ($emailAlreadyExists) {
 			$errorMsg = "User already exists with this email. Please try a different one!";
-         echo ChowChooserEngine::load_template("createUser", ["errorMsg" => $errorMsg]);
+         echo ChowChooserEngine::load_template("createAccount", ["errorMsg" => $errorMsg]);
 			exit();
 		}
-		echo "Can create account: user does not exist with this email!";
+
+      $statement = $db->mysqli->prepare("
+         insert into user
+         (email, password, username) values
+         ( (?), (?), (?) );");
+      $statement->bind_param('sss', $email, $password, $username);
+      $statement->execute();
+
+      return User::getUserFromCredentials($email);
 	}
 
 }
