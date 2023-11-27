@@ -13,10 +13,11 @@ class ChowChooserEngine {
 	
 	function __construct() {
 
-		// direct user to the welcome page if user
-		// isn't logged in and isn't actively trying to log in,
-		// such as when visiting the site for the first time
-		if (empty($_SESSION) && !isset($_POST['login'])) {
+		// direct user to the welcome page if:
+		// 1) User is not logged in, and
+		// 2) User is not logging in, and
+		// 3) User is not creating an account
+		if (empty($_SESSION) && !isset($_POST['login']) && !isset($_GET['action'])) {
 			$this->welcome();
 			return;
 		}
@@ -38,9 +39,7 @@ class ChowChooserEngine {
 			return;
 		} else if (isset($_POST['logout'])) {
 			session_unset();
-		} else if (isset($_POST['createAccount'])) {
-			$this->db->createAccount($_POST['email'], $_POST['password']);
-		}
+      }
 
 		$orderKey = "";
 		$actionKey = "";
@@ -107,6 +106,11 @@ class ChowChooserEngine {
 					$order = new OrderCreation($_GET['lobbyId']);
 					$order->processRemoveOrderItem();
 					break;
+				case "createAccount":
+					$this->createAccount();
+					/* echo $this->main_menu(); */
+					header("Location: ".$_SERVER['PHP_SELF']);
+					exit();
 				case "showlobby":
                if (isset($_POST['deleteOrderRequest'])) {
                   Order::deleteOrderById($_POST['orderId']);
@@ -350,6 +354,34 @@ class ChowChooserEngine {
 			$votingEndTime,
 			$orderingEndTime
 		);
+	}
+
+	private function createAccount() {
+		// user is navigating to the page, has not submitted form
+		if (!isset($_POST['formSubmitted'])) {
+			echo $this->load_template("createAccount", ["errorMsg" => ""]);
+			exit();
+		}
+
+		$email = $_POST['email'];
+		$username = $_POST['username'];
+		$password = $_POST['password'];
+
+		if (empty($email) || empty($password) || empty($username)) {
+			$errorMsg = "Please fill in all input fields.";
+			echo $this->load_template("createAccount", ["errorMsg" => $errorMsg]);
+			exit();
+		}
+
+		$user = User::createUserInDatabase($email, $password, $username);
+
+		if (is_null($user)) {
+			$errorMsg = "Something went wrong: error writing user to database";
+			echo $this->load_template("createAccount", ["errorMsg" => $errorMsg]);
+			exit();
+		}
+
+		$_SESSION['user'] = $user;
 	}
 
 }
