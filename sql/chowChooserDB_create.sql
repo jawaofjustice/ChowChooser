@@ -19,7 +19,7 @@ create table restaurant (
    primary key (id)
 );
 
-insert into restaurant (name) values
+insert into restaurant (name, address, phone, website) values
    ("Marco's Pizza", "1752 Plymouth Road, Ann Arbor MI 48105", "(734) 998-2600", "https://www.marcos.com"),
    ("Burger King", "4885 Washtenaw Ave, Ann Arbor, MI 48108", "(734) 434-8994", "https://www.bk.com"),
    ("McDonald's", "2310 W Stadium Blvd, Ann Arbor, MI 48103", "(734) 761-9087", "https://www.mcdonalds.com/us/en-us.html"),
