@@ -13,10 +13,11 @@ class ChowChooserEngine {
 	
 	function __construct() {
 
-		// direct user to the welcome page if user
-		// isn't logged in and isn't actively trying to log in,
-		// such as when visiting the site for the first time
-		if (empty($_SESSION) && !isset($_POST['login'])) {
+      // direct user to the welcome page if:
+      // 1) User is not logged in, and
+		// 2) User is not logging in, and
+		// 3) User is not creating an account
+		if (empty($_SESSION) && !isset($_POST['login']) && !isset($_POST['createUser'])) {
 			$this->welcome();
 			return;
 		}
@@ -38,9 +39,20 @@ class ChowChooserEngine {
 			return;
 		} else if (isset($_POST['logout'])) {
 			session_unset();
-		} else if (isset($_POST['createAccount'])) {
-			$this->db->createAccount($_POST['email'], $_POST['password']);
-		}
+		} else if (isset($_POST['createUser'])) {
+         if (!isset($_POST['formSubmitted'])) {
+            echo $this->load_template("createUser", ["errorMsg" => ""]);
+            exit();
+         }
+         if (empty($_POST['email']) || empty($_POST['password']) || empty($_POST['username'])) {
+            $errorMsg = "Please fill in all input fields.";
+            echo $this->load_template("createUser", ["errorMsg" => $errorMsg]);
+            exit();
+         }
+         User::createUserInDatabase($_POST['email'], $_POST['password']);
+         echo "account created!";
+         exit();
+      }
 
 		$orderKey = "";
 		$actionKey = "";

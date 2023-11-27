@@ -28,7 +28,7 @@ class User {
 		return "this is resetting a password";
 	}
 
-	public static function getUserFromCredentials(string $email, string $password): User|null {
+	public static function getUserFromDatabase(string $email, string $password = null): User|null {
 		$db = new Database();
 		if (is_null($password)) {
 			// when creating an account, we're only concerned with finding
@@ -51,9 +51,10 @@ class User {
 		return new User($user['id'], $user['email'], $db);
 	}
 
-	function createUserInDatabase(string $email, string $password): void {
-		$id = $this->getUserFromCredentials($email, null);
-		if (!is_null($id)) {
+	public static function createUserInDatabase(string $email, string $password): void {
+      $db = new Database();
+		$emailAlreadyExists = !is_null(User::getUserFromDatabase($email));
+		if ($emailAlreadyExists) {
 			echo "Cannot create account: user already exists with this email.";
 			return;
 		}
