@@ -1,13 +1,35 @@
+
+@font-face {
+  font-family: Rubik;
+  src: url(templates/fonts/Rubik/Rubik-VariableFont_wght.ttf);
+}
+
+
+
+@font-face {
+  font-family: Brice;
+  src: url(templates/fonts/Brice Regular SemiExpanded/Brice Regular SemiExpanded.otf);
+}
+
+
 body {
 	margin: 0px;
 	padding: 0px;
+	background-color: black;
+	color: white;
+	font-family: Rubik;
+	/*font-family: Brice;*/
+
 }
 
 table {
 	margin: 10px auto 0px auto;
-	border: 1px solid black;
+	border: 2px solid #F99716;
 	text-align: center;
 	border-spacing: 0px;
+	border-radius: 16px;
+	background-color: black;
+	color:white;
 }
 
 td {
@@ -16,10 +38,26 @@ td {
 }
 
 th {
-	background-color: #ddd;
+	background-color: #F99716;
 	padding: 4px;
+	color: black;
+	border-top-right-radius: 12px;
+	border-top-left-radius: 12px;
 }
 
+.gradientButton {
+	background-image: linear-gradient(to left, #11A047, #F0CC8E);
+	border-radius: 16px;
+	border: 0px;
+	cursor: pointer;
+	padding: 8px;
+	font-size: 16px;
+}
+.gradientButton:hover {
+	background: #333;
+	color: white;
+}
+	
 .warningMessage {
 	color: red;
 	font-weight: bold;
@@ -73,40 +111,42 @@ th {
 }
 
 .menuItem > div{
-	border: 2px solid #666;
+	/* border: 2px solid #666; */
 	width: 400px;
 	height: 60px;
 	font-size: 24px;
 	line-height: 60px;
-	margin-bottom: 4px;
-	border-radius: 4px;
+	border-radius: 16px;
 	color: black;
+	background-image: linear-gradient(to left, #11A047, #F0CC8E);
+	margin: 10px;
 }
 
 .menuItem > div:hover{
-	border: 2px solid #666;
+	color: white;
 	width: 400px;
 	height: 60px;
 	font-size: 24px;
 	line-height: 60px;
-	margin-bottom: 4px;
-	border-radius: 4px;
-	background-color: #666;
-	color: white;
+	border-radius: 16px;
 	
+	background: #333;
 }
 
 
 .orderLineItem{
-	border: 2px solid #666;
+	/* border: 2px solid #666; */
 	width: 600px;
 	height: 60px;
-	font-size: 24px;
 	line-height: 60px;
-	margin-bottom: 4px;
-	border-radius: 4px;
+	border-radius: 16px;
 	color: black;
+	/* background-color: red; */
+	margin: 10px;
+	font-size: 24px;
+	padding: 0px;
 	
+	background-image: linear-gradient(to left, #11A047, #F0CC8E);
 }
 
 .orderLineItem > a {
@@ -119,22 +159,43 @@ th {
 	display: inline-block;
 	text-decoration: none;
 	float: right;
-	background-color: #ddd;
+	background-color: #11A047;
+	
 	color: black;
+	border-top-right-radius: 14px;
+	border-bottom-right-radius: 14px;
 }
 
 .addLineItemButton:hover, .removeLineItemButton:hover {
-	background-color: #666;
+	background-color: #333;
 	color: white;
 }
 
 .removeLineItemButton {
 	width: 40px;
-	#border: 1px solid red;
+	#border: 2px solid #11A047;
 	display: inline-block;
 	text-decoration: none;
 	float: left;
-	background-color: #ddd;
+	background-color: #F0CC8E;
+	color: black;
+	border-top-left-radius: 14px;
+	border-bottom-left-radius: 14px;
+}
+
+
+.outerTable {
+	padding: 10px;
+	background-color: #F99716;
 	color: black;
 }
 
+.searchBox{
+	height: 32px;
+	font-size: 16px;
+	font-weight: bold;
+	padding: 4px;
+	display: block;
+	margin: 4px auto;
+	width: 80%;
+}
