@@ -51,12 +51,13 @@ class User {
 		return new User($user['id'], $user['email'], $db);
 	}
 
-	public static function createUserInDatabase(string $email, string $password): void {
+	public static function createUserInDatabase(string $email, string $password): User|null {
       $db = new Database();
 		$emailAlreadyExists = !is_null(User::getUserFromDatabase($email));
 		if ($emailAlreadyExists) {
-			echo "Cannot create account: user already exists with this email.";
-			return;
+			$errorMsg = "User already exists with this email. Please try a different one!";
+         echo ChowChooserEngine::load_template("createUser", ["errorMsg" => $errorMsg]);
+			exit();
 		}
 		echo "Can create account: user does not exist with this email!";
 	}
