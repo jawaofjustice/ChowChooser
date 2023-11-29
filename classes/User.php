@@ -4,12 +4,14 @@ class User {
 
 	private int $id;
 	private string $email;
+	private string $username;
 	private Database $db;
 
-	function __construct(int $id, string $email, Database $db) {
+	function __construct(int $id, string $email, string $username, Database $db) {
 		$this->id = $id;
 		$this->email = $email;
-		$this->db = new Database();
+		$this->username = $username;
+		$this->db = $db;
 	}
 
 	public function getId(): int {
@@ -18,6 +20,10 @@ class User {
 
 	public function getEmail(): string {
 		return $this->email;
+	}
+
+	public function getUsername(): string {
+		return $this->username;
 	}
 
 	function editUser() {
@@ -48,7 +54,19 @@ class User {
 			return null;
 		}
 
-		return new User($user['id'], $user['email'], $db);
+		return new User($user['id'], $user['email'], $user['username'], $db);
+	}
+
+	public static function getUserFromId(int $id): User {
+		$db = new Database();
+
+      $statement = $db->mysqli->prepare("select * from user where id = (?) limit 1");
+      $statement->bind_param('i', $id);
+		$statement->execute();
+
+		$user = mysqli_fetch_assoc($statement->get_result());
+
+		return new User($user['id'], $user['email'], $user['username'], $db);
 	}
 
 	public static function createUserInDatabase(string $email, string $password, string $username): User|null {

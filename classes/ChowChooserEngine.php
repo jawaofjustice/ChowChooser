@@ -235,7 +235,8 @@ class ChowChooserEngine {
 
 		$swapArray['lobbyId'] = $_GET['lobby'];
 		$lobby = Lobby::getLobbyFromDatabase($_GET['lobby']);
-		$user = $_SESSION['user'];
+		$userId = $_SESSION['user']->getId();
+		$userIsAdmin = $userId == $lobby->getAdminId();
 
 		$swapArray['votingEndTime'] = $lobby->getVotingEndTime();
 		$swapArray['orderingEndTime'] = $lobby->getOrderingEndTime();
@@ -258,7 +259,7 @@ class ChowChooserEngine {
 				foreach ($restaurantArray as $i) {
 					$restaurant = Restaurant::getRestaurantFromDatabase($i['restaurant_id']);
 
-					if(Vote::getUsersVote($user->getId(), $lobby->getId()) == $restaurant->id) {
+					if(Vote::getUsersVote($userId, $lobby->getId()) == $restaurant->id) {
 						$hasVoted = ' style="background-color: red;" ';
 					} else {
 						$hasVoted = ' ';
@@ -276,18 +277,33 @@ class ChowChooserEngine {
 				break;
 
 			case '2':
-            $orders = Order::getOrdersFromUserAndLobby(
-               $_SESSION['user']->getId(), $lobby->getId()
-            );
+            // display orders from all users if you are the lobby admin,
+            // otherwise just display your own
+            if ($userIsAdmin) {
+               $orders = Order::getOrdersFromLobby($lobby->getId());
+            } else {
+               $orders = Order::getOrdersFromUserAndLobby(
+                  $userId,
+                  $lobby->getId()
+               );
+            }
 
-            $orderDisplay = '<table style="text-align: left"><th>Quantity</th><th>Food</th><th>Order price</th>';
+            $orderDisplay = '<table style="text-align: left">';
+            if ($userIsAdmin) {
+               $orderDisplay .= "<th>Username</th>";
+            }
+            $orderDisplay .= '<th>Quantity</th><th>Food</th><th>Order price</th>';
             $subtotal = 0.0;
             foreach ($orders as $order) {
                $food = FoodItem::getFoodItemFromId($order->getFoodId());
                $orderPrice = $food->price * $order->quantity;
                $subtotal += $orderPrice;
-               $orderDisplay .= "<tr><td>"
-                  .$order->quantity."</td><td>"
+               $orderDisplay .= "<tr><td>";
+               if ($userIsAdmin) {
+                  $username = User::getUserFromId($order->getUserId())->getUsername();
+                  $orderDisplay .= $username."</td><td>";
+               }
+               $orderDisplay .= $order->quantity."</td><td>"
                   .$food->name."</td><td>$"
                   .$orderPrice."</td>"
                   .'<td><form action="" method="post">
