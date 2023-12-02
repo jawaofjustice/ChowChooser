@@ -138,6 +138,15 @@ class Lobby {
       $statement->bind_param('sssii', $lobbyName, $votingEndTime, $orderingEndTime, $admin_id, $status_id);
 
       $statement->execute();
+
+      //insert admin as a member of the newly created lobby
+    $statement = $db->mysqli->prepare('
+    INSERT INTO lobby_user (lobby_id, user_id) VALUES ( (SELECT id 
+    FROM lobby
+    WHERE name = (?) AND admin_id = (?) ), (?) )');
+    $statement->bind_param('sii', $lobbyName, $admin_id, $admin_id);
+    $statement->execute();
+
    }
 
 }

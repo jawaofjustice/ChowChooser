@@ -27,6 +27,15 @@
          <label for="orderingEndTime">Ordering time limit</label>
          <input id="orderingEndTime" name="orderingEndTime" type="datetime-local" />
          <br>
+
+         <!-- THIS DIV IS FOR ADDING RESTAURANTS TO THE LOBBY -->
+         <div>
+
+            {{restaurantCheckboxes}}
+
+         </div>
+         <br>
+
          <input type="submit" name="createLobby" id="submitLobbyForm" value="Create lobby" />
       </form>
 </html>
