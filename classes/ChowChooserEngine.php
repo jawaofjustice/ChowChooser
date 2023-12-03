@@ -272,6 +272,7 @@ class ChowChooserEngine {
 				}
 
 				$swapArray['tableContent'] = $tableContentSwapValue;
+				$swapArray['topRestaurant'] = Restaurant::getRestaurantFromDatabase($restaurantArray[0]['restaurant_id'])->name;
 
 				echo $this->load_template('lobby_voting', $swapArray);
 				break;

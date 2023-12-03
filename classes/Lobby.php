@@ -74,8 +74,12 @@ class Lobby {
 
     //returns an array of arrays containing [restartant_id=?]
     public function getRestaurants(): Array {
-        $statement = $this->db->mysqli->prepare('select restaurant_id from lobby_restaurant where lobby_restaurant.lobby_id = (?)');
-        $statement->bind_param('s', $this->id);
+        $statement = $this->db->mysqli->prepare('SELECT restaurant_id, COUNT(restaurant_id) votes 
+                                                    FROM chow_chooser.vote
+                                                    WHERE lobby_id = (?)
+                                                    GROUP BY restaurant_id
+                                                    order by votes desc');
+        $statement->bind_param('i', $this->id);
         $statement->execute();
 
         foreach ($statement->get_result() as $restaurant) {
