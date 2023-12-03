@@ -6,7 +6,6 @@ class User {
 	private string $email;
 	private string $username;
 	private Database $db;
-	private string $username;
 
 	function __construct(int $id, string $email, string $username, Database $db) {
 		$this->id = $id;
@@ -27,9 +26,6 @@ class User {
 		return $this->email;
 	}
 
-	public function getUsername(): string {
-		return $this->username;
-	}
 
 	function editUser() {
 		return "this is editing a user";
