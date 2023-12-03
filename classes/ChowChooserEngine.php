@@ -277,6 +277,11 @@ class ChowChooserEngine {
 				break;
 
 			case '2':
+
+			// display the name of the restaurant that wins the voting phase
+			$restaurant = Restaurant::getRestaurantFromDatabase($lobby->getRestaurants()[0]['restaurant_id']);
+			$swapArray['restaurant'] = $restaurant->name;
+
             // display orders from all users if you are the lobby admin,
             // otherwise just display your own
             if ($userIsAdmin) {
