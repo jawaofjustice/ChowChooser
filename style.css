@@ -51,6 +51,7 @@ th {
 	cursor: pointer;
 	padding: 8px;
 	font-size: 16px;
+	min-width: 140px;
 }
 .gradientButton:hover {
 	background: #333;
@@ -216,6 +217,7 @@ th {
 }
 
 .welcomeLogin {
+	
 }
 
 .welcomeLoginTitle {
@@ -267,4 +269,23 @@ th {
 	background-size: clip;
 	background-position: center;
 	
+}
+
+h1 {
+
+	color: #ff914d;
+	margin: 0px auto;
+	font-family: Brice;
+	text-align: center;
+	font-size: 48px;
+}
+
+.rightAlignText {
+	text-align: right;
+}
+
+.loginTextInput {
+	width: 240px;
+	height: 32px;
+	font-size: 20px;
 }

@@ -17,6 +17,8 @@
 				<div class="welcomeLogin" id="login">
 					<form action="" method="post">
 						<table>
+							<col width="40%" />
+							<col width="60%" />
 							<tr>
 								<th colspan="2">
 											
@@ -25,27 +27,27 @@
 								</th>
 							</td>
 							<tr>
-								<td>
+								<td class="rightAlignText">
 									<label for="email">Email:</label>
 								</td>
 								<td>
-									<input type="text" name="email" id="email" /><br />
+									<input class="loginTextInput" type="text" name="email" id="email" /><br />
 								</td>
 							</tr>
 							<tr>
-								<td>
+								<td class="rightAlignText">
 									<label for="password">Password:</label>
 								</td>
 								<td>
-									<input type="password" name="password" id="password"/><br />
+									<input class="loginTextInput" type="password" name="password" id="password"/><br />
 								</td>
 							</tr>
 							<tr>
 								<td>
-									<input type="submit" name="login" id="login" value="Log in" style="display: inline" class="gradientButton" />
+									<a href="?action=createAccount"><input type="button" value="Create Account" class="gradientButton" /></a>
 								</td>
 								<td>
-									<a href="?action=createAccount"><input type="button" value="Create Account" class="gradientButton" /></a>
+									<input type="submit" name="login" id="login" value="Log in" style="display: inline" class="gradientButton" />
 								</td>
 							</tr>
 						</table>	
