@@ -23,7 +23,7 @@ body {
 
 table {
 	margin: 10px auto 0px auto;
-	border: 2px solid #F99716;
+
 	text-align: center;
 	border-spacing: 0px;
 	border-radius: 16px;
@@ -290,6 +290,10 @@ h1 {
 	text-align: right;
 }
 
+.leftAlignText {
+	text-align: left;
+}
+
 .loginTextInput {
 	width: 240px;
 	height: 32px;
@@ -351,4 +355,14 @@ h1 {
 	text-align:center;
 	margin: 0px auto;
 	height: 20px;
+}
+
+.largeCenteredButton {
+  margin: 0px auto;
+  text-decoration: none;
+  display: block;
+}
+
+.thinTable {
+	border: 2px solid #F99716;
 }

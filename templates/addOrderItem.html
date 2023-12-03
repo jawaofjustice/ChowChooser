@@ -1,84 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<link rel="stylesheet" type="text/css" href="style.css" />
-		<title>ChowChooser - {{pageTitle}}</title>
-	</head>
-	<body>
-		{{loginLogoutForm}}
-
-		<table class="outerTable">
-			<tr>
-				<th colspan="2">					
-					{{pageTitle}}
-					<br />
-				</th>
-				
-			</tr>
+<table class="outerTable">
+	<tr>
+		<th colspan="2">					
+			{{pageTitle}}
+			<br />
+		</th>
+		
+	</tr>
+	
+	<tr>
+		<td colspan="2">
+			<span class="warningMessage">{{warningMessage}}</span>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			{{lobbyInfo}}
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<table>
+				<tr>
+					<th>
+						your order so far
+					</th>
+				</tr>
+				<tr>
+					<td>
+						{{existingOrderItems}}
+					</td>
+				</tr>
+			</table>
 			
-			<tr>
-				<td colspan="2">
-					<span class="warningMessage">{{warningMessage}}</span>
-				</td>
-			</tr>
-			<tr>
-				<td colspan="2">
-					{{lobbyInfo}}
-				</td>
-			</tr>
-			
-			<tr>
-				<td>
-					<table>
-						<tr>
-							<th>
-								your order so far
-							</th>
-						</tr>
-						<tr>
-							<td>
-								{{existingOrderItems}}
-							</td>
-						</tr>
-					</table>
-					
-				</td>
-				<td>
-					<table>
-						<tr>
-							<th>
-								Select something to add to your order
-							</th>
-						</tr>
-						<tr>
-							<td>
-								<form action="?action=viewPlaceOrderSample&lobbyId={{lobbyId}}" method="post">
-									<label for="searchText"> Search for an item here: </label></br >
-									<input type="text" name="searchText" id="searchText" class="searchBox">
-									<input type="submit" value="Search" class="gradientButton" />
-									
-									<a href="?action=viewPlaceOrderSample&lobbyId={{lobbyId}}">
-										<input type="button" value="Reset Search" class="gradientButton" />
-									</a>
-									{{searchResultsHeader}}
-								</form>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								
-								{{menuList}}
-								
-							</td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-		</table>
+		</td>
+		<td>
+			<table>
+				<tr>
+					<th>
+						Select something to add to your order
+					</th>
+				</tr>
+				<tr>
+					<td>
+						<form action="?action=viewPlaceOrderSample&lobbyId={{lobbyId}}" method="post">
+							<label for="searchText"> Search for an item here: </label></br >
+							<input type="text" name="searchText" id="searchText" class="searchBox">
+							<input type="submit" value="Search" class="gradientButton" />
+							
+							<a href="?action=viewPlaceOrderSample&lobbyId={{lobbyId}}">
+								<input type="button" value="Reset Search" class="gradientButton" />
+							</a>
+							{{searchResultsHeader}}
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						
+						{{menuList}}
+						
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
 
-		<br>
-		<a href="?action=showlobby&lobby={{lobbyId}}"><input type="button" value="Back to lobby" /></a>
+<br>
+<a href="?action=showlobby&lobby={{lobbyId}}"><input type="button" value="Back to lobby" /></a>
 
-	</body>
-</html>
