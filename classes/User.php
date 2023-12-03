@@ -5,13 +5,19 @@ class User {
 	private int $id;
 	private string $email;
 	private Database $db;
+	private string $username;
 
-	function __construct(int $id, string $email, Database $db) {
+	function __construct(int $id, string $email, string $username, Database $db) {
 		$this->id = $id;
 		$this->email = $email;
 		$this->db = new Database();
+		$this->username = $username;
 	}
-
+	
+	public function getUsername(): string {
+		return $this->username;
+	}
+	
 	public function getId(): int {
 		return $this->id;
 	}
@@ -48,7 +54,7 @@ class User {
 			return null;
 		}
 
-		return new User($user['id'], $user['email'], $db);
+		return new User($user['id'], $user['email'], $user['username'], $db);
 	}
 
 	public static function createUserInDatabase(string $email, string $password, string $username): User|null {

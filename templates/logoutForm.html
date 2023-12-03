@@ -1,8 +1,28 @@
-<span class="loginHolder">
+<!--<span class="loginHolder">
 	<div class="logout" id="logout">
 		<form action="?" method="post">
-			<p>Hello, User {{userId}}!</p>
-			<input type="submit" name="logout" id="logout" value="Log out" style="display: inline" />
+			<p>Hello, User {{userName}}!</p>
+			<input type="submit" name="logout" id="logout" value="Log out" style="display: inline" class="gradientButton" />
 		</form>
 	</div>
+</span>
+-->
+
+
+<span class="loginHolder">
+	
+	<form action="?" method="post">
+		<table>
+			<tr>
+				<th>
+					<p>Hello, User {{userName}}!</p>
+				</th>
+			</tr>
+			<tr>
+				<td>
+					<input type="submit" name="logout" id="logout" value="Log out" style="display: inline" class="gradientButton" />
+				</td>
+			</tr>
+		</table>
+	</form>
 </span>

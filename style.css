@@ -8,7 +8,7 @@
 
 @font-face {
   font-family: Brice;
-  src: url(templates/fonts/Brice Regular SemiExpanded/Brice Regular SemiExpanded.otf);
+  src: url("templates/fonts/Brice Regular SemiExpanded/Brice Regular SemiExpanded.otf");
 }
 
 
@@ -18,7 +18,6 @@ body {
 	background-color: black;
 	color: white;
 	font-family: Rubik;
-	/*font-family: Brice;*/
 
 }
 
@@ -66,7 +65,8 @@ th {
 .loginHolder {
 	margin: 2px 8px;
 	padding: 4px 8px;
-	border: 1px solid #888;
+	/*border: 1px solid #888;
+	*/
 	float: right;
 	border-radius: 4px;
 }
@@ -198,4 +198,73 @@ th {
 	display: block;
 	margin: 4px auto;
 	width: 80%;
+}
+
+.showLobbyTable > tr > td{
+	background-color: white;
+}
+
+.logoHeader {
+	background-image: url(templates/images/logo.png);
+	background-repeat: no-repeat;
+	width: 100%;
+	height: 144px;
+	
+}
+
+.welcomeLoginHolder {
+}
+
+.welcomeLogin {
+}
+
+.welcomeLoginTitle {
+}
+
+.welcomePageHolder {
+	border: 0px;
+	width: 100%;
+}
+
+.welcomePageLeftSideA {
+	/*
+	border: 1px solid green;
+	*/
+	width: 50%;
+	font-size: 80px;
+	font-family: Brice;
+	text-align: left;
+	color: #ff914d;
+}
+
+.welcomePageLeftSideA > div {
+	/*
+		border: 1px solid purple;
+	*/
+	width: 500px;
+	margin: 0px auto;
+}
+
+.welcomePageLeftSideB {
+	/*
+	border: 1px solid red;
+	*/
+}
+
+.welcomePageRightSide {
+	
+	
+	height: 600px;
+	/*
+	border: 1px solid blue;
+	
+	border-radius: 40px;
+	*/
+	background-image: url(templates/images/welcomeSplashImage.jpg);
+	background-repeat: no-repeat;
+	height: 500px;
+	width: 600px;
+	background-size: clip;
+	background-position: center;
+	
 }

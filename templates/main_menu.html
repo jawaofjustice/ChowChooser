@@ -1,26 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<link rel="stylesheet" type="text/css" href="style.css" />
-		<title>ChowChooser - Your Lobbies</title>
-	</head>
-	<body>
-		<h1>Hello, User {{userId}}!</h1>
-		<p>You are looking at the "View Lobbies" page!</p>
 
-		{{lobbies}}<br><br>
+<body>
+	<h1>Hello, User {{userName}}!</h1>
+	<p>You are looking at the "View Lobbies" page!</p>
 
-		<a href="index.php?action=showlobby&lobby=1">Test lobby status 1</a><br>
-		<a href="index.php?action=showlobby&lobby=2">Test lobby status 2</a><br>
-		<a href="index.php?action=showlobby&lobby=3">Test lobby status 3</a><br>
+	{{lobbies}}<br><br>
 
-		<a href="?action=createLobby"><input type="button" value="Create a new lobby" /></a>
-		
-		<div class="logout" id="logout">
-			<form action="?" method="post">
-				<input type="submit" name="logout" id="logout" value="Log out" style="display: inline" />
-			</form>
-		</div>
-	</body>
-</html>
+	<a href="index.php?action=showlobby&lobby=1">Test lobby status 1</a><br>
+	<a href="index.php?action=showlobby&lobby=2">Test lobby status 2</a><br>
+	<a href="index.php?action=showlobby&lobby=3">Test lobby status 3</a><br>
+
+	<a href="?action=createLobby"><input type="button" value="Create a new lobby" /></a>
+	
+	<div class="logout" id="logout">
+		<form action="?" method="post">
+			<input type="submit" name="logout" id="logout" value="Log out" style="display: inline" />
+		</form>
+	</div>
+</body>

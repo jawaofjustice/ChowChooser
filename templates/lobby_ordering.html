@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Lobby {{lobbyName}}</title>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" type="text/css" href="style.css" />
+		<title>ChowChooser - Lobby {{lobbyName}}</title>
 	</head>
+	{{loginLogoutForm}}
 	<body>
 		<h1 id="heading1">Lobby {{lobbyName}} is in the Ordering phase!</h1>
 		<ul id="orderItems">
 			{{orderItems}}
 		</ul>
 
-	<table>
+	<table class="showLobbyTable">
 			<tr>
 				<td>Subtotal:</td>
 				<td>${{subtotal}}</td>
