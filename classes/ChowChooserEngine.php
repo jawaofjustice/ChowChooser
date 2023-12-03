@@ -10,7 +10,7 @@ require_once "classes/Order.php";
 
 class ChowChooserEngine {
 	public $db;
-	
+
 	function __construct() {
 
 		// direct user to the welcome page if:
@@ -61,6 +61,16 @@ class ChowChooserEngine {
 			return;
 		}
 
+
+
+		// login form changes to logout form if user is logged in
+		if (!isset($_SESSION['user'])) {
+			$swapArray['loginLogoutForm'] = $this->load_template("loginForm");
+		} else {
+			$swapArray['loginLogoutForm'] = $this->load_template("logoutForm");
+			$swapArray['userId'] = $_SESSION['user']->getUsername();
+		}
+		$this->swapArray = $swapArray;
 		if(!$orderKeyExists && !$actionKeyExists) {
 			// no action or orderKey means we're going to the welcome page
 			$this->welcome();
@@ -110,7 +120,7 @@ class ChowChooserEngine {
 					$this->createAccount();
 					/* echo $this->main_menu(); */
 					header("Location: ".$_SERVER['PHP_SELF']);
-					exit();
+					break;
 				case "showlobby":
                if (isset($_POST['deleteOrderRequest'])) {
                   Order::deleteOrderById($_POST['orderId']);
@@ -140,20 +150,20 @@ class ChowChooserEngine {
 	}
 
 	function welcome($warning = null) {
-		$swapArray['testMessage'] = "This is a message to swap into our template."; // this will replace the tag {{testMessage}} in the template welcome.html
-
+		
 		$swapArray['warningMessage'] = "" . $warning == "" ? "" : $warning . "<br /><br />";
 
-		// login form changes to logout form if user is logged in
-		if (!isset($_SESSION['user'])) {
-			$swapArray['loginLogoutForm'] = $this->load_template("loginForm");
-		} else {
-			$swapArray['loginLogoutForm'] = $this->load_template("logoutForm");
-			$swapArray['userId'] = $_SESSION['user']->getId();
-		}
-
-		//echo getenv('CHOWCHOOSER_P');
-		echo $this->load_template("welcome", $swapArray);
+		//~ // login form changes to logout form if user is logged in
+		//~ if (!isset($_SESSION['user'])) {
+			//~ $swapArray['loginLogoutForm'] = $this->load_template("loginForm");
+		//~ } else {
+			//~ $swapArray['loginLogoutForm'] = $this->load_template("logoutForm");
+			//~ $swapArray['userId'] = $_SESSION['user']->getId();
+		//~ }
+		
+		$swapArray['loginLogoutForm'] = "";
+		$swapArray['mainContent'] = $this->load_template("welcome", $swapArray);
+		echo $this->load_template("base", $swapArray);
 	}
 
 	function view_order($orderKey) {
@@ -188,12 +198,15 @@ class ChowChooserEngine {
 
 	function main_menu(): void {
 		$swapArray['userId'] = $_SESSION['user']->getId();
-
+		$swapArray['loginLogoutForm'] = $this->load_template("logoutForm");
+		$swapArray['userName'] = $_SESSION['user']->getUsername();
 		$all_user_lobbies=$this->db->getUsersLobbies($_SESSION['user']->getId());
 		
 		$swapArray['lobbies'] = $all_user_lobbies;
 
-		echo $this->load_template("main_menu", $swapArray);
+		$swapArray['mainContent'] = $this->load_template("main_menu", $swapArray);
+		echo $this->load_template("base", $swapArray);
+		
 		return;
 	}
 
@@ -233,6 +246,7 @@ class ChowChooserEngine {
 
 	function view_lobby() {
 
+		$swapArray = $this->swapArray;
 		$swapArray['lobbyId'] = $_GET['lobby'];
 		$lobby = Lobby::getLobbyFromDatabase($_GET['lobby']);
 		$userId = $_SESSION['user']->getId();

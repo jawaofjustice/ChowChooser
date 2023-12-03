@@ -18,13 +18,12 @@ class OrderCreation {
 		$this->db = $db->mysqli;
 		$this->lobbyId = $lobbyId; // for testing purposes
 		$this->userId = $_SESSION['user']->getId();
-		
 		//$this->viewAddOrderItem();
 	}
 	
 	function viewAddOrderItem() {
 		
-		
+		$swapArray['lobbyId'] = $this->lobbyId;
 		$swapArray['pageTitle'] = "Add an item to your order!";	
 		$swapArray['loginLogoutForm'] = ChowChooserEngine::load_template("logoutForm");
 		$swapArray['userId'] = $this->userId;
@@ -33,7 +32,7 @@ class OrderCreation {
 		$swapArray['menuList'] = $this->buildMenu();
 		$swapArray['existingOrderItems'] = $this->buildCurrentOrder();
 		$swapArray['searchResultsHeader'] = $this->buildSearchResultHeader();
-		$swapArray['lobbyId'] = $this->lobbyId;
+		
 		echo ChowChooserEngine::load_template("addOrderItem", $swapArray);
 	}
 	
@@ -173,7 +172,6 @@ class OrderCreation {
 		//
 		$output = "";
 		if(mysqli_num_rows($response) > 0) {
-			
 			$i = 0;
 			foreach ($response as $r) {
 				$i++;

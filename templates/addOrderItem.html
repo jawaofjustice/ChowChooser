@@ -6,7 +6,9 @@
 		<title>ChowChooser - {{pageTitle}}</title>
 	</head>
 	<body>
-		<table>
+		{{loginLogoutForm}}
+
+		<table class="outerTable">
 			<tr>
 				<th colspan="2">					
 					{{pageTitle}}
@@ -42,7 +44,7 @@
 					</table>
 					
 				</td>
-			<td>
+				<td>
 					<table>
 						<tr>
 							<th>
@@ -51,15 +53,13 @@
 						</tr>
 						<tr>
 							<td>
-								<form action="?" method="post">
-									<label for="searchText"> Search for an item here: </label></a >
-									<input type="text" name="searchText" id="searchText">
-									<input type="hidden" name="action" value="viewPlaceOrderSample" />
-									<input type="hidden" name="lobbyId" value="{{lobbyId}}" />
-									<input type="submit" value="Search" />
+								<form action="?action=viewPlaceOrderSample&lobbyId={{lobbyId}}" method="post">
+									<label for="searchText"> Search for an item here: </label></br >
+									<input type="text" name="searchText" id="searchText" class="searchBox">
+									<input type="submit" value="Search" class="gradientButton" />
 									
 									<a href="?action=viewPlaceOrderSample&lobbyId={{lobbyId}}">
-										<input type="button" value="Reset Search" />
+										<input type="button" value="Reset Search" class="gradientButton" />
 									</a>
 									{{searchResultsHeader}}
 								</form>
