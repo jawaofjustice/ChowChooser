@@ -30,6 +30,7 @@ class Database {
 
 		$all_user_lobbies="";
 
+
 		/* $lobbies = mysqli_fetch_assoc($statement->get_result()); */
 		foreach ($statement->get_result() as $lobby) {
 			// If the user is the lobby admin, put a star after their user ID
@@ -38,8 +39,18 @@ class Database {
 			else
 				$adminIcon = "";
 
+			// Display end of phase information based on the current phase
+			if ($lobby['description']=="Voting")
+				$phase_end_message="Voting ends at ".$lobby['voting_end_time'];
+			else if ($lobby['description']=="Ordering")
+				$phase_end_message="Ordering ends at ".$lobby['ordering_end_time'];
+			else if ($lobby['description']=="Completed")
+				$phase_end_message="Everyone has finished ordering. Enjoy your meal!";
+			else
+				$phase_end_message="ERROR: Invalid lobby status";
+
 			// Append each lobby to a list of lobbies for the user
-			$all_user_lobbies.='<a href="index.php?action=showlobby&lobby='.$lobby['id'].'">'.$lobby['name']."</a>"." User: ".$lobby['username'].$adminIcon." Status: ".$lobby['description']."<br>";
+			$all_user_lobbies.='<a href="index.php?action=showlobby&lobby='.$lobby['id'].'">'.$lobby['name']."</a>"." User: ".$lobby['username'].$adminIcon." ".$phase_end_message."<br>";
 		}
 
 		return $all_user_lobbies;
