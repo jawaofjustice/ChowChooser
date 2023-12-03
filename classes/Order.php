@@ -34,6 +34,10 @@ class Order {
       return $this->food_id;
    }
 
+   public function getUserId(): int {
+      return $this->user_id;
+   }
+
    public function __get($property) {
       if (property_exists($this, $property)) {
           return $this->$property;
@@ -63,6 +67,25 @@ class Order {
          $lobby_id,
          $food_id,
       );
+   }
+
+   public static function getOrdersFromLobby(int $lobbyId): array {
+      $db = new Database();
+      $statement = $db->mysqli->prepare("select * from order_item where lobby_id = (?)");
+      $statement->bind_param('i', $lobbyId);
+      $statement->execute();
+
+      $orders = array();
+      foreach ($statement->get_result() as $order) {
+         $id = $order['id'];
+         $quantity = $order['quantity'];
+         $user_id = $order['user_id'];
+         $lobby_id = $order['lobby_id'];
+         $food_id = $order['food_id'];
+         array_push($orders, new Order($db, $id, $quantity, $user_id, $lobby_id, $food_id));
+      }
+
+      return $orders;
    }
 
    public static function getOrdersFromUserAndLobby(int $userId, int $lobbyId): array {
