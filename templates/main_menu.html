@@ -5,12 +5,16 @@
 		<tr>
 			<th> here' some libbies
 			</th>
+		</tr>
+		{{lobbies}}
+		<tr>
 			<td>
-				dis a lob b
+				<a href="?action=createLobby"><input type="button" value="Create a new lobby" class="gradientButton" /></a>
+				
+				
 			</td>
 		</tr>
 	</table>
-	{{lobbies}}<br><br>
 	
 	<!--
 	<a href="index.php?action=showlobby&lobby=1">Test lobby status 1</a><br>
@@ -18,11 +22,5 @@
 	<a href="index.php?action=showlobby&lobby=3">Test lobby status 3</a><br>
 	-->
 	
-	<a href="?action=createLobby"><input type="button" value="Create a new lobby" /></a>
 	
-	<div class="logout" id="logout">
-		<form action="?" method="post">
-			<input type="submit" name="logout" id="logout" value="Log out" style="display: inline" />
-		</form>
-	</div>
 </body>

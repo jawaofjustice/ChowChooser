@@ -200,7 +200,7 @@ class ChowChooserEngine {
 		$swapArray['userId'] = $_SESSION['user']->getId();
 		$swapArray['loginLogoutForm'] = $this->load_template("logoutForm");
 		$swapArray['userName'] = $_SESSION['user']->getUsername();
-		$all_user_lobbies=$this->db->getUsersLobbies($_SESSION['user']->getId());
+		$all_user_lobbies=Lobby::getUsersLobbies($_SESSION['user']->getId());
 		
 		$swapArray['lobbies'] = $all_user_lobbies;
 
