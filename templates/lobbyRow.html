@@ -1,10 +1,13 @@
 <tr>
 	<td>
-		<div class="gradientButton">
-			<a href="index.php?action=showlobby&lobby={{lobbyId}">
-				{{lobbyName}}
-			</a>User: {{lobbyUsername}} {{lobbyAdminIcon}} - {{lobbyPhaseEndMessage}}<br />
-		</div>
+		<a href="index.php?action=showlobby&lobby={{lobbyId}}" class="lobbyRow">
+			<div class="gradientButton bigListItem">
+				<div>{{lobbyName}} </div>
+				<!--<div>created {{lobbyAdminIcon}}by {{lobbyUsername}} </div>-->
+				<div>created by {{lobbyUsername}} </div>
+				<div>{{lobbyPhaseEndMessage}}<br /></div>
+			</div>
+		</a>
 	</td>
 </tr>
 

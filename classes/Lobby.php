@@ -164,7 +164,7 @@ class Lobby {
 		foreach ($statement->get_result() as $lobby) {
 			// If the user is the lobby admin, put a star after their user ID
 			if ($lobby['admin_id']==$lobby['user_id'])
-				$adminIcon = "*";
+				$adminIcon = "and administrated ";
 			else
 				$adminIcon = "";
 
@@ -182,11 +182,15 @@ class Lobby {
 			//$all_user_lobbies.='<a href="index.php?action=showlobby&lobby='.$lobby['id'].'">'.$lobby['name']."</a>"." User: ".$lobby['username'].$adminIcon." ".$phase_end_message."<br>";
 			$swapArray['lobbyId'] = $lobby['id'];
 			$swapArray['lobbyName'] = $lobby['name'];
-			$swapArray['lobbyUsername'] = $lobby['username'];
+			$swapArray['lobbyUsername'] = $_SESSION['user']->getUsername() == $lobby['username'] ? "You" : $lobby['username'];
 			$swapArray['lobbyAdminIcon'] = $adminIcon;
 			$swapArray['lobbyPhaseEndMessage'] = $phase_end_message;
 			
 			$all_user_lobbies .= ChowChooserEngine::load_template('lobbyRow', $swapArray);
+		}
+		
+		if ($all_user_lobbies == "") {
+			return "<tr><td><h2>You have no active lobbies!</h2></td></tr>";
 		}
 
 		return $all_user_lobbies;

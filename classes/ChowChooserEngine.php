@@ -30,8 +30,7 @@ class ChowChooserEngine {
 		if (isset($_POST['login'])) {
 			$user = User::getUserFromCredentials($_POST['email'], $_POST['password']);
 			if (is_null($user)) {
-				echo "Failed to log in: invalid credentials";
-				$this->welcome();
+				$this->welcome("Failed to log in: invalid credentials");
 				return;
 			}
 			$_SESSION['user'] = $user;
@@ -122,9 +121,9 @@ class ChowChooserEngine {
 					header("Location: ".$_SERVER['PHP_SELF']);
 					break;
 				case "showlobby":
-               if (isset($_POST['deleteOrderRequest'])) {
-                  Order::deleteOrderById($_POST['orderId']);
-               }
+				   if (isset($_POST['deleteOrderRequest'])) {
+					  Order::deleteOrderById($_POST['orderId']);
+				   }
 					$this->view_lobby();
 					break;
 				case "main":
@@ -151,7 +150,7 @@ class ChowChooserEngine {
 
 	function welcome($warning = null) {
 		
-		$swapArray['warningMessage'] = "" . $warning == "" ? "" : $warning . "<br /><br />";
+		$swapArray['warningMessage'] = "" . $warning == "" ? "" : $warning;
 
 		//~ // login form changes to logout form if user is logged in
 		//~ if (!isset($_SESSION['user'])) {
@@ -291,57 +290,57 @@ class ChowChooserEngine {
 				break;
 
 			case '2':
-            // display orders from all users if you are the lobby admin,
-            // otherwise just display your own
-            if ($userIsAdmin) {
-               $orders = Order::getOrdersFromLobby($lobby->getId());
-            } else {
-               $orders = Order::getOrdersFromUserAndLobby(
-                  $userId,
-                  $lobby->getId()
-               );
-            }
+				// display orders from all users if you are the lobby admin,
+				// otherwise just display your own
+				if ($userIsAdmin) {
+				   $orders = Order::getOrdersFromLobby($lobby->getId());
+				} else {
+				   $orders = Order::getOrdersFromUserAndLobby(
+					  $userId,
+					  $lobby->getId()
+				   );
+				}
+				$orderTableRows = "";
+				$adminColumnHeader = $userIsAdmin ? "<th>User</th>" : "";
+			   
+				$subtotal = 0.0;
+				foreach ($orders as $order) {
+				   $food = FoodItem::getFoodItemFromId($order->getFoodId());
+				   $orderPrice = $food->price * $order->quantity;
+				   $subtotal += $orderPrice;
+				   $username = "";
+				   if ($userIsAdmin) {
+					  $username = User::getUserFromId($order->getUserId())->getUsername();
+				   }
+				   $rowSwap = Array();
+				   $rowSwap['adminColumn'] = $userIsAdmin ? "<td>".$username."</td>" : "";
+				   $rowSwap['foodName'] = $food->name;
+				   $rowSwap['orderQty'] = $order->quantity;
+				   $rowSwap['orderPrice'] = $orderPrice;
+				   $rowSwap['orderId'] = $order->id;
+				   
+					$orderTableRows .= $this->load_template('lobbyOrderRow', $rowSwap);
+				}
 
-            $orderDisplay = '<table style="text-align: left">';
-            if ($userIsAdmin) {
-               $orderDisplay .= "<th>Username</th>";
-            }
-            $orderDisplay .= '<th>Quantity</th><th>Food</th><th>Order price</th>';
-            $subtotal = 0.0;
-            foreach ($orders as $order) {
-               $food = FoodItem::getFoodItemFromId($order->getFoodId());
-               $orderPrice = $food->price * $order->quantity;
-               $subtotal += $orderPrice;
-               $orderDisplay .= "<tr><td>";
-               if ($userIsAdmin) {
-                  $username = User::getUserFromId($order->getUserId())->getUsername();
-                  $orderDisplay .= $username."</td><td>";
-               }
-               $orderDisplay .= $order->quantity."</td><td>"
-                  .$food->name."</td><td>$"
-                  .$orderPrice."</td>"
-                  .'<td><form action="" method="post">
-                  <input type="hidden" name="deleteOrderRequest" value="SO TRUE" />
-                  <input type="hidden" name="orderId" value="'.$order->id.'" />
-                  <input name="deleteOrder" type="submit" value="Delete"/>
-                  </form></td></tr>';
-            }
-            $orderDisplay .= "</table>";
+				// saves if/else indentation, even if it overwrites previous work
+				if (empty($orders)) {
+				   $orderDisplay = "<p>You have no orders in this lobby!</p>";
+				}
+				
+				if (empty($orders)) {
+					$swapArray['orderItems'] = "<p>You have no orders in this lobby!</p>";
+				} else {
+					$swapArray['orderItems'] = $this->load_template('lobbyOrderTable', ["orderTableRows" => $orderTableRows, "adminColumnHeader" => $adminColumnHeader]);
+				}
 
-            // saves if/else indentation, even if it overwrites previous work
-            if (empty($orders)) {
-               $orderDisplay = "<p>You have no orders in this lobby!</p>";
-            }
-
-            $swapArray['orderItems'] = $orderDisplay;
-            $swapArray['lobbyName'] = $lobby->getName();
-            $swapArray['subtotal'] = $subtotal;
-            $swapArray['taxes'] = number_format(round($subtotal * 0.06, 2), 2);
-            $swapArray['totalPrice'] = number_format(round($subtotal * 1.06, 2), 2);
-            // required for placing orders
-            $swapArray['lobbyId'] = $lobby->getId();
-            echo $this->load_template('lobby_ordering', $swapArray);
-				break;
+				$swapArray['lobbyName'] = $lobby->getName();
+				$swapArray['subtotal'] = $subtotal;
+				$swapArray['taxes'] = number_format(round($subtotal * 0.06, 2), 2);
+				$swapArray['totalPrice'] = number_format(round($subtotal * 1.06, 2), 2);
+				// required for placing orders
+				$swapArray['lobbyId'] = $lobby->getId();
+				echo $this->load_template('base', ['mainContent' => $this->load_template('lobby_ordering', $swapArray), 'loginLogoutForm' => $this->load_template("logoutForm")]);
+					break;
 
 			case '3':
 				//Lobby status: COMPLETED
@@ -389,7 +388,9 @@ class ChowChooserEngine {
 	private function createAccount() {
 		// user is navigating to the page, has not submitted form
 		if (!isset($_POST['formSubmitted'])) {
-			echo $this->load_template("createAccount", ["errorMsg" => ""]);
+			$swap['loginLogoutForm'] = $this->load_template("logoutForm");
+			$swap['mainContent'] = $this->load_template("createAccount", ["errorMsg" => ""]);
+			echo $this->load_template("base", $swap);
 			exit();
 		}
 
@@ -399,7 +400,9 @@ class ChowChooserEngine {
 
 		if (empty($email) || empty($password) || empty($username)) {
 			$errorMsg = "Please fill in all input fields.";
-			echo $this->load_template("createAccount", ["errorMsg" => $errorMsg]);
+			$swap['loginLogoutForm'] = $this->load_template("logoutForm");
+			$swap['mainContent'] = $this->load_template("createAccount", ["errorMsg" => $errorMsg]);
+			echo $this->load_template("base", $swap);
 			exit();
 		}
 
@@ -407,7 +410,9 @@ class ChowChooserEngine {
 
 		if (is_null($user)) {
 			$errorMsg = "Something went wrong: error writing user to database";
-			echo $this->load_template("createAccount", ["errorMsg" => $errorMsg]);
+			$swap['loginLogoutForm'] = $this->load_template("logoutForm");
+			$swap['mainContent'] = $this->load_template("createAccount", ["errorMsg" => $errorMsg]);
+			echo $this->load_template("base", $swap);
 			exit();
 		}
 

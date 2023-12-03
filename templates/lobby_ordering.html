@@ -1,34 +1,22 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="UTF-8">
-		<link rel="stylesheet" type="text/css" href="style.css" />
-		<title>ChowChooser - Lobby {{lobbyName}}</title>
-	</head>
-	{{loginLogoutForm}}
-	<body>
-		<h1 id="heading1">Lobby {{lobbyName}} is in the Ordering phase!</h1>
-		<ul id="orderItems">
-			{{orderItems}}
-		</ul>
 
-	<table class="showLobbyTable">
-			<tr>
-				<td>Subtotal:</td>
-				<td>${{subtotal}}</td>
-			</tr>
-			<tr>
-			<td>Taxes:</td>
-				<td>${{taxes}}</td>
-			</tr>
-			<tr>
-				<td>Total price:</td>
-				<td>${{totalPrice}}</td>
-			</tr>
-		</table>
+<h1 id="heading1">Lobby {{lobbyName}} is in the Ordering phase!</h1>
+{{orderItems}}
 
-		<a href="?action=viewPlaceOrderSample&lobbyId={{lobbyId}}"><input type="button" value="Edit your order" /></a>
-		<br>
-		<a href="?showlobby=back"><input type="button" value="Main Menu" /></a>
-	</body>
-</html>
+<table class="showLobbyTable">
+	<tr>
+		<td>Subtotal:</td>
+		<td>${{subtotal}}</td>
+	</tr>
+	<tr>
+	<td>Taxes:</td>
+		<td>${{taxes}}</td>
+	</tr>
+	<tr>
+		<td>Total price:</td>
+		<td>${{totalPrice}}</td>
+	</tr>
+</table>
+
+<a href="?action=viewPlaceOrderSample&lobbyId={{lobbyId}}"><input type="button" value="Edit your order" /></a>
+<br>
+<a href="?showlobby=back"><input type="button" value="Main Menu" /></a>
