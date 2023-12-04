@@ -390,10 +390,12 @@ class ChowChooserEngine {
 
 		// user must select at least one restaurant
 		$noRestaurantIsSelected = true;
-		foreach ($_POST as $key => $value) {
+
+		$selectedRestaurantIds  = array();
+		foreach ($_POST as $key => $restaurantId) {
 			if (str_starts_with($key, "selectedRestaurant")) {
 				$noRestaurantIsSelected = false;
-				break;
+				array_push($selectedRestaurantIds, $restaurantId);
 			}
 		}
 
