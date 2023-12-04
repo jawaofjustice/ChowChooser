@@ -91,15 +91,6 @@ class ChowChooserEngine {
 					echo $user->editUser();
 					break;
 				case "createLobby":
-					if (isset($_POST['formSubmitted'])) {
-						$this->create_lobby();
-						// redirect to main menu as per POST-Redirect-GET
-						// design pattern in order to prevent duplicate
-						// form requests on refresh
-						header("Location: ".$_SERVER['PHP_SELF']);
-						break;
-					}
-
 					$restaurantInputs = "";
 					foreach (Restaurant::getAllRestaurants() as $restaurant) {
 						$restaurantInputs .= '<input type="checkbox"'
@@ -110,9 +101,19 @@ class ChowChooserEngine {
 					}
 
 					// user is navigating to the page, hasn't submitted the form
-					$swapArray['restaurantInputs'] = $restaurantInputs;
-					$swapArray['errorMsg'] = "";
-               echo $this->load_template("create_lobby", $swapArray);
+					$this->swapArray['restaurantInputs'] = $restaurantInputs;
+					$this->swapArray['errorMsg'] = "";
+
+					if (isset($_POST['formSubmitted'])) {
+						$this->create_lobby();
+						// redirect to main menu as per POST-Redirect-GET
+						// design pattern in order to prevent duplicate
+						// form requests on refresh
+						header("Location: ".$_SERVER['PHP_SELF']);
+						break;
+					}
+
+					echo $this->load_template("create_lobby", $swapArray);
 					break;
 				case "resetPassword":
 					echo $user->resetPassword();
@@ -393,7 +394,8 @@ class ChowChooserEngine {
       // (3) ordering end time is empty
 		// (4) no restaurant has been selected
 		if (empty($lobbyName) || (is_null($votingEndTime) && !key_exists('skipVoting', $_POST)) || empty($orderingEndTime)) {
-			echo $this->load_template("create_lobby", ["errorMsg" => "Please enter data in all fields."]);
+			$this->swapArray["errorMsg"] = "Please enter data in all fields.";
+			echo $this->load_template("create_lobby", $this->swapArray);
 			// do not return to calling function, we have already
 			// handled all page logic
 			exit();
