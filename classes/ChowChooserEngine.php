@@ -10,6 +10,7 @@ require_once "classes/Order.php";
 
 class ChowChooserEngine {
 	public $db;
+	private $swapArray;
 
 	function __construct() {
 
