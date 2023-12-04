@@ -271,8 +271,8 @@ class ChowChooserEngine {
 				$tableContentSwapValue = '';
 
 				$restaurantArray = $lobby->getRestaurants();
-				foreach ($restaurantArray as $i) {
-					$restaurant = Restaurant::getRestaurantFromDatabase($i['restaurant_id']);
+				foreach ($restaurantArray as $r) {
+					$restaurant = Restaurant::getRestaurantFromDatabase($r->getId());
 
 					if(Vote::getUsersVote($userId, $lobby->getId()) == $restaurant->id) {
 						$hasVoted = ' style="background-color: red;" ';
@@ -287,7 +287,7 @@ class ChowChooserEngine {
 				}
 
 				$swapArray['tableContent'] = $tableContentSwapValue;
-				$swapArray['topRestaurant'] = Restaurant::getRestaurantFromDatabase($restaurantArray[0]['restaurant_id'])->name;
+				$swapArray['topRestaurant'] = array_values($lobby->getRestaurants())[0]->name;
 
 				echo $this->load_template('lobby_voting', $swapArray);
 				break;
@@ -295,7 +295,8 @@ class ChowChooserEngine {
 			case '2':
 
 			// display the name of the restaurant that wins the voting phase
-			$restaurant = Restaurant::getRestaurantFromDatabase($lobby->getRestaurants()[0]['restaurant_id']);
+			$winningRestaurantId = array_values($lobby->getRestaurants())[0]->getId();
+			$restaurant = Restaurant::getRestaurantFromDatabase($winningRestaurantId);
 			$swapArray['restaurant'] = $restaurant->name;
 
             // display orders from all users if you are the lobby admin,

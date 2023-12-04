@@ -18,9 +18,9 @@ class Restaurant {
         }
 	}
 
-    //public function getName() {
-      //  return $this->name;
-    //}
+	public function getId(): int {
+		return $this->id;
+	}
 
     public static function getRestaurantFromDatabase(int $id) {
         $db = new Database();

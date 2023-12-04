@@ -72,19 +72,19 @@ class Lobby {
         
     }
 
-    //returns an array of arrays containing [restartant_id=?]
     public function getRestaurants(): Array {
         $statement = $this->db->mysqli->prepare('SELECT restaurant_id, COUNT(restaurant_id) votes 
-                                                    FROM chow_chooser.vote
+                                                    FROM lobby_restaurant
                                                     WHERE lobby_id = (?)
                                                     GROUP BY restaurant_id
                                                     order by votes desc');
         $statement->bind_param('i', $this->id);
         $statement->execute();
 
-        foreach ($statement->get_result() as $restaurant) {
-            $restaurants[] = $restaurant;
-        }
+      $restaurants = array();
+      foreach ($statement->get_result() as $restaurant) {
+         array_push($restaurants, Restaurant::getRestaurantFromDatabase($restaurant['restaurant_id']));
+      }
 
         return $restaurants;
     }
@@ -109,12 +109,17 @@ class Lobby {
         $statement->execute();
 
         // populate an array with the results because there will be more than one result if there is a tie
+      $voteArray = array();
         foreach ($statement->get_result() as $votesForRestaurant) {
-            $voteArray[] = $votesForRestaurant;
+            array_push($voteArray, $votesForRestaurant);
         }
 
-        // if the length of voteArray is larger than one there is a tie
-        if(count($voteArray) > 1) {
+      // no votes -> select some random restaurant
+      if (empty($voteArray)) {
+         $winningRestaurantId = 1;
+      }
+      // if the length of voteArray is larger than one there is a tie
+      else if(count($voteArray) > 1) {
 
             // deal with a tie
 
@@ -122,7 +127,7 @@ class Lobby {
             $statement = $this->db->mysqli->prepare("SELECT restaurant_id 
                                                         FROM vote JOIN lobby ON vote.lobby_id = lobby.id
                                                         WHERE lobby.admin_id = vote.user_id AND lobby_id = (?)");
-            $statement->bind_param('i', $id);
+            $statement->bind_param('i', $this->id);
             $statement->execute();
 
             $adminVote = mysqli_fetch_assoc($statement->get_result())['restaurant_id'];
