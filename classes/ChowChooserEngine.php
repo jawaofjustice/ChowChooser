@@ -94,7 +94,7 @@ class ChowChooserEngine {
 					$restaurantInputs = "";
 					foreach (Restaurant::getAllRestaurants() as $restaurant) {
 						$restaurantInputs .= '<input type="checkbox"'
-							.'name="restaurant'.$restaurant->id.'"'
+							.'name="selectedRestaurant'.$restaurant->id.'"'
 							.'value="'.$restaurant->id.'">'
 							.'<label for="restaurant'.$restaurant->id.'">'
 							.$restaurant->name . "</label></br>";
@@ -113,7 +113,7 @@ class ChowChooserEngine {
 						break;
 					}
 
-					echo $this->load_template("create_lobby", $swapArray);
+					echo $this->load_template("create_lobby", $this->swapArray);
 					break;
 				case "resetPassword":
 					echo $user->resetPassword();
@@ -388,12 +388,21 @@ class ChowChooserEngine {
 		// the voting end time key is not sent in $_POST
 		$votingEndTime = key_exists('votingEndTime', $_POST) ? $_POST['votingEndTime'] : null;
 
-      // error message appears if:
-      // (1) lobby name is empty
-      // (2) voting end time is empty WHILE user did not elect to skip voting
-      // (3) ordering end time is empty
+		// user must select at least one restaurant
+		$noRestaurantIsSelected = true;
+		foreach ($_POST as $key => $value) {
+			if (str_starts_with($key, "selectedRestaurant")) {
+				$noRestaurantIsSelected = false;
+				break;
+			}
+		}
+
+		// error message appears if:
+		// (1) lobby name is empty
+		// (2) voting end time is empty WHILE user did not elect to skip voting
+		// (3) ordering end time is empty
 		// (4) no restaurant has been selected
-		if (empty($lobbyName) || (is_null($votingEndTime) && !key_exists('skipVoting', $_POST)) || empty($orderingEndTime)) {
+		if (empty($lobbyName) || (is_null($votingEndTime) && !key_exists('skipVoting', $_POST)) || empty($orderingEndTime) || $noRestaurantIsSelected) {
 			$this->swapArray["errorMsg"] = "Please enter data in all fields.";
 			echo $this->load_template("create_lobby", $this->swapArray);
 			// do not return to calling function, we have already
