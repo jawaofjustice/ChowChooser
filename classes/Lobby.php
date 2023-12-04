@@ -43,16 +43,16 @@ class Lobby {
             // Check if current time is over ordering end time
             if(new DateTime($date) > new DateTime($lobby->getOrderingEndTime())) {
                 // This lobby is completed
-                $lobby->setStatusId(3);
+                $lobby->updateStatusId(3);
             } else {
                 // in ordering phase
                 $lobby->determineWinner();
-                $lobby->setStatusId(2);
+                $lobby->updateStatusId(2);
             }
 
         } else {
             // in voting phase
-            $lobby->setStatusId(1);
+            $lobby->updateStatusId(1);
         }
 
         //Check whether the status_id in the database is correct or not
@@ -200,9 +200,15 @@ class Lobby {
         return $this->status_id;
     }
 
-    public function setStatusId($status_id) {
-        $this->status_id = $status_id;
-    }
+   public function updateStatusId($status_id) {
+      $statement = $this->db->mysqli->prepare('
+         UPDATE lobby
+         SET status_id = (?)
+         WHERE id = (?)');
+      $statement->bind_param('ii', $status_id, $this->id);
+      $statement->execute();
+      $this->status_id = $status_id;
+   }
 
    public static function createLobbyInDatabase(
       string $lobbyName,
