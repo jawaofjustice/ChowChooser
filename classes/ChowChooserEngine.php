@@ -104,7 +104,7 @@ class ChowChooserEngine {
 					foreach (Restaurant::getAllRestaurants() as $restaurant) {
 						$restaurantInputs .= '<input type="checkbox"'
 							.'name="restaurant'.$restaurant->id.'"'
-							.'value="'.$restaurant->id.'"'
+							.'value="'.$restaurant->id.'">'
 							.'<label for="restaurant'.$restaurant->id.'">'
 							.$restaurant->name . "</label></br>";
 					}
