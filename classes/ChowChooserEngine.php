@@ -99,8 +99,20 @@ class ChowChooserEngine {
 						header("Location: ".$_SERVER['PHP_SELF']);
 						break;
 					}
+
+					$restaurantInputs = "";
+					foreach (Restaurant::getAllRestaurants() as $restaurant) {
+						$restaurantInputs .= '<input type="checkbox"'
+							.'name="restaurant'.$restaurant->id.'"'
+							.'value="'.$restaurant->id.'"'
+							.'<label for="restaurant'.$restaurant->id.'">'
+							.$restaurant->name . "</label></br>";
+					}
+
 					// user is navigating to the page, hasn't submitted the form
-					echo $this->load_template("create_lobby", ["errorMsg" => ""]);
+					$swapArray['restaurantInputs'] = $restaurantInputs;
+					$swapArray['errorMsg'] = "";
+               echo $this->load_template("create_lobby", $swapArray);
 					break;
 				case "resetPassword":
 					echo $user->resetPassword();
@@ -379,6 +391,7 @@ class ChowChooserEngine {
       // (1) lobby name is empty
       // (2) voting end time is empty WHILE user did not elect to skip voting
       // (3) ordering end time is empty
+		// (4) no restaurant has been selected
 		if (empty($lobbyName) || (is_null($votingEndTime) && !key_exists('skipVoting', $_POST)) || empty($orderingEndTime)) {
 			echo $this->load_template("create_lobby", ["errorMsg" => "Please enter data in all fields."]);
 			// do not return to calling function, we have already
