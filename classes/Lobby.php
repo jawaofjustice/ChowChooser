@@ -188,11 +188,13 @@ class Lobby {
         $this->status_id = $status_id;
     }
 
+	// returns the ID of the new lobby
    public static function createLobbyInDatabase(
       string $lobbyName,
       string|null $votingEndTime,
-      string $orderingEndTime
-   ): void {
+      string $orderingEndTime,
+      array $restaurants
+   ): int {
       $db = new Database();
       // skip to "ordering" status if skipping the voting phase
       $status_id = is_null($votingEndTime) ? 2 : 1;
@@ -215,6 +217,16 @@ class Lobby {
       $statement->bind_param('ii', $lobbyId, $admin_id);
       $statement->execute();
 
+      foreach ($restaurants as $restaurant) {
+         $restaurantId = $restaurant->getId();
+         $statement = $db->mysqli->prepare('
+            INSERT INTO lobby_restaurant (lobby_id, restaurant_id)
+            VALUES ( (?), (?) )');
+         $statement->bind_param('ii', $lobbyId, $restaurantId);
+         $statement->execute();
+      }
+
+      return $lobbyId;
    }
 
 }

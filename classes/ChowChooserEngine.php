@@ -388,6 +388,7 @@ class ChowChooserEngine {
 		// the voting end time key is not sent in $_POST
 		$votingEndTime = key_exists('votingEndTime', $_POST) ? $_POST['votingEndTime'] : null;
 
+<<<<<<< Updated upstream
 		// user must select at least one restaurant
 		$noRestaurantIsSelected = true;
 
@@ -396,6 +397,18 @@ class ChowChooserEngine {
 			if (str_starts_with($key, "selectedRestaurant")) {
 				$noRestaurantIsSelected = false;
 				array_push($selectedRestaurantIds, $restaurantId);
+         }
+      }
+
+		// user must select at least one restaurant
+		$noRestaurantIsSelected = true;
+
+		$selectedRestaurants = array();
+		foreach ($_POST as $key => $restaurantId) {
+			if (str_starts_with($key, "selectedRestaurant")) {
+				$noRestaurantIsSelected = false;
+				$restaurant = Restaurant::getRestaurantFromDatabase($restaurantId);
+				array_push($selectedRestaurants, $restaurant);
 			}
 		}
 
@@ -415,7 +428,8 @@ class ChowChooserEngine {
 		Lobby::createLobbyInDatabase(
 			$lobbyName,
 			$votingEndTime,
-			$orderingEndTime
+			$orderingEndTime,
+			$selectedRestaurants
 		);
 	}
 
