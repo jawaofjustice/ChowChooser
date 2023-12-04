@@ -389,7 +389,6 @@ class ChowChooserEngine {
 		// the voting end time key is not sent in $_POST
 		$votingEndTime = key_exists('votingEndTime', $_POST) ? $_POST['votingEndTime'] : null;
 
-<<<<<<< Updated upstream
 		// user must select at least one restaurant
 		$noRestaurantIsSelected = true;
 
