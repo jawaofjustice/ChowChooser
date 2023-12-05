@@ -270,7 +270,7 @@ class Lobby {
          FROM lobby
          WHERE invite_code = (?)
          LIMIT 1");
-      $statement->bind_param('i', $inviteCode);
+      $statement->bind_param('s', $inviteCode);
       $statement->execute();
 
       $result = mysqli_fetch_assoc($statement->get_result());

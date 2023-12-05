@@ -92,7 +92,8 @@ class ChowChooserEngine {
 					break;
             case "joinLobby":
                $_SESSION['user']->joinLobby($_GET['inviteCode']);
-               exit();
+               $this->main_menu();
+               break;
 				case "createLobby":
 					$restaurantInputs = "";
 					foreach (Restaurant::getAllRestaurants() as $restaurant) {

@@ -90,7 +90,8 @@ class User {
 	}
 
    private function isInLobby($lobbyId): bool {
-      $statement = $this->db->mysqli->prepare("
+      $db = new Database();
+      $statement = $db->mysqli->prepare("
          SELECT *
          FROM lobby_user
          WHERE lobby_id = (?) and user_id = (?)");
@@ -106,6 +107,7 @@ class User {
    }
 
    public function joinLobby(string $inviteCode): void {
+      $db = new Database();
       $lobby = Lobby::getLobbyByInviteCode($inviteCode);
 
       // if there is no matching lobby, do nothing
@@ -119,7 +121,6 @@ class User {
          return;
       }
 
-      $db = new Database();
       $statement = $db->mysqli->prepare("
          insert into lobby_user
          (lobby_id, user_id) values
