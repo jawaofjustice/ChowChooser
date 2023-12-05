@@ -105,7 +105,7 @@ class User {
       return true;
    }
 
-   public function joinLobby(string $inviteCode) {
+   public function joinLobby(string $inviteCode): void {
       $lobby = Lobby::getLobbyByInviteCode($inviteCode);
 
       // if there is no matching lobby, do nothing
