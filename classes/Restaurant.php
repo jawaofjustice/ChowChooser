@@ -5,7 +5,7 @@ class Restaurant {
     private Database $db;
     private $id;
     private $name;
-    private $votesByLobby;
+    private int $votesByLobby;
 
     public function __construct(Database $db, $id, $name) {
         $this->db = $db;
@@ -60,8 +60,14 @@ class Restaurant {
 		$statement->bind_param('ii', $lobbyId, $this->id);
 		$statement->execute();
 
-        $this->votesByLobby = mysqli_fetch_assoc($statement->get_result())['votes'];
+      $result = mysqli_fetch_assoc($statement->get_result());
 
+      if (is_null($result)) {
+         $this->votesByLobby = 0;
+         return;
+      }
+
+      $this->votesByLobby = $result['votes'];
     }
 
     public function getVotesByLobby($lobbyId): int {
