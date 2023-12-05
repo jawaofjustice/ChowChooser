@@ -49,14 +49,16 @@ class Lobby {
         //echo($date);
 
         // Check if current time is over voting end time
-      $votingEndTime = $lobby->getVotingEndTime();
-      if (is_null($votingEndTime)) {
-         $lobbyVoteTime = null;
+      $voteEndTime = $lobby->getVotingEndTime();
+
+      // the effective vote end time accounts for NULL voting_end_time
+      if (is_null($voteEndTime)) {
+         $effectiveVoteEndTime = null;
       } else {
-         $lobbyVoteTime = new DateTime($lobbyVoteTime);
+         $effectiveVoteEndTime = new DateTime($voteEndTime);
       }
 
-        if(new DateTime($date) > $lobbyVoteTime) {
+        if(new DateTime($date) > $effectiveVoteEndTime) {
 
             // Check if current time is over ordering end time
             if(new DateTime($date) > new DateTime($lobby->getOrderingEndTime())) {
