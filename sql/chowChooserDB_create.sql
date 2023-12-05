@@ -56,7 +56,7 @@ create table lobby (
 );
 
 insert into lobby (name, admin_id, voting_end_time, ordering_end_time, status_id, invite_code) values
-   ("Work", 1, "2023-11-29 12:00:00", "2023-12-12 12:00:00", 1, "ABCDEF"),
+   ("Work", 1, "2024-01-29 12:00:00", "2023-12-12 12:00:00", 1, "ABCDEF"),
    ("English class", 1, "2023-11-08 12:00:00", "2023-12-12 12:00:00", 2, "ACDFEG"),
    ("Science class", 1, "2023-10-29 12:00:00", "2023-11-01 12:00:00", 3, "AAAAAA"),
    ("Sandwich club", 2, "2023-11-08 12:00:00", "2023-12-12 12:00:00", 2, "BABABA"),
@@ -89,7 +89,16 @@ create table lobby_restaurant (
 
 insert into lobby_restaurant (lobby_id, restaurant_id) values
    (1, 1),
-   (2, 1);
+   (1, 2),
+   (1, 4),
+   (1, 6),
+   (2, 7),
+   (3, 6),
+   (3, 7),
+   (4, 3),
+   (4, 6),
+   (5, 2),
+   (5, 4);
 
 create table vote (
    id int unsigned not null AUTO_INCREMENT,
