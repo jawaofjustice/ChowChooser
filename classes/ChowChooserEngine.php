@@ -90,6 +90,9 @@ class ChowChooserEngine {
 				case "editUser":
 					echo $user->editUser();
 					break;
+            case "joinLobby":
+               print_r($_GET);
+               exit();
 				case "createLobby":
 					$restaurantInputs = "";
 					foreach (Restaurant::getAllRestaurants() as $restaurant) {
