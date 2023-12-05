@@ -43,16 +43,16 @@ class Lobby {
             // Check if current time is over ordering end time
             if(new DateTime($date) > new DateTime($lobby->getOrderingEndTime())) {
                 // This lobby is completed
-                $lobby->setStatusId(3);
+                $lobby->updateStatusId(3);
             } else {
                 // in ordering phase
-                $lobby->determineWinner();
-                $lobby->setStatusId(2);
+                $lobby->getWinningRestaurant();
+                $lobby->updateStatusId(2);
             }
 
         } else {
             // in voting phase
-            $lobby->setStatusId(1);
+            $lobby->updateStatusId(1);
         }
 
         //Check whether the status_id in the database is correct or not
@@ -100,9 +100,8 @@ class Lobby {
         return $restaurants;
     }
 
-    public function determineWinner() {
-
-        // determine the winning restaurant and make it the edit the lobby-restaurant table
+   public function getWinningRestaurant(): Restaurant {
+      // determine the winning restaurant and make it the edit the lobby-restaurant table
         $statement = $this->db->mysqli->prepare("SELECT restaurant_id restaurant, COUNT(restaurant_id) votes 
                                                     FROM chow_chooser.vote
                                                     WHERE lobby_id = (?)
@@ -119,62 +118,74 @@ class Lobby {
         $statement->bind_param('ii', $this->id, $this->id);
         $statement->execute();
 
-        // populate an array with the results because there will be more than one result if there is a tie
+      // populate an array with the results because there will be
+      // more than one result if there is a tie
       $voteArray = array();
         foreach ($statement->get_result() as $votesForRestaurant) {
             array_push($voteArray, $votesForRestaurant);
         }
 
-      // no votes -> select some random restaurant
-      if (empty($voteArray)) {
-         $winningRestaurantId = 1;
+      // single winner with no ties -> return the winner
+      if (count($voteArray) == 1) {
+         $winningRestaurantId = $voteArray[0]['restaurant'];
+         return Restaurant::getRestaurantFromDatabase($winningRestaurantId);
       }
-      // if the length of voteArray is larger than one there is a tie
-      else if(count($voteArray) > 1) {
 
-            // deal with a tie
+      // no one voted -> can return any restaurant
+      if (empty($voteArray)) {
+         // safest way I found to get first element from a collection
+         return array_values($this->getRestaurants())[0];
+      }
 
-            // start by getting the vote of the admin
-            $statement = $this->db->mysqli->prepare("SELECT restaurant_id 
-                                                        FROM vote JOIN lobby ON vote.lobby_id = lobby.id
-                                                        WHERE lobby.admin_id = vote.user_id AND lobby_id = (?)");
-            $statement->bind_param('i', $this->id);
-            $statement->execute();
+      // deal with a tie, so start by getting the vote of the admin,
+      // which will be the tie-breaker (if it exists)
+      $statement = $this->db->mysqli->prepare("SELECT restaurant_id 
+         FROM vote JOIN lobby ON vote.lobby_id = lobby.id
+         WHERE lobby.admin_id = vote.user_id AND lobby_id = (?)");
+      $statement->bind_param('i', $this->id);
+      $statement->execute();
 
-            $adminVote = mysqli_fetch_assoc($statement->get_result())['restaurant_id'];
+      $adminVoteRow = mysqli_fetch_assoc($statement->get_result());
 
-            // check if the restaurant the admin voted for is in the list of tied restaurants
-            foreach($voteArray as $candidate) {
-                if(in_array($adminVote, $candidate)) {
-                    $found = true;
-                }
-            }
+      // admin did not vote -> return arbitrary restaurant
+      if (is_null($adminVoteRow)) {
+         $winningRestaurantId = $voteArray[0]['restaurant'];
+         return Restaurant::getRestaurantFromDatabase($winningRestaurantId);
+      }
 
-            // if the admin did vote for one of the tied restaurants, set winningRestaurantId to the restaurant id that the admin voted for
-            // otherwise set it to the first restaurant in the list of tied restaurants 
-            if($found == true) {
-                $winningRestaurantId = $adminVote; 
-            } else {
-                $winningRestaurantId = $voteArray[0]['restaurant'];
-            }
+      $adminVote = $adminVoteRow['restaurant_id'];
 
-        } else {
-            // if we are here that means there was no tie. Set the winningRestaurantId
-            $winningRestaurantId = $voteArray[0]['restaurant'];
-        }
+      // check if the restaurant the admin voted for is in the list of tied restaurants
+      $found = false;
+      foreach($voteArray as $candidate) {
+         if(in_array($adminVote, $candidate)) {
+            $found = true;
+         }
+      }
 
-        $this->setWinningRestaurant($winningRestaurantId);
+      // if the admin did vote for one of the tied restaurants, set winningRestaurantId to the restaurant id that the admin voted for
+      // otherwise set it to the first restaurant in the list of tied restaurants 
+      if($found == true) {
+         $winningRestaurantId = $adminVote; 
+      } else {
+         $winningRestaurantId = $voteArray[0]['restaurant'];
+      }
 
-    }
+      // clean up the database
+      $this->deleteLoserRestaurants($winningRestaurantId);
 
-    public function setWinningRestaurant($winningRestaurantId) {
+      return Restaurant::getRestaurantFromDatabase($winningRestaurantId);
+   }
 
-        // mysql statement to delete every other restaurant from lobby_restaurant that isn't the winner
-        $statement = $this->db->mysqli->prepare("DELETE FROM lobby_restaurant WHERE lobby_id = (?) AND restaurant_id != (?)");
-		$statement->bind_param('ii', $this->id, $winningRestaurantId);
-		$statement->execute();
-
-    }
+   public function deleteLoserRestaurants($winningRestaurantId) {
+      // mysql statement to delete every other restaurant from lobby_restaurant that isn't the winner
+      $statement = $this->db->mysqli->prepare("
+         DELETE FROM
+         lobby_restaurant
+         WHERE lobby_id = (?) AND restaurant_id != (?)");
+      $statement->bind_param('ii', $this->id, $winningRestaurantId);
+      $statement->execute();
+   }
     
     public function getId() {
         return $this->id;
@@ -200,9 +211,15 @@ class Lobby {
         return $this->status_id;
     }
 
-    public function setStatusId($status_id) {
-        $this->status_id = $status_id;
-    }
+   public function updateStatusId($status_id) {
+      $statement = $this->db->mysqli->prepare('
+         UPDATE lobby
+         SET status_id = (?)
+         WHERE id = (?)');
+      $statement->bind_param('ii', $status_id, $this->id);
+      $statement->execute();
+      $this->status_id = $status_id;
+   }
 
 	// returns the ID of the new lobby
    public static function createLobbyInDatabase(
