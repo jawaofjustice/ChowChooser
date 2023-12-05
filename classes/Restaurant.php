@@ -5,6 +5,7 @@ class Restaurant {
     private Database $db;
     private $id;
     private $name;
+    private $votesByLobby;
 
     public function __construct(Database $db, $id, $name) {
         $this->db = $db;
@@ -32,6 +33,24 @@ class Restaurant {
 
         return new Restaurant($db, $restaurantArray['id'], $restaurantArray['name']);
 
+    }
+
+    public function setVotesByLobby($lobbyId) {
+
+        $statement = $this->db->mysqli->prepare("SELECT COUNT(restaurant_id) votes 
+                                                    FROM chow_chooser.vote
+                                                    WHERE lobby_id = (?) AND restaurant_id = (?)
+                                                    GROUP BY restaurant_id
+                                                    order by votes desc");
+		$statement->bind_param('ii', $lobbyId, $this->id);
+		$statement->execute();
+
+        $this->votesByLobby = mysqli_fetch_assoc($statement->get_result())['votes'];
+
+    }
+
+    public function getVotesByLobby($lobbyId): int {
+        return $this->votesByLobby;
     }
 
 }

@@ -73,18 +73,29 @@ class Lobby {
     }
 
     public function getRestaurants(): Array {
-        $statement = $this->db->mysqli->prepare('SELECT restaurant_id, COUNT(restaurant_id) votes 
+
+        // fetch the restaurants assosiated with the lobby
+        $statement = $this->db->mysqli->prepare('SELECT restaurant_id
                                                     FROM lobby_restaurant
-                                                    WHERE lobby_id = (?)
-                                                    GROUP BY restaurant_id
-                                                    order by votes desc');
+                                                    WHERE lobby_id = (?)');
         $statement->bind_param('i', $this->id);
         $statement->execute();
 
-      $restaurants = array();
-      foreach ($statement->get_result() as $restaurant) {
-         array_push($restaurants, Restaurant::getRestaurantFromDatabase($restaurant['restaurant_id']));
-      }
+        // create an object for each restaurant and populate the restaurants array with them
+        $restaurants = array();
+        foreach ($statement->get_result() as $restaurant) {
+            array_push($restaurants, Restaurant::getRestaurantFromDatabase($restaurant['restaurant_id']));
+        }
+
+        // set the votesByLobby in each restaurant using the votes table (method contained in restaurant class)
+        foreach($restaurants as $restaurant) {
+            $restaurant->setVotesByLobby($this->id);
+        }
+
+        // order the array of restaurants by how many votes they have
+        usort($restaurants, function($a, $b){
+            return $b->getVotesByLobby($this->id) - $a->getVotesByLobby($this->id);
+        });
 
         return $restaurants;
     }
