@@ -286,12 +286,14 @@ class Lobby {
    public static function getLobbyByInviteCode(string $inviteCode): Lobby|null {
       $db = new Database;
 
+      $inviteCode = strtoupper($inviteCode);
+
       $statement = $db->mysqli->prepare("
          SELECT *
          FROM lobby
          WHERE invite_code = (?)
          LIMIT 1");
-      $statement->bind_param('s', strtoupper($inviteCode));
+      $statement->bind_param('s', $inviteCode);
       $statement->execute();
 
       $result = mysqli_fetch_assoc($statement->get_result());
