@@ -9,8 +9,9 @@ class Lobby {
     private $votingEndTime;
     private $orderingEndTime;
     private $status_id;
+    private string $invite_code;
 
-    function __construct($db, $id, $admin_id, $name, $votingEndTime, $orderingEndTime, $status_id) {
+    function __construct($db, $id, $admin_id, $name, $votingEndTime, $orderingEndTime, $status_id, $invite_code) {
         $this->db = new Database();
         $this->id = $id;
         $this->admin_id = $admin_id;
@@ -18,6 +19,7 @@ class Lobby {
         $this->votingEndTime = $votingEndTime;
         $this->orderingEndTime = $orderingEndTime;
         $this->status_id = $status_id;
+        $this->invite_code = $invite_code;
     }
 
     public static function getLobbyFromDatabase(int $id) {
@@ -30,7 +32,7 @@ class Lobby {
         $lobbyArray = mysqli_fetch_assoc($statement->get_result());
         
         // Create new lobby object
-        $lobby = new Lobby($db, $lobbyArray['id'], $lobbyArray['admin_id'], $lobbyArray['name'], $lobbyArray['voting_end_time'], $lobbyArray['ordering_end_time'], $lobbyArray['status_id']);
+        $lobby = new Lobby($db, $lobbyArray['id'], $lobbyArray['admin_id'], $lobbyArray['name'], $lobbyArray['voting_end_time'], $lobbyArray['ordering_end_time'], $lobbyArray['status_id'], $lobbyArray['invite_code']);
 
         // Make timestamp and date format
         date_default_timezone_set('America/New_York');
@@ -233,11 +235,12 @@ class Lobby {
       $status_id = is_null($votingEndTime) ? 2 : 1;
       $admin_id = $_SESSION['user']->getId();
 
+      $invite_code = Lobby::generateInviteCode();
       $statement = $db->mysqli->prepare("
          insert into lobby
-         (name, voting_end_time, ordering_end_time, admin_id, status_id) values
-         ( (?), (?), (?), (?), (?) );");
-      $statement->bind_param('sssii', $lobbyName, $votingEndTime, $orderingEndTime, $admin_id, $status_id);
+         (name, voting_end_time, ordering_end_time, admin_id, status_id, invite_code) values
+         ( (?), (?), (?), (?), (?), (?) );");
+      $statement->bind_param('sssiis', $lobbyName, $votingEndTime, $orderingEndTime, $admin_id, $status_id, $invite_code);
       $statement->execute();
 
       // retrieve the ID of the lobby we just created
@@ -270,7 +273,7 @@ class Lobby {
          FROM lobby
          WHERE invite_code = (?)
          LIMIT 1");
-      $statement->bind_param('s', $inviteCode);
+      $statement->bind_param('s', strtoupper($inviteCode));
       $statement->execute();
 
       $result = mysqli_fetch_assoc($statement->get_result());
@@ -279,7 +282,13 @@ class Lobby {
          return null;
       }
 
-      return new Lobby($db, $result['id'], $result['admin_id'], $result['name'], $result['voting_end_time'], $result['ordering_end_time'], $result['status_id']);
+      return new Lobby($db, $result['id'], $result['admin_id'], $result['name'], $result['voting_end_time'], $result['ordering_end_time'], $result['status_id'], $result['invite_code']);
+   }
+
+   // generates six-character long, all uppercase hexadecimal code
+   private static function generateInviteCode(): string {
+      $longCode = sha1(rand(0, 20));
+      return strtoupper(substr($longCode, 34));
    }
 
 }
