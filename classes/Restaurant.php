@@ -23,6 +23,21 @@ class Restaurant {
 		return $this->id;
 	}
 
+   public static function getAllRestaurants(): array {
+      $db = new Database();
+      $statement = $db->mysqli->prepare("select * from restaurant");
+      $statement->execute();
+
+      $restaurants = array();
+      foreach ($statement->get_result() as $restaurant) {
+         $id = $restaurant['id'];
+         $name = $restaurant['name'];
+         array_push($restaurants, new Restaurant($db, $id, $name));
+      }
+
+      return $restaurants;
+   }
+
     public static function getRestaurantFromDatabase(int $id) {
         $db = new Database();
         $statement = $db->mysqli->prepare("select * from restaurant where restaurant.id = (?)");

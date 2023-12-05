@@ -204,11 +204,13 @@ class Lobby {
         $this->status_id = $status_id;
     }
 
+	// returns the ID of the new lobby
    public static function createLobbyInDatabase(
       string $lobbyName,
       string|null $votingEndTime,
-      string $orderingEndTime
-   ): void {
+      string $orderingEndTime,
+      array $restaurants
+   ): int {
       $db = new Database();
       // skip to "ordering" status if skipping the voting phase
       $status_id = is_null($votingEndTime) ? 2 : 1;
@@ -219,17 +221,28 @@ class Lobby {
          (name, voting_end_time, ordering_end_time, admin_id, status_id) values
          ( (?), (?), (?), (?), (?) );");
       $statement->bind_param('sssii', $lobbyName, $votingEndTime, $orderingEndTime, $admin_id, $status_id);
-
       $statement->execute();
 
-      //insert admin as a member of the newly created lobby
-    $statement = $db->mysqli->prepare('
-    INSERT INTO lobby_user (lobby_id, user_id) VALUES ( (SELECT id 
-    FROM lobby
-    WHERE name = (?) AND admin_id = (?) ), (?) )');
-    $statement->bind_param('sii', $lobbyName, $admin_id, $admin_id);
-    $statement->execute();
+      // retrieve the ID of the lobby we just created
+      $lobbyId = $db->mysqli->insert_id;
 
+      //insert admin as a member of the newly created lobby
+      $statement = $db->mysqli->prepare('
+         INSERT INTO lobby_user (lobby_id, user_id)
+         VALUES ( (?), (?) )');
+      $statement->bind_param('ii', $lobbyId, $admin_id);
+      $statement->execute();
+
+      foreach ($restaurants as $restaurant) {
+         $restaurantId = $restaurant->getId();
+         $statement = $db->mysqli->prepare('
+            INSERT INTO lobby_restaurant (lobby_id, restaurant_id)
+            VALUES ( (?), (?) )');
+         $statement->bind_param('ii', $lobbyId, $restaurantId);
+         $statement->execute();
+      }
+
+      return $lobbyId;
    }
 
 }
