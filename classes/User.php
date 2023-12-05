@@ -89,6 +89,22 @@ class User {
       return User::getUserFromCredentials($email);
 	}
 
+   public function joinLobby(string $inviteCode) {
+      $lobby = Lobby::getLobbyByInviteCode($inviteCode);
+
+      // if there is no matching lobby, do nothing
+      if (is_null($lobby)) {
+         return;
+      }
+
+      $statement = $this->db->mysqli->prepare("
+         insert into lobby_user
+         (lobby_id, user_id) values
+         ( (?), (?) );");
+      $statement->bind_param('ii', $lobby->getId(), $this->id);
+      $statement->execute();
+   }
+
 }
 
 ?>

@@ -262,6 +262,26 @@ class Lobby {
       return $lobbyId;
    }
 
+   public static function getLobbyByInviteCode(string $inviteCode): Lobby|null {
+      $db = new Database;
+
+      $statement = $db->mysqli->prepare("
+         SELECT *
+         FROM lobby
+         WHERE invite_code = (?)
+         LIMIT 1");
+      $statement->bind_param('i', $inviteCode);
+      $statement->execute();
+
+      $result = mysqli_fetch_assoc($statement->get_result());
+
+      if (is_null($result)) {
+         return null;
+      }
+
+      return new Lobby($db, $result['id'], $result['admin_id'], $result['name'], $result['voting_end_time'], $result['ordering_end_time'], $result['status_id']);
+   }
+
 }
 
 ?>
