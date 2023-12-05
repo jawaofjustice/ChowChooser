@@ -91,8 +91,7 @@ class ChowChooserEngine {
 					echo $user->editUser();
 					break;
             case "joinLobby":
-               $inviteCode = $_GET['inviteCode'];
-               $_SESSION['user']->joinLobby($inviteCode);
+               $_SESSION['user']->joinLobby($_GET['inviteCode']);
                exit();
 				case "createLobby":
 					$restaurantInputs = "";

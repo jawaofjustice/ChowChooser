@@ -89,6 +89,22 @@ class User {
       return User::getUserFromCredentials($email);
 	}
 
+   private function isInLobby($lobbyId): bool {
+      $statement = $this->db->mysqli->prepare("
+         SELECT *
+         FROM lobby_user
+         WHERE lobby_id = (?) and user_id = (?)");
+      $statement->bind_param('ii', $lobbyId, $this->id);
+      $statement->execute();
+
+      $result = mysqli_fetch_assoc($statement->get_result());
+
+      if (is_null($result)) {
+         return false;
+      }
+      return true;
+   }
+
    public function joinLobby(string $inviteCode) {
       $lobby = Lobby::getLobbyByInviteCode($inviteCode);
 
@@ -97,11 +113,18 @@ class User {
          return;
       }
 
-      $statement = $this->db->mysqli->prepare("
+      $lobbyId = $lobby->getId();
+
+      if ($this->isInLobby($lobbyId)) {
+         return;
+      }
+
+      $db = new Database();
+      $statement = $db->mysqli->prepare("
          insert into lobby_user
          (lobby_id, user_id) values
          ( (?), (?) );");
-      $statement->bind_param('ii', $lobby->getId(), $this->id);
+      $statement->bind_param('ii', $lobbyId, $this->id);
       $statement->execute();
    }
 
