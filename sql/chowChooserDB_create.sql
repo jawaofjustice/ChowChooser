@@ -49,17 +49,18 @@ create table lobby (
    voting_end_time Datetime null,
    ordering_end_time Datetime not null,
    status_id int unsigned not null,
+   invite_code char(6) not null,
    primary key (id),
    foreign key (admin_id) references user(id),
    foreign key (status_id) references status(id)
 );
 
-insert into lobby (name, admin_id, voting_end_time, ordering_end_time, status_id) values
-   ("Work", 1, "2023-11-29 12:00:00", "2023-12-12 12:00:00", 1),
-   ("English class", 1, "2023-11-08 12:00:00", "2023-12-12 12:00:00", 2),
-   ("Science class", 1, "2023-10-29 12:00:00", "2023-11-01 12:00:00", 3),
-   ("Sandwich club", 2, "2023-11-08 12:00:00", "2023-12-12 12:00:00", 2),
-   ("Chess club", 2, "2023-11-08 12:00:00", "2023-12-12 12:00:00", 2);
+insert into lobby (name, admin_id, voting_end_time, ordering_end_time, status_id, invite_code) values
+   ("Work", 1, "2023-11-29 12:00:00", "2023-12-12 12:00:00", 1, "ABCDEF"),
+   ("English class", 1, "2023-11-08 12:00:00", "2023-12-12 12:00:00", 2, "ACDFEG"),
+   ("Science class", 1, "2023-10-29 12:00:00", "2023-11-01 12:00:00", 3, "AAAAAA"),
+   ("Sandwich club", 2, "2023-11-08 12:00:00", "2023-12-12 12:00:00", 2, "BABABA"),
+   ("Chess club", 2, "2023-11-08 12:00:00", "2023-12-12 12:00:00", 2, "AB1235");
 
 create table lobby_user (
    lobby_id int unsigned not null,
