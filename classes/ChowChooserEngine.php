@@ -151,8 +151,9 @@ class ChowChooserEngine {
 					break;
 				case "vote":
 					$user = $_SESSION['user'];
-					Vote::toggleVote($user->getId(), $_GET['restaurantId'], $_GET['lobby']);
-					$this->view_lobby();
+					Vote::toggleVote($user->getId(), $_POST['restaurantId'], $_POST['lobbyId']);
+					// redirection as per Post/Redirect/Get design pattern
+					header("Location: ".$_SERVER['PHP_SELF']."?action=showlobby&lobby=".$_POST['lobbyId']);
 					break;
 				default: 
 
@@ -288,23 +289,32 @@ class ChowChooserEngine {
 				// if lobby is in voting phase
 				$swapArray['votingEndTime'] = $lobby->getVotingEndTime();
 
-				$tableContentSwapValue = '';
+				$tableContentSwapValue = '<table>';
 
 				$restaurantArray = $lobby->getRestaurants();
 				foreach ($restaurantArray as $r) {
 					$restaurant = Restaurant::getRestaurantFromDatabase($r->getId());
 
 					if(Vote::getUsersVote($userId, $lobby->getId()) == $restaurant->id) {
-						$hasVoted = ' style="background-color: red;" ';
+						$hasVotedStyle = ' style="background-color: red;" ';
 					} else {
-						$hasVoted = ' ';
+						$hasVotedStyle = ' ';
 					}
 
-					$tableContentSwapValue .= '<tr><td>'.$restaurant->name.'</td><td><form action="?action=vote&lobby='.$lobby->getId().
-						'&restaurantId='.$restaurant->id.'" method="post"><input type="submit"'.$hasVoted.'value="Vote for '.$restaurant->name.'"/></form></td><td>Votes: '.
-							Vote::getVotesForRestaurant($restaurant->id, $lobby->getId()).'</td></tr>';
+					$numVotes = Vote::getVotesForRestaurant($restaurant->id, $lobby->getId());
+
+					$tableContentSwapValue .= '<tr><td>'.$restaurant->name.'</td>
+						<td><form action="" method="post">
+						<input type="hidden" name="action" value="vote">
+						<input type="hidden" name="lobbyId" value="'.$lobby->getId().'">
+						<input type="hidden" name="restaurantId" value="'.$restaurant->getId().'">
+						<input type="submit" '.$hasVotedStyle.' value="Vote for '.$restaurant->getName().'"/>
+						</form></td>
+						<td>Votes: '.$numVotes.'</td></tr>';
 
 				}
+
+				$tableContentSwapValue .= "</table>";
 
 				$swapArray['tableContent'] = $tableContentSwapValue;
 				$swapArray['topRestaurant'] = $lobby->getWinningRestaurant()->name;

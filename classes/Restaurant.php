@@ -23,6 +23,10 @@ class Restaurant {
 		return $this->id;
 	}
 
+   public function getName(): string {
+      return $this->name;
+   }
+
    public static function getAllRestaurants(): array {
       $db = new Database();
       $statement = $db->mysqli->prepare("select * from restaurant");
