@@ -47,6 +47,7 @@ class Lobby {
             } else {
                 // in ordering phase
                 $lobby->getWinningRestaurant();
+                $lobby->deleteLoserRestaurants();
                 $lobby->updateStatusId(2);
             }
 
@@ -171,13 +172,11 @@ class Lobby {
          $winningRestaurantId = $voteArray[0]['restaurant'];
       }
 
-      // clean up the database
-      $this->deleteLoserRestaurants($winningRestaurantId);
-
       return Restaurant::getRestaurantFromDatabase($winningRestaurantId);
    }
 
-   public function deleteLoserRestaurants($winningRestaurantId) {
+   public function deleteLoserRestaurants(): void {
+      $winningRestaurantId = $this->getWinningRestaurant()->getId();
       // mysql statement to delete every other restaurant from lobby_restaurant that isn't the winner
       $statement = $this->db->mysqli->prepare("
          DELETE FROM
