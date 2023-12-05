@@ -3,15 +3,24 @@
 class Lobby {
 
     private Database $db;
-    private $id;
-    private $admin_id;
-    private $name;
-    private $votingEndTime;
-    private $orderingEndTime;
-    private $status_id;
+    private int $id;
+    private int $admin_id;
+    private string $name;
+    private string|null $votingEndTime;
+    private string $orderingEndTime;
+    private int $status_id;
     private string $invite_code;
 
-    function __construct($db, $id, $admin_id, $name, $votingEndTime, $orderingEndTime, $status_id, $invite_code) {
+   function __construct(
+      Database $db,
+      int $id,
+      int $admin_id,
+      string $name,
+      string|null $votingEndTime,
+      string $orderingEndTime,
+      int $status_id,
+      string $invite_code
+   ) {
         $this->db = new Database();
         $this->id = $id;
         $this->admin_id = $admin_id;
@@ -22,7 +31,7 @@ class Lobby {
         $this->invite_code = $invite_code;
     }
 
-    public static function getLobbyFromDatabase(int $id) {
+    public static function getLobbyFromDatabase(int $id): Lobby {
         $db = new Database();
 
         $statement = $db->mysqli->prepare("select * from lobby where lobby.id = (?)");
@@ -40,7 +49,14 @@ class Lobby {
         //echo($date);
 
         // Check if current time is over voting end time
-        if(new DateTime($date) > new DateTime($lobby->getVotingEndTime())) {
+      $votingEndTime = $lobby->getVotingEndTime();
+      if (is_null($votingEndTime)) {
+         $lobbyVoteTime = null;
+      } else {
+         $lobbyVoteTime = new DateTime($lobbyVoteTime);
+      }
+
+        if(new DateTime($date) > $lobbyVoteTime) {
 
             // Check if current time is over ordering end time
             if(new DateTime($date) > new DateTime($lobby->getOrderingEndTime())) {
@@ -179,7 +195,7 @@ class Lobby {
       return Restaurant::getRestaurantFromDatabase($winningRestaurantId);
    }
 
-   public function deleteLoserRestaurants($winningRestaurantId) {
+   public function deleteLoserRestaurants($winningRestaurantId): void {
       // mysql statement to delete every other restaurant from lobby_restaurant that isn't the winner
       $statement = $this->db->mysqli->prepare("
          DELETE FROM
@@ -189,31 +205,31 @@ class Lobby {
       $statement->execute();
    }
     
-    public function getId() {
+    public function getId(): int {
         return $this->id;
     }
 
-    public function getAdminId() {
+    public function getAdminId(): int {
         return $this->admin_id;
     }
 
-    public function getName() {
+    public function getName(): string {
         return $this->name;
     }
 
-    public function getVotingEndTime() {
+    public function getVotingEndTime(): string|null {
         return $this->votingEndTime;
     }
 
-    public function getOrderingEndTime() {
+    public function getOrderingEndTime(): string {
         return $this->orderingEndTime;
     }
 
-    public function getStatusId() {
+    public function getStatusId(): int {
         return $this->status_id;
     }
 
-   public function updateStatusId($status_id) {
+   public function updateStatusId($status_id): void {
       $statement = $this->db->mysqli->prepare('
          UPDATE lobby
          SET status_id = (?)
@@ -282,7 +298,16 @@ class Lobby {
          return null;
       }
 
-      return new Lobby($db, $result['id'], $result['admin_id'], $result['name'], $result['voting_end_time'], $result['ordering_end_time'], $result['status_id'], $result['invite_code']);
+      return new Lobby(
+         $db,
+         $result['id'],
+         $result['admin_id'],
+         $result['name'],
+         $result['voting_end_time'],
+         $result['ordering_end_time'],
+         $result['status_id'],
+         $result['invite_code']
+      );
    }
 
    // generates six-character long, all uppercase hexadecimal code

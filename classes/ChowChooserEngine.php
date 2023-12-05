@@ -270,7 +270,6 @@ class ChowChooserEngine {
 		$userId = $_SESSION['user']->getId();
 		$userIsAdmin = $userId == $lobby->getAdminId();
 
-		$swapArray['votingEndTime'] = $lobby->getVotingEndTime();
 		$swapArray['orderingEndTime'] = $lobby->getOrderingEndTime();
 
 		switch ($lobby->getStatusId()) {
@@ -284,6 +283,10 @@ class ChowChooserEngine {
 					<input type="submit" value="Hardcoded value for looby=1$restaurantId=1"/>
 				</form>
 				*/
+
+				// placed here because could be null, but guaranteed to be not null
+				// if lobby is in voting phase
+				$swapArray['votingEndTime'] = $lobby->getVotingEndTime();
 
 				$tableContentSwapValue = '';
 
