@@ -31,6 +31,9 @@ class Lobby {
         $this->invite_code = $invite_code;
     }
 
+   /**
+   * Retrieves a lobby from the database by ID.
+   */
     public static function getLobbyFromDatabase(int $id): Lobby {
         $db = new Database();
 
@@ -93,6 +96,11 @@ class Lobby {
         
     }
 
+   /**
+   * Retrieves all restaurants associated with this lobby.
+   *
+   * @return array<Restaurant> A collection of `Restaurant` instances.
+   */
     public function getRestaurants(): Array {
 
         // fetch the restaurants assosiated with the lobby
@@ -121,6 +129,11 @@ class Lobby {
         return $restaurants;
     }
 
+   /**
+   * Retrieves the most popularly voted restaurant associated with this lobby.
+   *
+   * @return Restaurant The winning restaurant.
+   */
    public function getWinningRestaurant(): Restaurant {
       // determine the winning restaurant and make it the edit the lobby-restaurant table
         $statement = $this->db->mysqli->prepare("SELECT restaurant_id restaurant, COUNT(restaurant_id) votes 
@@ -196,6 +209,9 @@ class Lobby {
    }
 
 
+   /**
+   * Deletes all records relating this lobby with any non-winning restaurants.
+   */
    public function deleteLoserRestaurants(): void {
       $winningRestaurantId = $this->getWinningRestaurant()->getId();
       // mysql statement to delete every other restaurant from lobby_restaurant that isn't the winner
@@ -231,6 +247,11 @@ class Lobby {
         return $this->status_id;
     }
 
+   /**
+   * Updates the status of a lobby according to its voting and ordering end times.
+   *
+   * @param int The new status ID.
+   */
    public function updateStatusId($status_id): void {
       $statement = $this->db->mysqli->prepare('
          UPDATE lobby
@@ -241,7 +262,15 @@ class Lobby {
       $this->status_id = $status_id;
    }
 
-	// returns the ID of the new lobby
+   /**
+   * Creates a record in the database's `lobby` table.
+   *
+   * @param string $lobbyName The lobby's human-readable name.
+   * @param string|null $votingEndTime Date and time at which the voting phase will end. `null` skips the voting phase.
+   * @param string $orderingEndTime Date and time at which the ordering phase will end.
+   * @param array<Restaurant> $restaurants Restaurants to vote for during the voting phase.
+   * @return int ID of the new lobby's record.
+   */
    public static function createLobbyInDatabase(
       string $lobbyName,
       string|null $votingEndTime,
@@ -283,6 +312,11 @@ class Lobby {
       return $lobbyId;
    }
 
+   /**
+   * Retrieves a lobby from the database by invite code.
+   *
+   * @return Lobby|null The matching lobby. Returns `null` if none were found.
+   */
    public static function getLobbyByInviteCode(string $inviteCode): Lobby|null {
       $db = new Database;
 
@@ -314,7 +348,11 @@ class Lobby {
       );
    }
 
-   // generates six-character long, all uppercase hexadecimal code
+   /**
+   * Generates an invite code.
+   *
+   * @return string The invite code, which consists of six uppercase hexadecimal characters.
+   */
    private static function generateInviteCode(): string {
       $longCode = sha1(rand(0, 20));
       return strtoupper(substr($longCode, 34));

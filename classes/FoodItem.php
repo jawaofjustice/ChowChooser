@@ -26,6 +26,9 @@ class FoodItem {
 		return $this->name.",".$this->price;
 	}
 
+   /**
+   * Retrieves a food item from the database by ID.
+   */
 	public static function getFoodItemFromId(int $id): FoodItem {
 		$db = new Database();
 		$statement = $db->mysqli->prepare("select * from food where id = (?)");

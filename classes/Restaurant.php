@@ -27,6 +27,11 @@ class Restaurant {
       return $this->name;
    }
 
+   /**
+   * Retrieves all records from the `restaurant` table.
+   *
+   * @return array<Restaurant> A collection of `Restaurant` instances.
+   */
    public static function getAllRestaurants(): array {
       $db = new Database();
       $statement = $db->mysqli->prepare("select * from restaurant");
@@ -42,6 +47,9 @@ class Restaurant {
       return $restaurants;
    }
 
+   /**
+   * Retrieves a record from the database's `restaurant` table by ID.
+   */
     public static function getRestaurantFromDatabase(int $id) {
         $db = new Database();
         $statement = $db->mysqli->prepare("select * from restaurant where restaurant.id = (?)");
@@ -54,7 +62,11 @@ class Restaurant {
 
     }
 
-    public function setVotesByLobby($lobbyId) {
+   /**
+   * Calculates the number of votes placed for this restaurant in a particular lobby.
+   * Stores the number of votes in the `votesByLobby` property.
+   */
+    public function setVotesByLobby(int $lobbyId) {
 
         $statement = $this->db->mysqli->prepare("SELECT COUNT(restaurant_id) votes 
                                                     FROM chow_chooser.vote
