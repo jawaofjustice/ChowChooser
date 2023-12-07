@@ -7,7 +7,12 @@ class User {
 	private string $username;
 	private Database $db;
 
-	function __construct(int $id, string $email, string $username, Database $db) {
+   function __construct(
+      int $id,
+      string $email,
+      string $username,
+      Database $db
+   ) {
 		$this->id = $id;
 		$this->email = $email;
 		$this->username = $username;
@@ -34,7 +39,15 @@ class User {
 		return "this is resetting a password";
 	}
 
-	public static function getUserFromCredentials(string $email, string $password = null): User|null {
+   /**
+   * Retrieves a user based on email and password.
+   *
+   * @return User|null The matching user. Returns `null` if no user was found.
+   */
+   public static function getUserFromCredentials(
+      string $email,
+      string $password = null
+   ): User|null {
 		$db = new Database();
 		if (is_null($password)) {
 			// when creating an account, we're only concerned with finding
@@ -58,6 +71,9 @@ class User {
 
 	}
 
+   /**
+   * Retrieves a user from the database by ID.
+   */
 	public static function getUserFromId(int $id): User {
 		$db = new Database();
 
@@ -70,6 +86,11 @@ class User {
 		return new User($user['id'], $user['email'], $user['username'], $db);
 	}
 
+   /**
+   * Creates a new record in the database's `user` table.
+   *
+   * @return User|null Instance of the newly created user. Returns `null` if a user already exists with the provided email.
+   */
 	public static function createUserInDatabase(string $email, string $password, string $username): User|null {
       $db = new Database();
 		$emailAlreadyExists = !is_null(User::getUserFromCredentials($email));
@@ -89,7 +110,10 @@ class User {
       return User::getUserFromCredentials($email);
 	}
 
-   private function isInLobby($lobbyId): bool {
+   /**
+   * Returns whether or not a user is a member of a lobby.
+   */
+   private function isInLobby(int $lobbyId): bool {
       $db = new Database();
       $statement = $db->mysqli->prepare("
          SELECT *
@@ -106,6 +130,9 @@ class User {
       return true;
    }
 
+   /**
+   * Adds this user as a member of a lobby via invite code.
+   */
    public function joinLobby(string $inviteCode): void {
       $db = new Database();
       $lobby = Lobby::getLobbyByInviteCode($inviteCode);
