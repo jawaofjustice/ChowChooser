@@ -32,9 +32,9 @@ class Lobby {
     }
 
    /**
-   * Retrieves a lobby from the database by ID.
+   * Reads a lobby from the database by ID.
    */
-    public static function getLobbyFromDatabase(int $id): Lobby {
+    public static function readLobby(int $id): Lobby {
         $db = new Database();
 
         $statement = $db->mysqli->prepare("select * from lobby where lobby.id = (?)");
@@ -97,7 +97,7 @@ class Lobby {
     }
 
    /**
-   * Retrieves all restaurants associated with this lobby.
+   * Reads all restaurants associated with this lobby.
    *
    * @return array<Restaurant> A collection of `Restaurant` instances.
    */
@@ -113,7 +113,7 @@ class Lobby {
         // create an object for each restaurant and populate the restaurants array with them
         $restaurants = array();
         foreach ($statement->get_result() as $restaurant) {
-            array_push($restaurants, Restaurant::getRestaurantFromDatabase($restaurant['restaurant_id']));
+            array_push($restaurants, Restaurant::readRestaurant($restaurant['restaurant_id']));
         }
 
         // set the votesByLobby in each restaurant using the votes table (method contained in restaurant class)
@@ -130,7 +130,7 @@ class Lobby {
     }
 
    /**
-   * Retrieves the most popularly voted restaurant associated with this lobby.
+   * Reads the most popularly voted restaurant associated with this lobby.
    *
    * @return Restaurant The winning restaurant.
    */
@@ -162,7 +162,7 @@ class Lobby {
       // single winner with no ties -> return the winner
       if (count($voteArray) == 1) {
          $winningRestaurantId = $voteArray[0]['restaurant'];
-         return Restaurant::getRestaurantFromDatabase($winningRestaurantId);
+         return Restaurant::readRestaurant($winningRestaurantId);
       }
 
       // no one voted -> can return any restaurant
@@ -184,7 +184,7 @@ class Lobby {
       // admin did not vote -> return arbitrary restaurant
       if (is_null($adminVoteRow)) {
          $winningRestaurantId = $voteArray[0]['restaurant'];
-         return Restaurant::getRestaurantFromDatabase($winningRestaurantId);
+         return Restaurant::readRestaurant($winningRestaurantId);
       }
 
       $adminVote = $adminVoteRow['restaurant_id'];
@@ -205,7 +205,7 @@ class Lobby {
          $winningRestaurantId = $voteArray[0]['restaurant'];
       }
 
-      return Restaurant::getRestaurantFromDatabase($winningRestaurantId);
+      return Restaurant::readRestaurant($winningRestaurantId);
    }
 
 
@@ -248,11 +248,11 @@ class Lobby {
     }
 
    /**
-   * Updates the status of a lobby according to its voting and ordering end times.
+   * Updates the status of a lobby.
    *
    * @param int The new status ID.
    */
-   public function updateStatusId($status_id): void {
+   public function updateStatusId(int $status_id): void {
       $statement = $this->db->mysqli->prepare('
          UPDATE lobby
          SET status_id = (?)
@@ -263,7 +263,7 @@ class Lobby {
    }
 
    /**
-   * Creates a record in the database's `lobby` table.
+   * Create a new record in the database's `lobby` table.
    *
    * @param string $lobbyName The lobby's human-readable name.
    * @param string|null $votingEndTime Date and time at which the voting phase will end. `null` skips the voting phase.
@@ -271,7 +271,7 @@ class Lobby {
    * @param array<Restaurant> $restaurants Restaurants to vote for during the voting phase.
    * @return int ID of the new lobby's record.
    */
-   public static function createLobbyInDatabase(
+   public static function createLobby(
       string $lobbyName,
       string|null $votingEndTime,
       string $orderingEndTime,
@@ -290,7 +290,7 @@ class Lobby {
       $statement->bind_param('sssiis', $lobbyName, $votingEndTime, $orderingEndTime, $admin_id, $status_id, $invite_code);
       $statement->execute();
 
-      // retrieve the ID of the lobby we just created
+      // read the ID of the lobby we just created
       $lobbyId = $db->mysqli->insert_id;
 
       //insert admin as a member of the newly created lobby
@@ -313,11 +313,11 @@ class Lobby {
    }
 
    /**
-   * Retrieves a lobby from the database by invite code.
+   * Reads a lobby from the database by invite code.
    *
    * @return Lobby|null The matching lobby. Returns `null` if none were found.
    */
-   public static function getLobbyByInviteCode(string $inviteCode): Lobby|null {
+   public static function readLobbyByInviteCode(string $inviteCode): Lobby|null {
       $db = new Database;
 
       $inviteCode = strtoupper($inviteCode);
@@ -349,9 +349,7 @@ class Lobby {
    }
 
    /**
-   * Generates an invite code.
-   *
-   * @return string The invite code, which consists of six uppercase hexadecimal characters.
+   * @return string The invite code: six uppercase hexadecimal characters.
    */
    private static function generateInviteCode(): string {
       $longCode = sha1(rand(0, 20));

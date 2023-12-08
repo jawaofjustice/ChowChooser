@@ -28,11 +28,11 @@ class Restaurant {
    }
 
    /**
-   * Retrieves all records from the `restaurant` table.
+   * Reads all records from the `restaurant` table.
    *
    * @return array<Restaurant> A collection of `Restaurant` instances.
    */
-   public static function getAllRestaurants(): array {
+   public static function readAllRestaurants(): array {
       $db = new Database();
       $statement = $db->mysqli->prepare("select * from restaurant");
       $statement->execute();
@@ -48,9 +48,9 @@ class Restaurant {
    }
 
    /**
-   * Retrieves a record from the database's `restaurant` table by ID.
+   * Reads a record from the database's `restaurant` table by ID.
    */
-    public static function getRestaurantFromDatabase(int $id) {
+    public static function readRestaurant(int $id) {
         $db = new Database();
         $statement = $db->mysqli->prepare("select * from restaurant where restaurant.id = (?)");
 		$statement->bind_param('s', $id);

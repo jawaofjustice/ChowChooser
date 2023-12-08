@@ -40,11 +40,11 @@ class User {
 	}
 
    /**
-   * Retrieves a user based on email and password.
+   * Reads a user based on email and password.
    *
    * @return User|null The matching user. Returns `null` if no user was found.
    */
-   public static function getUserFromCredentials(
+   public static function readUserByCredentials(
       string $email,
       string $password = null
    ): User|null {
@@ -72,9 +72,9 @@ class User {
 	}
 
    /**
-   * Retrieves a user from the database by ID.
+   * Reads a user from the database by ID.
    */
-	public static function getUserFromId(int $id): User {
+	public static function readUserById(int $id): User {
 		$db = new Database();
 
       $statement = $db->mysqli->prepare("select * from user where id = (?) limit 1");
@@ -93,7 +93,7 @@ class User {
    */
 	public static function createUserInDatabase(string $email, string $password, string $username): User|null {
       $db = new Database();
-		$emailAlreadyExists = !is_null(User::getUserFromCredentials($email));
+		$emailAlreadyExists = !is_null(User::readUserByCredentials($email));
 		if ($emailAlreadyExists) {
 			$errorMsg = "User already exists with this email. Please try a different one!";
          echo ChowChooserEngine::load_template("createAccount", ["errorMsg" => $errorMsg]);
@@ -107,7 +107,7 @@ class User {
       $statement->bind_param('sss', $email, $password, $username);
       $statement->execute();
 
-      return User::getUserFromCredentials($email);
+      return User::readUserByCredentials($email);
 	}
 
    /**
@@ -135,7 +135,7 @@ class User {
    */
    public function joinLobby(string $inviteCode): void {
       $db = new Database();
-      $lobby = Lobby::getLobbyByInviteCode($inviteCode);
+      $lobby = Lobby::readLobbyByInviteCode($inviteCode);
 
       // if there is no matching lobby, do nothing
       if (is_null($lobby)) {
@@ -155,6 +155,46 @@ class User {
       $statement->bind_param('ii', $lobbyId, $this->id);
       $statement->execute();
    }
+
+   /**
+   * Reads all lobbies that this user is a member of.
+   *
+   * @return string HTML containing lobby info.
+   */
+	public function readLobbies(): string {
+      $db = new Database();
+		$statement = $db->mysqli->prepare("select distinct l.*, lu.user_id, u.username, s.description 
+			from lobby as l inner join lobby_user as lu on l.id = lu.lobby_id inner join status as s 
+			on l.status_id=s.id inner join user as u on lu.user_id=u.id where lu.user_id = (?)");
+		$statement->bind_param('s', $this->id);
+		$statement->execute();
+
+		$all_user_lobbies="";
+
+
+		foreach ($statement->get_result() as $lobby) {
+			// If the user is the lobby admin, put a star after their user ID
+			if ($lobby['admin_id']==$lobby['user_id'])
+				$adminIcon = "*";
+			else
+				$adminIcon = "";
+
+			// Display end of phase information based on the current phase
+			if ($lobby['description']=="Voting")
+				$phase_end_message="Voting ends at ".$lobby['voting_end_time'];
+			else if ($lobby['description']=="Ordering")
+				$phase_end_message="Ordering ends at ".$lobby['ordering_end_time'];
+			else if ($lobby['description']=="Completed")
+				$phase_end_message="Everyone has finished ordering. Enjoy your meal!";
+			else
+				$phase_end_message="ERROR: Invalid lobby status";
+
+			// Append each lobby to a list of lobbies for the user
+			$all_user_lobbies.='<a href="index.php?action=showlobby&lobby='.$lobby['id'].'">'.$lobby['name']."</a>"." User: ".$lobby['username'].$adminIcon." ".$phase_end_message."<br>";
+		}
+
+		return $all_user_lobbies;
+	}
 
 }
 

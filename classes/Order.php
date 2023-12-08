@@ -44,7 +44,7 @@ class Order {
       }
    }
 
-   public static function getOrderFromDatabase(int $id) {
+   public static function readOrder(int $id) {
       $db = new Database();
       $statement = $db->mysqli->prepare("select * from order_item where id = (?)");
       $statement->bind_param('i', $id);
@@ -69,7 +69,7 @@ class Order {
       );
    }
 
-   public static function getOrdersFromLobby(int $lobbyId): array {
+   public static function readLobbyOrders(int $lobbyId): array {
       $db = new Database();
       $statement = $db->mysqli->prepare("select * from order_item where lobby_id = (?)");
       $statement->bind_param('i', $lobbyId);
@@ -88,7 +88,11 @@ class Order {
       return $orders;
    }
 
-   public static function getOrdersFromUserAndLobby(int $userId, int $lobbyId): array {
+   /**
+   * Reads orders placed by a user in a specified lobby.
+   * @return array An array of `Order` instances.
+   */
+   public static function readUserOrdersByLobby(int $userId, int $lobbyId): array {
       $db = new Database();
       $statement = $db->mysqli->prepare("select * from order_item where user_id = (?) and lobby_id = (?)");
       $statement->bind_param('ii', $userId, $lobbyId);
