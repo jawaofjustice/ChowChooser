@@ -27,13 +27,8 @@ class User {
 		return $this->email;
 	}
 
-
-	function editUser() {
-		return "this is editing a user";
-	}
-
-	function resetPassword() {
-		return "this is resetting a password";
+	public function getUsername(): string {
+		return $this->username;
 	}
 
    /**

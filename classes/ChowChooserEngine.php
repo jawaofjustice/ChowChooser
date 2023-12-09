@@ -354,62 +354,64 @@ class ChowChooserEngine {
 
 			case '2':
 
-            // display the name of the restaurant that wins the voting phase
-            $swapArray['restaurant'] = $lobby->getWinningRestaurant()->name;
+				// display the name of the restaurant that wins the voting phase
+				$swapArray['restaurant'] = $lobby->getWinningRestaurant()->name;
 
-            // display orders from all users if you are the lobby admin,
-            // otherwise just display your own
-            if ($userIsAdmin) {
-               $orders = Order::readLobbyOrders($lobby->getId());
-            } else {
-               $orders = Order::readUserOrdersByLobby(
-                  $userId,
-                  $lobby->getId()
-               );
-            }
+				// display orders from all users if you are the lobby admin,
+				// otherwise just display your own
+				if ($userIsAdmin) {
+				   $orders = Order::readLobbyOrders($lobby->getId());
+				} else {
+				   $orders = Order::readUserOrdersByLobby(
+					  $userId,
+					  $lobby->getId()
+				   );
+				}
 
-            if ($userIsAdmin) {
-              $username = User::getUserFromId($order->getUserId())->getUsername();
-            }
-            
-			    	$orderTableRows = "";
-				    $adminColumnHeader = $userIsAdmin ? "<th>User</th>" : "";
-			   
-            $orderDisplay .= '<th>Quantity</th><th>Food</th><th>Order price</th>';
-            $subtotal = 0.0;
-            foreach ($orders as $order) {
-                
-                
-              $food = FoodItem::readFoodItem($order->getFoodId());
-              $orderPrice = $food->price * $order->quantity;
-              $subtotal += $orderPrice;
-              $username = "";
-              /*
-              $orderDisplay .= "<tr><td>";
-              if ($userIsAdmin) {
-                  $username = User::readUserById($order->getUserId())->getUsername();
-                  $orderDisplay .= $username."</td><td>";
-              }
-              $orderDisplay .= $order->quantity."</td><td>"
-                  .$food->name."</td><td>$"
-                  .$orderPrice."</td>"
-                  .'<td><form action="" method="post">
-                  <input type="hidden" name="deleteOrderRequest" value="SO TRUE" />
-                  <input type="hidden" name="orderId" value="'.$order->id.'" />
-                  <input name="deleteOrder" type="submit" value="Delete"/>
-                  </form></td></tr>';
-                */
-                
-               $rowSwap = Array();
-               $rowSwap['adminColumn'] = $userIsAdmin ? "<td>".$username."</td>" : "";
-               $rowSwap['foodName'] = $food->name;
-               $rowSwap['orderQty'] = $order->quantity;
-               $rowSwap['orderPrice'] = $orderPrice;
-               $rowSwap['orderId'] = $order->id;
+				
+				
+				$orderTableRows = "";
+				$adminColumnHeader = $userIsAdmin ? "<th>User</th>" : "";
+				   
+				//$orderDisplay .= '<th>Quantity</th><th>Food</th><th>Order price</th>';
+				$subtotal = 0.0;
+				echo "we should have " . count($orders);
+				foreach ($orders as $order) {
+					
+					
+					$food = FoodItem::readFoodItem($order->getFoodId());
+					$orderPrice = $food->price * $order->quantity;
+					$subtotal += $orderPrice;
+					$username = "";
+					if ($userIsAdmin) {
+					  $username = User::readUserById($order->getUserId())->getUsername();
+					}
+					/*
+					$orderDisplay .= "<tr><td>";
+					if ($userIsAdmin) {
+					  $username = User::readUserById($order->getUserId())->getUsername();
+					  $orderDisplay .= $username."</td><td>";
+					}
+					$orderDisplay .= $order->quantity."</td><td>"
+					  .$food->name."</td><td>$"
+					  .$orderPrice."</td>"
+					  .'<td><form action="" method="post">
+					  <input type="hidden" name="deleteOrderRequest" value="SO TRUE" />
+					  <input type="hidden" name="orderId" value="'.$order->id.'" />
+					  <input name="deleteOrder" type="submit" value="Delete"/>
+					  </form></td></tr>';
+					*/
 
-               $orderTableRows .= $this->load_template('lobbyOrderRow', $rowSwap); 
-                
-            }
+					$rowSwap = Array();
+					$rowSwap['adminColumn'] = $userIsAdmin ? "<td>".$username."</td>" : "";
+					$rowSwap['foodName'] = $food->name;
+					$rowSwap['orderQty'] = $order->quantity;
+					$rowSwap['orderPrice'] = $orderPrice;
+					$rowSwap['orderId'] = $order->id;
+
+					$orderTableRows .= $this->load_template('lobbyOrderRow', $rowSwap); 
+					
+				}
             $orderDisplay .= "</table>";
 
             if (empty($orders)) {
@@ -418,7 +420,7 @@ class ChowChooserEngine {
                 $swapArray['orderItems'] = $this->load_template('lobbyOrderTable', ["orderTableRows" => $orderTableRows, "adminColumnHeader" => $adminColumnHeader]);
             }
 
-            $swapArray['orderItems'] = $orderDisplay;
+         //   $swapArray['orderItems'] = $orderDisplay;
             $swapArray['lobbyName'] = $lobby->getName();
             $swapArray['subtotal'] = $subtotal;
             $swapArray['taxes'] = number_format(round($subtotal * 0.06, 2), 2);
