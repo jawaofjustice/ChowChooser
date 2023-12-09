@@ -220,8 +220,32 @@ class ChowChooserEngine {
 		$swapArray['loginLogoutForm'] = $this->load_template("logoutForm");
 		$swapArray['userName'] = $_SESSION['user']->getUsername();
 		$all_user_lobbies = $_SESSION['user']->readLobbies();
-		
-		$swapArray['lobbies'] = $all_user_lobbies;
+
+		$swapArray['lobbies'] = "";
+		foreach ($all_user_lobbies as $lobby) {
+			// If the user is the lobby admin, put a star after their user ID
+			if ($lobby->getAdminId() == $_SESSION['user']->getId())
+				$adminIcon = "*";
+			else
+				$adminIcon = "";
+
+			// Display end of phase information based on the current phase
+			if ($lobby->getStatusId() == 1)
+				$phase_end_message="Voting ends at ".$lobby->getVotingEndTime();
+			else if ($lobby->getStatusId() == 2)
+				$phase_end_message="Ordering ends at ".$lobby->getOrderingEndTime();
+			else if ($lobby->getStatusId() == 3)
+				$phase_end_message="Everyone has finished ordering. Enjoy your meal!";
+			else
+				$phase_end_message="ERROR: Invalid lobby status";
+
+			// Append each lobby to a list of lobbies for the user
+			$swapArray['lobbies'] .= '<a href="index.php?
+				action=showlobby&lobby='.$lobby->getId().'">'
+				.$lobby->getName()."</a>"
+				." User: ".$_SESSION['user']->getUsername().$adminIcon." "
+				.$phase_end_message."<br>";
+		}
 
 		$swapArray['mainContent'] = $this->load_template("main_menu", $swapArray);
 		echo $this->load_template("base", $swapArray);

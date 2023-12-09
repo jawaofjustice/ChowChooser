@@ -159,9 +159,9 @@ class User {
    /**
    * Reads all lobbies that this user is a member of.
    *
-   * @return string HTML containing lobby info.
+   * @return array<Lobby> A collection of `Lobby` instances.
    */
-	public function readLobbies(): string {
+	public function readLobbies(): array {
       $db = new Database();
 		$statement = $db->mysqli->prepare("select distinct l.*, lu.user_id, u.username, s.description 
 			from lobby as l inner join lobby_user as lu on l.id = lu.lobby_id inner join status as s 
@@ -169,31 +169,14 @@ class User {
 		$statement->bind_param('s', $this->id);
 		$statement->execute();
 
-		$all_user_lobbies="";
+		$all_user_lobbies = array();
 
+      foreach ($statement->get_result() as $l) {
+         $lobby = new Lobby($db, $l['id'], $l['admin_id'], $l['name'], $l['voting_end_time'], $l['ordering_end_time'], $l['status_id'], $l['invite_code']);
+         array_push($all_user_lobbies, $lobby);
+      }
 
-		foreach ($statement->get_result() as $lobby) {
-			// If the user is the lobby admin, put a star after their user ID
-			if ($lobby['admin_id']==$lobby['user_id'])
-				$adminIcon = "*";
-			else
-				$adminIcon = "";
-
-			// Display end of phase information based on the current phase
-			if ($lobby['description']=="Voting")
-				$phase_end_message="Voting ends at ".$lobby['voting_end_time'];
-			else if ($lobby['description']=="Ordering")
-				$phase_end_message="Ordering ends at ".$lobby['ordering_end_time'];
-			else if ($lobby['description']=="Completed")
-				$phase_end_message="Everyone has finished ordering. Enjoy your meal!";
-			else
-				$phase_end_message="ERROR: Invalid lobby status";
-
-			// Append each lobby to a list of lobbies for the user
-			$all_user_lobbies.='<a href="index.php?action=showlobby&lobby='.$lobby['id'].'">'.$lobby['name']."</a>"." User: ".$lobby['username'].$adminIcon." ".$phase_end_message."<br>";
-		}
-
-		return $all_user_lobbies;
+      return $all_user_lobbies;
 	}
 
 }
