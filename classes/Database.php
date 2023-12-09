@@ -22,6 +22,7 @@ class Database {
             return $this->$property;
         }
 	}
+
 }
 
 ?>

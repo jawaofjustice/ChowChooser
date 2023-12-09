@@ -5,23 +5,49 @@
 	</head>
 	<body>
 		<div class="createAccount" id="createAccount">
-			<h1 class="loginTitle">Create Account</h1>
-			<span id="errorMsg" style="color: red">{{errorMsg}}</span>
+			<div class="warningMessage centeredWarning">{{errorMsg}}</div>
 			<form action="" method="post">
+				<table class="thickTable">
+					<tr>
+						<th colspan="2">
+							Create a ChowChooser Account!
+						</th>
+					</tr>
+					<tr>
+						<td class="rightAlignText">
+							<label for="username">Username:</label>
+						</td>
+						<td>
+							<input class="loginTextInput" type="text" name="username" id="username" /><br />
+						</td>
+					</tr>
+					<tr>
+						<td class="rightAlignText">
+							<label for="email">Email:</label>
+						</td>
+						<td>
+							<input class="loginTextInput" type="text" name="email" id="email" /><br />
+						</td>
+					</tr>
+					<tr>
+						<td class="rightAlignText">
+							<label for="password">Password:</label>
+						</td>
+						<td>
+							<input class="loginTextInput" type="password" name="password" id="password"/><br />
+						</td>
+					</tr>
+					<tr>
+						<td>
+
+							<a href="?"><input class="gradientButton" type="button" value="Back to main menu" /></a>
+						</td>
+						<td>
+							<input class="gradientButton" type="submit" name="createAccount" id="createAccount" value="Create account" style="display: inline" />
+						</td>
+					</tr>
+				</table>
 				<input type="hidden" name="formSubmitted" value="1" /><br />
-
-				<label for="username">Username:</label>
-				<input type="text" name="username" id="username" /><br />
-
-				<label for="email">Email:</label>
-				<input type="text" name="email" id="email" /><br />
-
-				<label for="password">Password:</label>
-				<input type="password" name="password" id="password"/><br />
-
-				<a href="?"><input type="button" value="Back to main menu" /></a>
-				<br>
-				<input type="submit" name="createAccount" id="createAccount" value="Create account" style="display: inline" />
 			</form>
+		</div>
 	</body>
-	</div>

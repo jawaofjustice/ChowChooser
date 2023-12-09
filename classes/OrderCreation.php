@@ -25,15 +25,15 @@ class OrderCreation {
 		
 		$swapArray['lobbyId'] = $this->lobbyId;
 		$swapArray['pageTitle'] = "Add an item to your order!";	
-		$swapArray['loginLogoutForm'] = ChowChooserEngine::load_template("logoutForm");
 		$swapArray['userId'] = $this->userId;
 		$swapArray['warningMessage'] = "This is a sample warning message!";
 		$swapArray['lobbyInfo'] = $this->readLobbyInfo();
 		$swapArray['menuList'] = $this->buildMenu();
 		$swapArray['existingOrderItems'] = $this->buildCurrentOrder();
 		$swapArray['searchResultsHeader'] = $this->buildSearchResultHeader();
-		
-		echo ChowChooserEngine::load_template("addOrderItem", $swapArray);
+		$baseArray['loginLogoutForm'] = ChowChooserEngine::load_template("logoutForm");
+		$baseArray['mainContent'] = ChowChooserEngine::load_template("addOrderItem", $swapArray);
+		echo ChowChooserEngine::load_template("base", $baseArray);
 	}
 	
 	function buildSearchResultHeader() {

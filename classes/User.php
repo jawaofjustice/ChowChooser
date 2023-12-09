@@ -27,9 +27,6 @@ class User {
 		return $this->email;
 	}
 
-	public function getUsername(): string {
-		return $this->username;
-	}
 
 	function editUser() {
 		return "this is editing a user";

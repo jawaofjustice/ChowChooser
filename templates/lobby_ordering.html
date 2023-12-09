@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 	<head>
@@ -13,23 +14,26 @@
 			{{orderItems}}
 		</ul>
 
-	<table class="showLobbyTable">
-			<tr>
-				<td>Subtotal:</td>
-				<td>${{subtotal}}</td>
-			</tr>
-			<tr>
-			<td>Taxes:</td>
-				<td>${{taxes}}</td>
-			</tr>
-			<tr>
-				<td>Total price:</td>
-				<td>${{totalPrice}}</td>
-			</tr>
-		</table>
+<h1 id="heading1">{{lobbyName}} is in the Ordering phase!</h1><br />
 
-		<a href="?action=viewPlaceOrderSample&lobbyId={{lobbyId}}"><input type="button" value="Edit your order" /></a>
-		<br>
-		<a href="?showlobby=back"><input type="button" value="Main Menu" /></a>
-	</body>
-</html>
+<a href="?action=viewPlaceOrderSample&lobbyId={{lobbyId}}" class="largeCenteredButton"><input type="button" value="Edit Your order" class="gradientButton bigListItem largeCenteredButton" /></a>
+<br />
+{{orderItems}}
+
+<table class="">
+	<tr>
+		<td class="rightAlignText">Subtotal:</td>
+		<td class="leftAlignText">${{subtotal}}</td>
+	</tr>
+	<tr>
+		<td class="rightAlignText">Taxes:</td>
+		<td class="leftAlignText">${{taxes}}</td>
+	</tr>
+	<tr>
+		<td class="rightAlignText">Total price:</td>
+		<td class="leftAlignText">${{totalPrice}}</td>
+	</tr>
+</table>
+
+<br>
+<a href="?showlobby=back"><input type="button" value="Main Menu" /></a>
