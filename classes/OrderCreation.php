@@ -26,12 +26,14 @@ class OrderCreation {
 		$swapArray['lobbyId'] = $this->lobbyId;
 		$swapArray['pageTitle'] = "Add an item to your order!";	
 		$swapArray['userId'] = $this->userId;
-		$swapArray['warningMessage'] = "This is a sample warning message!";
+		$swapArray['warningMessage'] = "";
+		//$swapArray['warningMessage'] = "This is a sample warning message!";
 		$swapArray['lobbyInfo'] = $this->readLobbyInfo();
 		$swapArray['menuList'] = $this->buildMenu();
 		$swapArray['existingOrderItems'] = $this->buildCurrentOrder();
 		$swapArray['searchResultsHeader'] = $this->buildSearchResultHeader();
 		$baseArray['loginLogoutForm'] = ChowChooserEngine::load_template("logoutForm");
+		$baseArray['backButton'] = ChowChooserEngine::load_template("backButton", ["backLink" => "?action=showlobby&lobby=".$this->lobbyId]);
 		$baseArray['mainContent'] = ChowChooserEngine::load_template("addOrderItem", $swapArray);
 		echo ChowChooserEngine::load_template("base", $baseArray);
 	}
@@ -89,7 +91,7 @@ class OrderCreation {
 			$output .= "<br /> Total: $" . number_format(round($subtotal * 1.06, 2), 2);
 			
 		} else {
-			$output .= "You current have no items in your order!";
+			$output .= "<br />You currently have no items in your order!<br /><br />";
 		}	
 		return $output;
 	}

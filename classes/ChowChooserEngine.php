@@ -219,41 +219,47 @@ class ChowChooserEngine {
 		$swapArray['loginLogoutForm'] = $this->load_template("logoutForm");
 		$swapArray['userName'] = $_SESSION['user']->getUsername();
         
-    /* from iss38
-		$all_user_lobbies=Lobby::getUsersLobbies($_SESSION['user']->getId());
-		
-		$swapArray['lobbies'] = $all_user_lobbies;
-        */
+   
         
-		$all_user_lobbies = $_SESSION['user']->readLobbies();
+		$all_user_lobbies = Lobby::getUsersLobbies($_SESSION['user']->getId());
+		$swapArray['lobbies'] = $all_user_lobbies;
+		//~ foreach ($all_user_lobbies as $lobby) {
+			
+			
+			
+			//~ $rowSwap = Array();
+			//~ // If the user is the lobby admin, put a star after their user ID
+			
+			
+			//~ if ($lobby->getAdminId() == $_SESSION['user']->getId())
+				//~ $adminIcon = "*";
+			//~ else
+				//~ $adminIcon = "";
 
-		$swapArray['lobbies'] = "";
-		foreach ($all_user_lobbies as $lobby) {
-			// If the user is the lobby admin, put a star after their user ID
-			if ($lobby->getAdminId() == $_SESSION['user']->getId())
-				$adminIcon = "*";
-			else
-				$adminIcon = "";
+			//~ // Display end of phase information based on the current phase
+			//~ if ($lobby->getStatusId() == 1)
+				//~ $phase_end_message="Voting ends at ".$lobby->getVotingEndTime();
+			//~ else if ($lobby->getStatusId() == 2)
+				//~ $phase_end_message="Ordering ends at ".$lobby->getOrderingEndTime();
+			//~ else if ($lobby->getStatusId() == 3)
+				//~ $phase_end_message="Everyone has finished ordering. Enjoy your meal!";
+			//~ else
+				//~ $phase_end_message="ERROR: Invalid lobby status";
 
-			// Display end of phase information based on the current phase
-			if ($lobby->getStatusId() == 1)
-				$phase_end_message="Voting ends at ".$lobby->getVotingEndTime();
-			else if ($lobby->getStatusId() == 2)
-				$phase_end_message="Ordering ends at ".$lobby->getOrderingEndTime();
-			else if ($lobby->getStatusId() == 3)
-				$phase_end_message="Everyone has finished ordering. Enjoy your meal!";
-			else
-				$phase_end_message="ERROR: Invalid lobby status";
-
-			// Append each lobby to a list of lobbies for the user
-			$swapArray['lobbies'] .= '<a href="index.php?
-				action=showlobby&lobby='.$lobby->getId().'">'
-				.$lobby->getName()."</a>"
-				." User: ".$_SESSION['user']->getUsername().$adminIcon." "
-				.$phase_end_message."<br>";
-		}
+			//~ // Append each lobby to a list of lobbies for the user
+			//~ $swapArray['lobbies'] .= '<a href="index.php?
+				//~ action=showlobby&lobby='.$lobby->getId().'">'
+				//~ .$lobby->getName()."</a>"
+				//~ ." User: ".$_SESSION['user']->getUsername().$adminIcon." "
+				//~ .$phase_end_message."<br>";
+				
+			
+				
+			//~ $swapArray['lobbies'] .= $this->load_template("lobbyRow", $rowSwap);
+		//~ }
         
 		$swapArray['mainContent'] = $this->load_template("main_menu", $swapArray);
+		$swapArray['backButton'] = "";
 		echo $this->load_template("base", $swapArray);
 		
 		return;
@@ -375,7 +381,6 @@ class ChowChooserEngine {
 				   
 				//$orderDisplay .= '<th>Quantity</th><th>Food</th><th>Order price</th>';
 				$subtotal = 0.0;
-				echo "we should have " . count($orders);
 				foreach ($orders as $order) {
 					
 					
@@ -412,10 +417,9 @@ class ChowChooserEngine {
 					$orderTableRows .= $this->load_template('lobbyOrderRow', $rowSwap); 
 					
 				}
-            $orderDisplay .= "</table>";
-
+           // $orderDisplay .= "</table>";
             if (empty($orders)) {
-                $swapArray['orderItems'] = "<p>You have no orders in this lobby!</p>";
+                $swapArray['orderItems'] = "<div class=\"centeredWarning\"><h3>You have no orders in this lobby!</h3></div>";
             } else {
                 $swapArray['orderItems'] = $this->load_template('lobbyOrderTable', ["orderTableRows" => $orderTableRows, "adminColumnHeader" => $adminColumnHeader]);
             }
@@ -427,7 +431,11 @@ class ChowChooserEngine {
             $swapArray['totalPrice'] = number_format(round($subtotal * 1.06, 2), 2);
             // required for placing orders
             $swapArray['lobbyId'] = $lobby->getId();
-            echo $this->load_template('base', ['mainContent' => $this->load_template('lobby_ordering', $swapArray), 'loginLogoutForm' => $this->load_template("logoutForm")]);
+            echo $this->load_template('base', [
+										'mainContent' => $this->load_template('lobby_ordering', $swapArray), 
+										'loginLogoutForm' => $this->load_template('logoutForm'),
+										'backButton' => $this->load_template('backButton', ["backLink" => "?"])
+										]);
 				break;
 
 			case '3':

@@ -278,12 +278,19 @@ th:last-child{
 }
 
 h1 {
-
 	color: #ff914d;
 	margin: 0px auto;
 	font-family: Brice;
 	text-align: center;
 	font-size: 48px;
+}
+
+h2 {
+	color: #white;
+	margin: 0px auto;
+	font-family: Rubik;
+	text-align: center;
+	font-size: 32px;
 }
 
 .rightAlignText {
@@ -304,6 +311,7 @@ h1 {
 	color: black;
 	text-decoration: none;
 }
+
 
 .thickTable {
 	padding: 20px 20px;
@@ -365,4 +373,14 @@ h1 {
 
 .thinTable {
 	border: 2px solid #F99716;
+}
+
+.backButton {
+	color: #ff914d;
+	margin: 0px auto;
+	font-family: Brice;
+	font-size: 48px;
+	text-decoration: none;
+	margin: 10px;
+	float: left;
 }
