@@ -34,13 +34,13 @@ class Vote {
         $db = new Database();
 
         //Check whether the user has voted before
-        if (Vote::getUsersVote($userId, $lobbyId) > 0) {
+        if (Vote::readVote($userId, $lobbyId) > 0) {
 
             //do not write to database
             //tell user that they have already voted in this lobby
             //echo("y'already voted, son! (southern accent)");
             
-            if (Vote::getUsersVote($userId, $lobbyId) == $restaurantId) {
+            if (Vote::readVote($userId, $lobbyId) == $restaurantId) {
 
                 $statement = $db->mysqli->prepare("DELETE FROM vote WHERE user_id = (?) AND lobby_id = (?)");
                 $statement->bind_param("ii", $userId, $lobbyId);
@@ -79,7 +79,7 @@ class Vote {
         return $results;
     }
 
-    public static function getVotesForRestaurant(int $restaurantId, int $lobbyId): int {
+    public static function readVotesForRestaurant(int $restaurantId, int $lobbyId): int {
         $db = new Database();
 
         $statement = $db->mysqli->prepare("SELECT COUNT(id) FROM vote WHERE restaurant_id = (?) AND lobby_id = (?)");
@@ -95,7 +95,7 @@ class Vote {
    *
    * @return int ID of the restaurant that the user has voted for. Returns zero if the user has not voted in this lobby.
    */
-    public static function getUsersVote(int $userId, int $lobbyId): int {
+    public static function readVote(int $userId, int $lobbyId): int {
         $db = new Database();
 
 		$statement = $db->mysqli->prepare("SELECT * FROM vote WHERE lobby_id = (?) AND user_id = (?)");

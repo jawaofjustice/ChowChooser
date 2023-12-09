@@ -29,7 +29,7 @@ class ChowChooserEngine {
 		//$this->example_query();
 
 		if (isset($_POST['login'])) {
-			$user = User::getUserFromCredentials($_POST['email'], $_POST['password']);
+			$user = User::readUserByCredentials($_POST['email'], $_POST['password']);
 			if (is_null($user)) {
 				echo "Failed to log in: invalid credentials";
 				$this->welcome();
@@ -96,7 +96,7 @@ class ChowChooserEngine {
                break;
 				case "createLobby":
 					$restaurantInputs = "";
-					foreach (Restaurant::getAllRestaurants() as $restaurant) {
+					foreach (Restaurant::readAllRestaurants() as $restaurant) {
 						$restaurantInputs .= '<input type="checkbox"'
 							.'name="selectedRestaurant'.$restaurant->id.'"'
 							.'value="'.$restaurant->id.'">'
@@ -219,9 +219,33 @@ class ChowChooserEngine {
 		$swapArray['userId'] = $_SESSION['user']->getId();
 		$swapArray['loginLogoutForm'] = $this->load_template("logoutForm");
 		$swapArray['userName'] = $_SESSION['user']->getUsername();
-		$all_user_lobbies=$this->db->getUsersLobbies($_SESSION['user']->getId());
-		
-		$swapArray['lobbies'] = $all_user_lobbies;
+		$all_user_lobbies = $_SESSION['user']->readLobbies();
+
+		$swapArray['lobbies'] = "";
+		foreach ($all_user_lobbies as $lobby) {
+			// If the user is the lobby admin, put a star after their user ID
+			if ($lobby->getAdminId() == $_SESSION['user']->getId())
+				$adminIcon = "*";
+			else
+				$adminIcon = "";
+
+			// Display end of phase information based on the current phase
+			if ($lobby->getStatusId() == 1)
+				$phase_end_message="Voting ends at ".$lobby->getVotingEndTime();
+			else if ($lobby->getStatusId() == 2)
+				$phase_end_message="Ordering ends at ".$lobby->getOrderingEndTime();
+			else if ($lobby->getStatusId() == 3)
+				$phase_end_message="Everyone has finished ordering. Enjoy your meal!";
+			else
+				$phase_end_message="ERROR: Invalid lobby status";
+
+			// Append each lobby to a list of lobbies for the user
+			$swapArray['lobbies'] .= '<a href="index.php?
+				action=showlobby&lobby='.$lobby->getId().'">'
+				.$lobby->getName()."</a>"
+				." User: ".$_SESSION['user']->getUsername().$adminIcon." "
+				.$phase_end_message."<br>";
+		}
 
 		$swapArray['mainContent'] = $this->load_template("main_menu", $swapArray);
 		echo $this->load_template("base", $swapArray);
@@ -266,9 +290,8 @@ class ChowChooserEngine {
 	function view_lobby() {
 
 		$swapArray = $this->swapArray;
-		//$swapArray['lobbyId'] = $_GET['lobby'];
-		$lobby = Lobby::getLobbyFromDatabase($_GET['lobby']);
-		$swapArray['lobbyName'] = $lobby->getName();
+		$swapArray['lobbyId'] = $_GET['lobby'];
+		$lobby = Lobby::readLobby($_GET['lobby']);
 		$userId = $_SESSION['user']->getId();
 		$userIsAdmin = $userId == $lobby->getAdminId();
 
@@ -294,15 +317,15 @@ class ChowChooserEngine {
 
 				$restaurantArray = $lobby->getRestaurants();
 				foreach ($restaurantArray as $r) {
-					$restaurant = Restaurant::getRestaurantFromDatabase($r->getId());
+					$restaurant = Restaurant::readRestaurant($r->getId());
 
-					if(Vote::getUsersVote($userId, $lobby->getId()) == $restaurant->id) {
+					if(Vote::readVote($userId, $lobby->getId()) == $restaurant->id) {
 						$hasVotedStyle = ' style="background-color: red;" ';
 					} else {
 						$hasVotedStyle = ' ';
 					}
 
-					$numVotes = Vote::getVotesForRestaurant($restaurant->id, $lobby->getId());
+					$numVotes = Vote::readVotesForRestaurant($restaurant->id, $lobby->getId());
 
 					$tableContentSwapValue .= '<tr><td>'.$restaurant->name.'</td>
 						<td><form action="" method="post">
@@ -330,9 +353,9 @@ class ChowChooserEngine {
             // display orders from all users if you are the lobby admin,
             // otherwise just display your own
             if ($userIsAdmin) {
-               $orders = Order::getOrdersFromLobby($lobby->getId());
+               $orders = Order::readLobbyOrders($lobby->getId());
             } else {
-               $orders = Order::getOrdersFromUserAndLobby(
+               $orders = Order::readUserOrdersByLobby(
                   $userId,
                   $lobby->getId()
                );
@@ -345,12 +368,12 @@ class ChowChooserEngine {
             $orderDisplay .= '<th>Quantity</th><th>Food</th><th>Order price</th>';
             $subtotal = 0.0;
             foreach ($orders as $order) {
-               $food = FoodItem::getFoodItemFromId($order->getFoodId());
+               $food = FoodItem::readFoodItem($order->getFoodId());
                $orderPrice = $food->price * $order->quantity;
                $subtotal += $orderPrice;
                $orderDisplay .= "<tr><td>";
                if ($userIsAdmin) {
-                  $username = User::getUserFromId($order->getUserId())->getUsername();
+                  $username = User::readUserById($order->getUserId())->getUsername();
                   $orderDisplay .= $username."</td><td>";
                }
                $orderDisplay .= $order->quantity."</td><td>"
@@ -471,7 +494,7 @@ class ChowChooserEngine {
 		foreach ($_POST as $key => $restaurantId) {
 			if (str_starts_with($key, "selectedRestaurant")) {
 				$noRestaurantIsSelected = false;
-				$restaurant = Restaurant::getRestaurantFromDatabase($restaurantId);
+				$restaurant = Restaurant::readRestaurant($restaurantId);
 				array_push($selectedRestaurants, $restaurant);
 			}
 		}
@@ -489,7 +512,7 @@ class ChowChooserEngine {
 			exit();
 		}
 
-		Lobby::createLobbyInDatabase(
+		Lobby::createLobby(
 			$lobbyName,
 			$votingEndTime,
 			$orderingEndTime,

@@ -27,9 +27,9 @@ class FoodItem {
 	}
 
    /**
-   * Retrieves a food item from the database by ID.
+   * Reads a food item from the database by ID.
    */
-	public static function getFoodItemFromId(int $id): FoodItem {
+	public static function readFoodItem(int $id): FoodItem {
 		$db = new Database();
 		$statement = $db->mysqli->prepare("select * from food where id = (?)");
 		$statement->bind_param('i', $id);

@@ -28,7 +28,7 @@ class OrderCreation {
 		$swapArray['loginLogoutForm'] = ChowChooserEngine::load_template("logoutForm");
 		$swapArray['userId'] = $this->userId;
 		$swapArray['warningMessage'] = "This is a sample warning message!";
-		$swapArray['lobbyInfo'] = $this->getLobbyInfo();
+		$swapArray['lobbyInfo'] = $this->readLobbyInfo();
 		$swapArray['menuList'] = $this->buildMenu();
 		$swapArray['existingOrderItems'] = $this->buildCurrentOrder();
 		$swapArray['searchResultsHeader'] = $this->buildSearchResultHeader();
@@ -97,7 +97,7 @@ class OrderCreation {
 	
 	
 	
-	function getLobbyInfo() {
+	function readLobbyInfo() {
 		// queries lobby and restaurant info for display 
 		//l.*, lb.*, r.*
 		$queryString = "select 
@@ -197,7 +197,7 @@ class OrderCreation {
 	}
 	
 	
-	function checkForExistingItem($lobbyId, $foodId) {
+	function userHasOrderedItem(int $lobbyId, int $foodId): bool  {
 		// first we check to see if this is already added to this order and try to increment up if possible
 		$queryString = "select * from order_item where user_id = ? and lobby_id = ? and food_id  = ? limit 1;";
 		$query = $this->db->prepare($queryString);
@@ -205,13 +205,17 @@ class OrderCreation {
 		
 		$query->execute();
 		$response = $query->get_result();
-		$output = mysqli_num_rows($response);
+		if (mysqli_num_rows($response) > 0) {
+			return true;
+		}
 		
-		// if we have 1 row, return a 1, otherwise 0
-		
-		return $output;
+		return false;
 	}
-	function getCountOfOrderItem($lobbyId, $foodId) {
+
+	/**
+	* Retrieve the quantity of a food item as ordered by a user.
+	*/
+	function readQuantity(int $lobbyId, int $foodId): int {
 	
 		$queryString = "select quantity from order_item where user_id = ? and lobby_id = ? and food_id  = ? limit 1;";
 		$query = $this->db->prepare($queryString);
@@ -222,7 +226,7 @@ class OrderCreation {
 		if (mysqli_num_rows($response)) {
 			$r = mysqli_fetch_assoc($response);
 		
-			$output = $r['quantity'];
+			$output = intval($r['quantity']);
 
 			return $output;
 		} else {
@@ -245,7 +249,7 @@ class OrderCreation {
 		
 			// first we check to see if this is already added to this order and try to increment up if possible
 			
-			if ($this->checkForExistingItem($lobbyId, $foodId)) {
+			if ($this->userHasOrderedItem($lobbyId, $foodId)) {
 				//if we have it already, increment
 				$queryString = "update order_item set quantity=quantity+? where user_id = ? and lobby_id = ? and food_id = ?;";
 				$query = $this->db->prepare($queryString);
@@ -287,8 +291,8 @@ class OrderCreation {
 		
 			// first we check to see if this is already added to this order
 			
-			if ($this->checkForExistingItem($lobbyId, $foodId)) {
-				if ($this->getCountOfOrderItem($lobbyId, $foodId) > 1) { // if the qty is greater than 1 for this line item
+			if ($this->userHasOrderedItem($lobbyId, $foodId)) {
+				if ($this->readQuantity($lobbyId, $foodId) > 1) { // if the qty is greater than 1 for this line item
 					// we will decrement by 1
 					$queryString = "update order_item set quantity=quantity-? where user_id = ? and lobby_id = ? and food_id = ?;";
 					$query = $this->db->prepare($queryString);
