@@ -1,31 +1,25 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="UTF-8">
-		<link rel="stylesheet" type="text/css" href="style.css" />
-		<title>ChowChooser - Lobby {{lobbyName}}</title>
-	</head>
-	{{loginLogoutForm}}
-	<body>
-		<h1 id="heading1">Lobby {{lobbyName}} Completed on {{orderingEndTime}}</h1>
-		<h2 id="heading2">The chosen restaurant was {{restaurant}}</h2>
-		<ul id="orderItems">
-			{{orderItems}}
-		</ul>
 
-	<table class="showLobbyTable">
-			<tr>
-				<td>Subtotal:</td>
-				<td>${{subtotal}}</td>
-			</tr>
-			<tr>
-			<td>Taxes:</td>
-				<td>${{taxes}}</td>
-			</tr>
-			<tr>
-				<td>Total price:</td>
-				<td>${{totalPrice}}</td>
-			</tr>
-		</table>
-	<a href="?action=main"><input type="button" value="Main Menu" /></a>
-</html>
+<h1 id="heading1">Ordering for {{lobbyName}}</h1>
+<h2 id="heading3">Concluded at {{orderingEndTime}}</h2>
+<h2 id="heading2">for {{restaurant}}</h2>
+<br />
+
+{{orderItems}}
+
+<table class="">
+	<tr>
+		<td class="rightAlignText">Subtotal:</td>
+		<td class="leftAlignText">${{subtotal}}</td>
+	</tr>
+	<tr>
+		<td class="rightAlignText">Taxes:</td>
+		<td class="leftAlignText">${{taxes}}</td>
+	</tr>
+	<tr>
+		<td class="rightAlignText">Total price:</td>
+		<td class="leftAlignText">${{totalPrice}}</td>
+	</tr>
+</table>
+<br />
+<h2>Thanks for ordering with ChowChooser!</h2>
+<h3 class="centeredWarning">We hope you enjoy your food and we'll see you again soon!</h3>

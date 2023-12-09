@@ -119,6 +119,7 @@ class ChowChooserEngine {
 					}
 					//echo $this->load_template("create_lobby", $this->swapArray);
 					echo $this->load_template('base', [
+										'title' => "Create a Lobby",
 										'mainContent' => $this->load_template('create_lobby', $this->swapArray), 
 										'loginLogoutForm' => $this->load_template('logoutForm'),
 										'backButton' => $this->load_template('backButton', ["backLink" => "?"])
@@ -188,6 +189,7 @@ class ChowChooserEngine {
 		$swapArray['loginLogoutForm'] = "";
 		$swapArray['mainContent'] = $this->load_template("welcome", $swapArray);
 		$swapArray['backButton'] = "";
+		$swapArray['title'] = "Welcome!";
 		echo $this->load_template("base", $swapArray);
 	}
 
@@ -225,7 +227,7 @@ class ChowChooserEngine {
 		$swapArray['userId'] = $_SESSION['user']->getId();
 		$swapArray['loginLogoutForm'] = $this->load_template("logoutForm");
 		$swapArray['userName'] = $_SESSION['user']->getUsername();
-        
+        $swapArray['title'] = "Main Menu";
    
         
 		$all_user_lobbies = Lobby::getUsersLobbies($_SESSION['user']->getId());
@@ -319,6 +321,7 @@ class ChowChooserEngine {
 		switch ($lobby->getStatusId()) {
 			
 			case '1':
+				
 				//Lobby status: VOTING
 				/*
 				HTML TABLE ROW FORMAT
@@ -364,6 +367,7 @@ class ChowChooserEngine {
 				$swapArray['topRestaurant'] = $lobby->getWinningRestaurant()->name;
 				$swapArray['lobbyName'] = $lobby->getName();
 				echo $this->load_template('base', [
+										'title' => "Voting for " . $lobby->getName(),
 										'mainContent' => $this->load_template('lobby_voting', $swapArray), 
 										'loginLogoutForm' => $this->load_template('logoutForm'),
 										'backButton' => $this->load_template('backButton', ["backLink" => "?"])
@@ -443,9 +447,10 @@ class ChowChooserEngine {
             $swapArray['totalPrice'] = number_format(round($subtotal * 1.06, 2), 2);
             // required for placing orders
             $swapArray['lobbyId'] = $lobby->getId();
-            $swapArray['votingEndTime'] = $lobby->getVotingEndTime();
+            $swapArray['orderingEndTime'] = $lobby->getOrderingEndTime();
 
             echo $this->load_template('base', [
+										'title' => "Ordering for " . $lobby->getName(),
 										'mainContent' => $this->load_template('lobby_ordering', $swapArray), 
 										'loginLogoutForm' => $this->load_template('logoutForm'),
 										'backButton' => $this->load_template('backButton', ["backLink" => "?"])
@@ -457,15 +462,15 @@ class ChowChooserEngine {
 
 				// display the name of the restaurant that wins the voting phase
 			$winningRestaurantId = array_values($lobby->getRestaurants())[0]->getId();
-			$restaurant = Restaurant::getRestaurantFromDatabase($winningRestaurantId);
+			$restaurant = Restaurant::readRestaurant($winningRestaurantId);
 			$swapArray['restaurant'] = $restaurant->name;
 
             // display orders from all users if you are the lobby admin,
             // otherwise just display your own
             if ($userIsAdmin) {
-               $orders = Order::getOrdersFromLobby($lobby->getId());
+               $orders = Order::readLobbyOrders($lobby->getId());
             } else {
-               $orders = Order::getOrdersFromUserAndLobby(
+               $orders = Order::readLobbyOrders(
                   $userId,
                   $lobby->getId()
                );
@@ -477,27 +482,43 @@ class ChowChooserEngine {
             }
             $orderDisplay .= '<th>Quantity</th><th>Food</th><th>Order price</th>';
             $subtotal = 0.0;
+            $orderTableRows = "";
+            $adminColumnHeader = $userIsAdmin ? "<th>User</th>" : "";
             foreach ($orders as $order) {
-               $food = FoodItem::getFoodItemFromId($order->getFoodId());
+               $food = FoodItem::readFoodItem($order->getFoodId());
                $orderPrice = $food->price * $order->quantity;
                $subtotal += $orderPrice;
-               $orderDisplay .= "<tr><td>";
-               if ($userIsAdmin) {
-                  $username = User::getUserFromId($order->getUserId())->getUsername();
-                  $orderDisplay .= $username."</td><td>";
-               }
-               $orderDisplay .= $order->quantity."</td><td>"
-                  .$food->name."</td><td>$"
-                  .$orderPrice."</td></tr>";
+               $username = "";
+				if ($userIsAdmin) {
+				  $username = User::readUserById($order->getUserId())->getUsername();
+				}
+               //~ $orderDisplay .= "<tr><td>";
+               //~ if ($userIsAdmin) {
+                  //~ $username = User::getUserFromId($order->getUserId())->getUsername();
+                  //~ $orderDisplay .= $username."</td><td>";
+               //~ }
+               //~ $orderDisplay .= $order->quantity."</td><td>"
+                  //~ .$food->name."</td><td>$"
+                  //~ .$orderPrice."</td></tr>";
+                  
+                  
+				$rowSwap = Array();
+				$rowSwap['adminColumn'] = $userIsAdmin ? "<td>".$username."</td>" : "";
+				$rowSwap['foodName'] = $food->name;
+				$rowSwap['orderQty'] = $order->quantity;
+				$rowSwap['orderPrice'] = $orderPrice;
+				$rowSwap['orderId'] = $order->id;
+
+				$orderTableRows .= $this->load_template('lobbyCompleteRow', $rowSwap); 
             }
             $orderDisplay .= "</table>";
-
             // saves if/else indentation, even if it overwrites previous work
             if (empty($orders)) {
-               $orderDisplay = "<p>You have no orders in this lobby!</p>";
+                $swapArray['orderItems'] = "<div class=\"centeredWarning\"><h3>You have no orders in this lobby!</h3></div>";
+            } else {
+                $swapArray['orderItems'] = $this->load_template('lobbyOrderTable', ["orderTableRows" => $orderTableRows, "adminColumnHeader" => $adminColumnHeader]);
             }
 
-            $swapArray['orderItems'] = $orderDisplay;
             $swapArray['lobbyName'] = $lobby->getName();
             $swapArray['subtotal'] = $subtotal;
             $swapArray['taxes'] = number_format(round($subtotal * 0.06, 2), 2);
@@ -505,7 +526,13 @@ class ChowChooserEngine {
             // required for placing orders
             $swapArray['lobbyId'] = $lobby->getId();
 
-				echo $this->load_template("lobby_completed", $swapArray);
+				//echo $this->load_template("lobby_completed", $swapArray);
+				echo $this->load_template('base', [
+									'title' => "Ordering for " . $lobby->getName(),
+									'mainContent' => $this->load_template('lobby_completed', $swapArray), 
+									'loginLogoutForm' => $this->load_template('logoutForm'),
+									'backButton' => $this->load_template('backButton', ["backLink" => "?"])
+									]);
 				break;
 
 			default:
@@ -521,6 +548,7 @@ class ChowChooserEngine {
 		$lobbyName = $_POST["lobbyName"];
 		$doSkipVoting = empty($_POST["skipVoting"]);
 		$orderingEndTime = $_POST["orderingEndTime"];
+		
 
 		// the voting end time is null if "skip voting" is enabled, which means
 		// the voting end time key is not sent in $_POST
@@ -558,6 +586,7 @@ class ChowChooserEngine {
 			$this->swapArray["errorMsg"] = "Please enter data in all fields.";
 			//echo $this->load_template("create_lobby", $this->swapArray);
 			echo $this->load_template('base', [
+										'title' => "Create a Lobby",
 										'mainContent' => $this->load_template('create_lobby', $this->swapArray), 
 										'loginLogoutForm' => $this->load_template('logoutForm'),
 										'backButton' => $this->load_template('backButton', ["backLink" => "?"])
@@ -578,8 +607,10 @@ class ChowChooserEngine {
 	private function createAccount() {
 		// user is navigating to the page, has not submitted form
 		if (!isset($_POST['formSubmitted'])) {
-			$swap['loginLogoutForm'] = $this->load_template("logoutForm");
+			$swap['loginLogoutForm'] = "";
 			$swap['mainContent'] = $this->load_template("createAccount", ["errorMsg" => ""]);
+			$swap['title'] = "Create an Account";
+			$swap['backButton'] = $this->load_template("backButton", ["backLink" => "?"]);
 			echo $this->load_template("base", $swap);
 			exit();
 		}
@@ -590,8 +621,10 @@ class ChowChooserEngine {
 
 		if (empty($email) || empty($password) || empty($username)) {
 			$errorMsg = "Please fill in all input fields.";
-			$swap['loginLogoutForm'] = $this->load_template("logoutForm");
+			$swap['loginLogoutForm'] = "";
 			$swap['mainContent'] = $this->load_template("createAccount", ["errorMsg" => $errorMsg]);
+			$swap['title'] = "Create an Account";
+			$swap['backButton'] = $this->load_template("backButton", ["backLink" => "?"]);
 			echo $this->load_template("base", $swap);
 			exit();
 		}
@@ -600,8 +633,10 @@ class ChowChooserEngine {
 
 		if (is_null($user)) {
 			$errorMsg = "Something went wrong: error writing user to database";
-			$swap['loginLogoutForm'] = $this->load_template("logoutForm");
+			$swap['loginLogoutForm'] = "";
 			$swap['mainContent'] = $this->load_template("createAccount", ["errorMsg" => $errorMsg]);
+			$swap['title'] = "Create an Account";
+			$swap['backButton'] = $this->load_template("backButton", ["backLink" => "?"]);
 			echo $this->load_template("base", $swap);
 			exit();
 		}

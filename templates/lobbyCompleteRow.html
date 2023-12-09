@@ -1,0 +1,18 @@
+<tr>
+	{{adminColumn}}
+	<td>
+		{{orderQty}}
+	</td>
+	<td>
+		{{foodName}}
+	</td>
+	<td>
+		${{orderPrice}}
+	</td>
+	<td>
+		<form action="" method="post">
+			<input type="hidden" name="deleteOrderRequest" value="SO TRUE" />
+			<input type="hidden" name="orderId" value="{{orderId}}" />
+		</form>
+	</td>
+</tr>
