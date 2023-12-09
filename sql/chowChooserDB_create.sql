@@ -1,4 +1,17 @@
 use chow_chooser;
+
+
+
+DROP TABLE IF EXISTS `lobby_user`;
+DROP TABLE IF EXISTS `order_item`;
+DROP TABLE IF EXISTS `vote`;
+DROP TABLE IF EXISTS `lobby_restaurant`;
+DROP TABLE IF EXISTS `lobby`;
+DROP TABLE IF EXISTS `status`;
+DROP TABLE IF EXISTS `food`;
+DROP TABLE IF EXISTS `restaurant`;
+DROP TABLE IF EXISTS `user`;
+
 create table status (
    id int unsigned not null auto_increment,
    description varchar(50) not null,
