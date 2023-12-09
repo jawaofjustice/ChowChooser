@@ -187,6 +187,7 @@ class ChowChooserEngine {
 		
 		$swapArray['loginLogoutForm'] = "";
 		$swapArray['mainContent'] = $this->load_template("welcome", $swapArray);
+		$swapArray['backButton'] = "";
 		echo $this->load_template("base", $swapArray);
 	}
 
