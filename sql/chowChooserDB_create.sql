@@ -40,7 +40,11 @@ insert into user (email, password, username) values
    ("dev","dev","dev"),
    ("quat@quat.com","quat","QuatCoretto"),
    ("jerma@email.com","jerma","JeremyElbertson"),
-   ("tree@email.com","tree","treetreetree");
+   ("tree@email.com","tree","treetreetree"),
+   ("syshook@wccnet.edu","Caleb","Caleb"),
+   ("anhubbard@wccnet.edu","Andrew","Andrew"),
+   ("kabutler@wccnet.edu","Kieran","Kieran"),
+   ("gadrake@wccnet.edu","Garrett","Garrett");
 
 create table lobby (
    id int unsigned not null AUTO_INCREMENT,
