@@ -94,17 +94,19 @@ class ChowChooserEngine {
                $this->main_menu();
                break;
 				case "createLobby":
-					$restaurantInputs = "";
+					$restaurantLabels = "";
+					$restaurantCheckboxes = "";
 					foreach (Restaurant::readAllRestaurants() as $restaurant) {
-						$restaurantInputs .= '<input type="checkbox"'
+						$restaurantLabels .= '<label for="restaurant'.$restaurant->id.'">'
+							.$restaurant->name . "</label><br />";
+						$restaurantCheckboxes .= '<input type="checkbox"'
 							.'name="selectedRestaurant'.$restaurant->id.'"'
-							.'value="'.$restaurant->id.'">'
-							.'<label for="restaurant'.$restaurant->id.'">'
-							.$restaurant->name . "</label></br>";
+							.'value="'.$restaurant->id.'"><br />';
 					}
 
 					// user is navigating to the page, hasn't submitted the form
-					$this->swapArray['restaurantInputs'] = $restaurantInputs;
+					$this->swapArray['restaurantLabels'] = $restaurantLabels;
+					$this->swapArray['restaurantCheckboxes'] = $restaurantCheckboxes;
 					$this->swapArray['errorMsg'] = "";
 
 					if (isset($_POST['formSubmitted'])) {
@@ -115,8 +117,12 @@ class ChowChooserEngine {
 						header("Location: ".$_SERVER['PHP_SELF']);
 						break;
 					}
-
-					echo $this->load_template("create_lobby", $this->swapArray);
+					//echo $this->load_template("create_lobby", $this->swapArray);
+					echo $this->load_template('base', [
+										'mainContent' => $this->load_template('create_lobby', $this->swapArray), 
+										'loginLogoutForm' => $this->load_template('logoutForm'),
+										'backButton' => $this->load_template('backButton', ["backLink" => "?"])
+										]);
 					break;
 				case "resetPassword":
 					echo $user->resetPassword();
@@ -325,37 +331,42 @@ class ChowChooserEngine {
 				// if lobby is in voting phase
 				$swapArray['votingEndTime'] = $lobby->getVotingEndTime();
 
-				$tableContentSwapValue = '<table>';
+				$tableContentSwapValue = '';
 
 				$restaurantArray = $lobby->getRestaurants();
+				$userHasVoted = Vote::userHasVoted($userId, $lobby->getId());
 				foreach ($restaurantArray as $r) {
 					$restaurant = Restaurant::readRestaurant($r->getId());
-
-					if(Vote::readVote($userId, $lobby->getId()) == $restaurant->id) {
-						$hasVotedStyle = ' style="background-color: red;" ';
+					
+					$votedForThisRestaurant = Vote::readVote($userId, $lobby->getId()) == $restaurant->id;
+					if($votedForThisRestaurant) {
+						$hasVotedStyle = ' votedButton';
 					} else {
 						$hasVotedStyle = ' ';
 					}
 
 					$numVotes = Vote::readVotesForRestaurant($restaurant->id, $lobby->getId());
-
-					$tableContentSwapValue .= '<tr><td>'.$restaurant->name.'</td>
-						<td><form action="" method="post">
-						<input type="hidden" name="action" value="vote">
-						<input type="hidden" name="lobbyId" value="'.$lobby->getId().'">
-						<input type="hidden" name="restaurantId" value="'.$restaurant->getId().'">
-						<input type="submit" '.$hasVotedStyle.' value="Vote for '.$restaurant->getName().'"/>
-						</form></td>
-						<td>Votes: '.$numVotes.'</td></tr>';
-
+					$rowSwap = Array();
+					$rowSwap['restaurantName'] = $restaurant->name;
+					$rowSwap['lobbyId'] = $lobby->getId();
+					$rowSwap['restaurantId'] = $restaurant->getId();
+					$rowSwap['hasVotedStyle'] = $hasVotedStyle;
+					$rowSwap['numVotes'] = $numVotes;
+					$rowSwap['removeVoteText'] = $votedForThisRestaurant ? "Remove vote" : "Vote";
+					$rowSwap['hideVoteButton'] = $votedForThisRestaurant || !$userHasVoted ? "" :"style=\"display:none;\"" ;
+					
+					$tableContentSwapValue .= $this->load_template('lobbyVotingRow', $rowSwap);
 				}
 
-				$tableContentSwapValue .= "</table>";
 
 				$swapArray['tableContent'] = $tableContentSwapValue;
 				$swapArray['topRestaurant'] = $lobby->getWinningRestaurant()->name;
-
-				echo $this->load_template('lobby_voting', $swapArray);
+				$swapArray['lobbyName'] = $lobby->getName();
+				echo $this->load_template('base', [
+										'mainContent' => $this->load_template('lobby_voting', $swapArray), 
+										'loginLogoutForm' => $this->load_template('logoutForm'),
+										'backButton' => $this->load_template('backButton', ["backLink" => "?"])
+										]);
 				break;
 
 			case '2':
@@ -431,6 +442,8 @@ class ChowChooserEngine {
             $swapArray['totalPrice'] = number_format(round($subtotal * 1.06, 2), 2);
             // required for placing orders
             $swapArray['lobbyId'] = $lobby->getId();
+            $swapArray['votingEndTime'] = $lobby->getVotingEndTime();
+
             echo $this->load_template('base', [
 										'mainContent' => $this->load_template('lobby_ordering', $swapArray), 
 										'loginLogoutForm' => $this->load_template('logoutForm'),
@@ -542,7 +555,12 @@ class ChowChooserEngine {
 		// (4) no restaurant has been selected
 		if (empty($lobbyName) || (is_null($votingEndTime) && !key_exists('skipVoting', $_POST)) || empty($orderingEndTime) || $noRestaurantIsSelected) {
 			$this->swapArray["errorMsg"] = "Please enter data in all fields.";
-			echo $this->load_template("create_lobby", $this->swapArray);
+			//echo $this->load_template("create_lobby", $this->swapArray);
+			echo $this->load_template('base', [
+										'mainContent' => $this->load_template('create_lobby', $this->swapArray), 
+										'loginLogoutForm' => $this->load_template('logoutForm'),
+										'backButton' => $this->load_template('backButton', ["backLink" => "?"])
+										]);
 			// do not return to calling function, we have already
 			// handled all page logic
 			exit();

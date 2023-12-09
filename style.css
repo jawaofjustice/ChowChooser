@@ -326,6 +326,7 @@ h2 {
 .thickTable > tbody > tr > td{
 	padding: 10px 10px 0px 10px;
 	background-color: black;
+	line-height: 34px;
 }
 .thickTable > tbody > tr:last-child > td{
 	padding: 10px;
@@ -339,8 +340,8 @@ h2 {
 	border-radius: 16px;
 	color: black;
 	background-image: linear-gradient(to left, #11A047, #F0CC8E);
-	margin: 10px;
-	
+	/*margin: 10px;
+	*/
 	font-weight: Bold;
 }
 
@@ -395,4 +396,30 @@ h2 {
 	height: 32px;
 	font-size: 20px;
 	text-align: center;
+}
+
+.votedButton {
+	background-image: linear-gradient(to right, #e42323, #daa97f);
+}
+
+.votedButton:hover{ 
+	background: #ddd;
+	color: black;
+}
+
+.wideTable {
+	min-width: 800px;
+}
+
+input[type=checkbox] {
+	width: 24px;
+	height: 24px;
+	vertical-align: top;
+	margin-top:4px;
+	
+}
+input[type=datetime-local] {
+	width: 240px;
+	height: 32px;
+	font-size: 20px;
 }

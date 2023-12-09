@@ -1,0 +1,12 @@
+<tr>
+	<td>{{restaurantName}}</td>
+	<td>
+		<form action="" method="post">
+			<input type="hidden" name="action" value="vote">
+			<input type="hidden" name="lobbyId" value="{{lobbyId}}">
+			<input type="hidden" name="restaurantId" value="{{restaurantId}}">
+			<input {{hideVoteButton}} type="submit" class="gradientButton {{hasVotedStyle}}" value="{{removeVoteText}} for {{restaurantName}}"/>
+		</form>
+	</td>
+	<td>Votes: {{numVotes}}</td>
+</tr>

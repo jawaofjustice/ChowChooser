@@ -1,42 +1,74 @@
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<link rel="stylesheet" type="text/css" href="style.css" />
-		<title>ChowChooser - Create a Lobby</title>
-	</head>
-	<body>
-		<form action="?" method="get">
-			<input type="submit" name="" value="Back to main menu" />
-		</form>
-		<h1>Create a lobby</h1>
-      <span id="errorMsg" style="color: red">{{errorMsg}}</span>
-      <br>
-      <form action="" method="post">
-         <input type="hidden" name="formSubmitted" value="1" />
-         <label for="lobbyName">Lobby name</label>
-         <input id="lobbyName" name="lobbyName" type="text" />
-         <br>
-         <label for="skipVoting">Skip voting phase</label>
-         <!-- "Skip voting" logic is inside the <script> element -->
-         <input id="skipVoting" name="skipVoting" type="checkbox" />
-         <br>
-         <label for="votingEndTime">Voting time limit</label>
-         <input id="votingEndTime" name="votingEndTime" type="datetime-local" />
-         <br>
-         <label for="orderingEndTime">Ordering time limit</label>
-         <input id="orderingEndTime" name="orderingEndTime" type="datetime-local" />
-         <br>
 
-         <h2>Please select at least one restaurant to vote on.</h2>
-         <div>
-            {{restaurantInputs}}
-         </div>
-         <br>
+<h1>Create a lobby</h1>
+<div id="errorMsg" class="centeredWarning warningMessage" >{{errorMsg}}</div>
+<br />
+<form action="" method="post">
+	<input type="hidden" name="formSubmitted" value="1" />
+	<table class="thickTable">
+		<col width="45%" />
+		<col width="*" />
+		<tr>
+			<th colspan="2">
+				Please fill out the form below to create a new lobby
+			</th>
+		</tr>
+		<tr>
+			<td class="rightAlignText">
+				<label for="lobbyName">Lobby name: </label>
+			</td>
+			<td class="leftAlignText">
+				<input id="lobbyName" name="lobbyName" type="text" class="loginTextInput" />
+			</td>
+		</tr>
+		<tr>
+			<td class="rightAlignText">
+				 <!-- "Skip voting" logic is inside the <script> element -->
+				<label for="skipVoting">Skip voting phase: </label>
+			</td>
+			<td class="leftAlignText">
+				<input id="skipVoting" name="skipVoting" type="checkbox" />
+			</td>
+		</tr>
+		<tr>
+			<td class="rightAlignText">
+				<label for="votingEndTime">Voting time limit: </label>
+			</td>
+			<td class="leftAlignText">
+				<input id="votingEndTime" name="votingEndTime" type="datetime-local" />
+			</td>
+		</tr>
+		<tr>
+			<td class="rightAlignText">
+				<label for="orderingEndTime">Ordering time limit: </label>
+			</td>
+			<td class="leftAlignText">
+				<input id="orderingEndTime" name="orderingEndTime" type="datetime-local" />
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<b>Select at least one restaurant to vote on:</b><br />
+				 
+			</td>
+		</tr>
+		<tr>
+			<td class="rightAlignText">
+				{{restaurantCheckboxes}}
+			</td>
+			<td class="leftAlignText">
+				{{restaurantLabels}}
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<input type="submit" name="createLobby" id="submitLobbyForm" value="Create lobby" class="gradientButton bigListItem" />
+			</td>
+		</tr>
+		 
+		 
+	</table>
+</form>
 
-         <input type="submit" name="createLobby" id="submitLobbyForm" value="Create lobby" />
-      </form>
-</html>
 <script>
 // this script enables/disables the "Voting end time" input
 // based on the status of the "Skip voting" checkbox
