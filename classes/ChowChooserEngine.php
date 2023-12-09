@@ -404,6 +404,57 @@ class ChowChooserEngine {
 
 			case '3':
 				//Lobby status: COMPLETED
+
+				// display the name of the restaurant that wins the voting phase
+			$winningRestaurantId = array_values($lobby->getRestaurants())[0]->getId();
+			$restaurant = Restaurant::getRestaurantFromDatabase($winningRestaurantId);
+			$swapArray['restaurant'] = $restaurant->name;
+
+            // display orders from all users if you are the lobby admin,
+            // otherwise just display your own
+            if ($userIsAdmin) {
+               $orders = Order::getOrdersFromLobby($lobby->getId());
+            } else {
+               $orders = Order::getOrdersFromUserAndLobby(
+                  $userId,
+                  $lobby->getId()
+               );
+            }
+
+            $orderDisplay = '<table style="text-align: left">';
+            if ($userIsAdmin) {
+               $orderDisplay .= "<th>Username</th>";
+            }
+            $orderDisplay .= '<th>Quantity</th><th>Food</th><th>Order price</th>';
+            $subtotal = 0.0;
+            foreach ($orders as $order) {
+               $food = FoodItem::getFoodItemFromId($order->getFoodId());
+               $orderPrice = $food->price * $order->quantity;
+               $subtotal += $orderPrice;
+               $orderDisplay .= "<tr><td>";
+               if ($userIsAdmin) {
+                  $username = User::getUserFromId($order->getUserId())->getUsername();
+                  $orderDisplay .= $username."</td><td>";
+               }
+               $orderDisplay .= $order->quantity."</td><td>"
+                  .$food->name."</td><td>$"
+                  .$orderPrice."</td></tr>";
+            }
+            $orderDisplay .= "</table>";
+
+            // saves if/else indentation, even if it overwrites previous work
+            if (empty($orders)) {
+               $orderDisplay = "<p>You have no orders in this lobby!</p>";
+            }
+
+            $swapArray['orderItems'] = $orderDisplay;
+            $swapArray['lobbyName'] = $lobby->getName();
+            $swapArray['subtotal'] = $subtotal;
+            $swapArray['taxes'] = number_format(round($subtotal * 0.06, 2), 2);
+            $swapArray['totalPrice'] = number_format(round($subtotal * 1.06, 2), 2);
+            // required for placing orders
+            $swapArray['lobbyId'] = $lobby->getId();
+
 				echo $this->load_template("lobby_completed", $swapArray);
 				break;
 
@@ -413,8 +464,6 @@ class ChowChooserEngine {
 				break;
 
 			}
-
-		//echo 'id: '.$lobby->getId().' admin: '.$lobby->getAdminId().' name: '.$lobby->getName().' status: '.$lobby->getStatusId();
 
 	}
 

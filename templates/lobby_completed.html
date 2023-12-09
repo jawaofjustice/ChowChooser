@@ -1,30 +1,31 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		
-        <div>
-            
-			<h1 id="heading1">Lobby {{lobbyId}} Completed on {{orderingEndTime}}</h1>
-
-        </div>
-
+		<meta charset="UTF-8">
+		<link rel="stylesheet" type="text/css" href="style.css" />
+		<title>ChowChooser - Lobby {{lobbyName}}</title>
 	</head>
-
+	{{loginLogoutForm}}
 	<body>
+		<h1 id="heading1">Lobby {{lobbyName}} Completed on {{orderingEndTime}}</h1>
+		<h2 id="heading2">The chosen restaurant was {{restaurant}}</h2>
+		<ul id="orderItems">
+			{{orderItems}}
+		</ul>
 
-		<div>
-			
-			<ul id="orderItems">
-			    {{orderItems}}
-			</ul>
-
-			${{totalPrice}}
-
-			<br>
-			
-			<a href="?action=main"><input type="button" value="Main Menu" /></a>
-
-        </div>
-
-	</body>
+	<table class="showLobbyTable">
+			<tr>
+				<td>Subtotal:</td>
+				<td>${{subtotal}}</td>
+			</tr>
+			<tr>
+			<td>Taxes:</td>
+				<td>${{taxes}}</td>
+			</tr>
+			<tr>
+				<td>Total price:</td>
+				<td>${{totalPrice}}</td>
+			</tr>
+		</table>
+	<a href="?action=main"><input type="button" value="Main Menu" /></a>
 </html>
