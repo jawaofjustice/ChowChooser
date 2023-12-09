@@ -1,6 +1,9 @@
 <?php
 require_once "classes/Credentials.php";
 
+/**
+* Creates and stores a MySQLi instance that interfaces with the database.
+*/
 class Database {
 	public $db;
 	public $mysqli;

@@ -1,4 +1,17 @@
 use chow_chooser;
+
+
+
+DROP TABLE IF EXISTS `lobby_user`;
+DROP TABLE IF EXISTS `order_item`;
+DROP TABLE IF EXISTS `vote`;
+DROP TABLE IF EXISTS `lobby_restaurant`;
+DROP TABLE IF EXISTS `lobby`;
+DROP TABLE IF EXISTS `status`;
+DROP TABLE IF EXISTS `food`;
+DROP TABLE IF EXISTS `restaurant`;
+DROP TABLE IF EXISTS `user`;
+
 create table status (
    id int unsigned not null auto_increment,
    description varchar(50) not null,
@@ -40,7 +53,11 @@ insert into user (email, password, username) values
    ("dev","dev","dev"),
    ("quat@quat.com","quat","QuatCoretto"),
    ("jerma@email.com","jerma","JeremyElbertson"),
-   ("tree@email.com","tree","treetreetree");
+   ("tree@email.com","tree","treetreetree"),
+   ("syshook@wccnet.edu","Caleb","Caleb"),
+   ("anhubbard@wccnet.edu","Andrew","Andrew"),
+   ("kabutler@wccnet.edu","Kieran","Kieran"),
+   ("gadrake@wccnet.edu","Garrett","Garrett");
 
 create table lobby (
    id int unsigned not null AUTO_INCREMENT,
@@ -49,17 +66,18 @@ create table lobby (
    voting_end_time Datetime null,
    ordering_end_time Datetime not null,
    status_id int unsigned not null,
+   invite_code char(6) not null,
    primary key (id),
    foreign key (admin_id) references user(id),
    foreign key (status_id) references status(id)
 );
 
-insert into lobby (name, admin_id, voting_end_time, ordering_end_time, status_id) values
-   ("Work", 1, "2023-11-29 12:00:00", "2023-12-12 12:00:00", 1),
-   ("English class", 1, "2023-11-08 12:00:00", "2023-12-12 12:00:00", 2),
-   ("Science class", 1, "2023-10-29 12:00:00", "2023-11-01 12:00:00", 3),
-   ("Sandwich club", 2, "2023-11-08 12:00:00", "2023-12-12 12:00:00", 2),
-   ("Chess club", 2, "2023-11-08 12:00:00", "2023-12-12 12:00:00", 2);
+insert into lobby (name, admin_id, voting_end_time, ordering_end_time, status_id, invite_code) values
+   ("Work", 1, "2024-01-29 12:00:00", "2023-12-12 12:00:00", 1, "ABCDEF"),
+   ("English class", 1, "2023-11-08 12:00:00", "2023-12-12 12:00:00", 2, "ACDFEG"),
+   ("Science class", 1, "2023-10-29 12:00:00", "2023-11-01 12:00:00", 3, "AAAAAA"),
+   ("Sandwich club", 2, "2023-11-08 12:00:00", "2023-12-12 12:00:00", 2, "BABABA"),
+   ("Chess club", 2, "2023-11-08 12:00:00", "2023-12-12 12:00:00", 2, "AB1235");
 
 create table lobby_user (
    lobby_id int unsigned not null,
@@ -88,7 +106,16 @@ create table lobby_restaurant (
 
 insert into lobby_restaurant (lobby_id, restaurant_id) values
    (1, 1),
-   (2, 1);
+   (1, 2),
+   (1, 4),
+   (1, 6),
+   (2, 7),
+   (3, 6),
+   (3, 7),
+   (4, 3),
+   (4, 6),
+   (5, 2),
+   (5, 4);
 
 create table vote (
    id int unsigned not null AUTO_INCREMENT,
