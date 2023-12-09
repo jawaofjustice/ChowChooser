@@ -384,3 +384,15 @@ h2 {
 	margin: 10px;
 	float: left;
 }
+
+
+.rubikFont {
+	font-family: Rubik;
+}
+
+.enterCode {
+	width: 240px;
+	height: 32px;
+	font-size: 20px;
+	text-align: center;
+}
