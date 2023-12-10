@@ -124,20 +124,22 @@ class User {
 
    /**
    * Adds this user as a member of a lobby via invite code.
+   *
+   * @return string An error message, if any.
    */
-   public function joinLobby(string $inviteCode): void {
+   public function joinLobby(string $inviteCode): string {
       $db = new Database();
       $lobby = Lobby::readLobbyByInviteCode($inviteCode);
 
       // if there is no matching lobby, do nothing
       if (is_null($lobby)) {
-         return;
+         return "No lobby exists with that invite code.";
       }
 
       $lobbyId = $lobby->getId();
 
       if ($this->isInLobby($lobbyId)) {
-         return;
+         return "You are already a member of lobby ".$lobby->getName().".";
       }
 
       $statement = $db->mysqli->prepare("
@@ -146,6 +148,8 @@ class User {
          ( (?), (?) );");
       $statement->bind_param('ii', $lobbyId, $this->id);
       $statement->execute();
+
+      return "";
    }
 
    /**
