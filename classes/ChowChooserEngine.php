@@ -333,7 +333,7 @@ class ChowChooserEngine {
 
 				// placed here because could be null, but guaranteed to be not null
 				// if lobby is in voting phase
-				$swapArray['votingEndTime'] = $lobby->getVotingEndTime();
+				$swapArray['votingEndTime'] = date_format(new Datetime($lobby->getVotingEndTime()),"M j, Y H:i:s");
 
 				$tableContentSwapValue = '';
 
@@ -367,7 +367,7 @@ class ChowChooserEngine {
 				$swapArray['topRestaurant'] = $lobby->getWinningRestaurant()->name;
 				$swapArray['lobbyName'] = $lobby->getName();
 				
-				$timerSwap['countDownTimeStart'] = $lobby->getOrderingEndTime();
+				$timerSwap['countDownTimeStart'] = date_format(new Datetime($lobby->getVotingEndTime()),"M j, Y H:i:s");
 				$timerSwap['elementToUpdate'] = 'orderEndTimeHolder';
 				$timerSwap['countDownEndText'] = 'None, voting has concluded!';
 				$swapArray['countDownTimer'] = $this->load_template('countDownTimer', $timerSwap);
@@ -452,8 +452,9 @@ class ChowChooserEngine {
             $swapArray['totalPrice'] = number_format(round($subtotal * 1.06, 2), 2);
             // required for placing orders
             $swapArray['lobbyId'] = $lobby->getId();
-            $swapArray['orderingEndTime'] = $lobby->getOrderingEndTime();
-            $timerSwap['countDownTimeStart'] = $lobby->getOrderingEndTime();
+            
+            $swapArray['orderingEndTime'] = $timerSwap['countDownTimeStart'] = date_format(new Datetime($lobby->getOrderingEndTime()),"M j, Y H:i:s");;
+            $timerSwap['countDownTimeStart'] = $timerSwap['countDownTimeStart'] = date_format(new Datetime($lobby->getOrderingEndTime()),"M j, Y H:i:s");;
             $timerSwap['elementToUpdate'] = 'orderEndTimeHolder';
             $timerSwap['countDownEndText'] = 'None, ordering has concluded!';
 			$swapArray['countDownTimer'] = $this->load_template('countDownTimer', $timerSwap);

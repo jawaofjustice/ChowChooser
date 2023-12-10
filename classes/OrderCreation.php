@@ -32,8 +32,7 @@ class OrderCreation {
 		$swapArray['menuList'] = $this->buildMenu();
 		$swapArray['existingOrderItems'] = $this->buildCurrentOrder();
 		$swapArray['searchResultsHeader'] = $this->buildSearchResultHeader();
-		
-		$timerSwap['countDownTimeStart'] = $lobby->getOrderingEndTime();
+		$timerSwap['countDownTimeStart'] = date_format(new Datetime($lobby->getOrderingEndTime()),"M j, Y H:i:s");
 		$timerSwap['elementToUpdate'] = 'orderEndTimeHolder';
 		$timerSwap['countDownEndText'] = 'None, ordering is now complete!';
 		$swapArray['countDownTimer'] = ChowChooserEngine::load_template('countDownTimer', $timerSwap);
@@ -129,7 +128,7 @@ class OrderCreation {
 		$info = mysqli_fetch_assoc($lobbyAndRestaurantInfo);
 		
 		
-		return "Ordering for " . $info['restaurantName'] . " will end at " . $info['ordering_end_time'];
+		return "Ordering for " . $info['restaurantName'] . " will end at " . date_format(new Datetime($info['ordering_end_time']),"M j, Y H:i:s");
 		//~ $output = "";
 		//~ $i = 0;
 		//~ foreach ($lobbyAndRestaurantInfo as $r) {
