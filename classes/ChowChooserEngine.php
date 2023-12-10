@@ -131,6 +131,7 @@ class ChowChooserEngine {
 						Lobby::deleteLobby($lobby->getId());
 					else
 						Lobby::deleteUserFromLobby($_SESSION['user']->getId(), $lobby->getId());
+					$this->swapArray['errorMsg'] = "Lobby ".$lobby->getName()." Deleted";
 					$this->main_menu();
 					break;
 				case "resetPassword":
