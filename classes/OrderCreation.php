@@ -24,7 +24,7 @@ class OrderCreation {
 	function viewAddOrderItem() {
 		
 		$swapArray['lobbyId'] = $this->lobbyId;
-		$swapArray['pageTitle'] = "Add an Item to Your Order!";	
+		$lobby = Lobby::readLobby($this->lobbyId);
 		$swapArray['userId'] = $this->userId;
 		$swapArray['warningMessage'] = "";
 		//$swapArray['warningMessage'] = "This is a sample warning message!";
@@ -32,9 +32,18 @@ class OrderCreation {
 		$swapArray['menuList'] = $this->buildMenu();
 		$swapArray['existingOrderItems'] = $this->buildCurrentOrder();
 		$swapArray['searchResultsHeader'] = $this->buildSearchResultHeader();
+		$timerSwap['countDownTimeStart'] = date_format(new Datetime($lobby->getOrderingEndTime()),"M j, Y H:i:s");
+		$timerSwap['elementToUpdate'] = 'orderEndTimeHolder';
+		$timerSwap['countDownEndText'] = 'None, ordering is now complete!';
+		$swapArray['countDownTimer'] = ChowChooserEngine::load_template('countDownTimer', $timerSwap);
+		$swapArray['title'] = "Build Your Order!";
+		$baseArray['title'] = "Build Your Order";
 		$baseArray['loginLogoutForm'] = ChowChooserEngine::load_template("logoutForm");
 		$baseArray['backButton'] = ChowChooserEngine::load_template("backButton", ["backLink" => "?action=showlobby&lobby=".$this->lobbyId]);
+		
+		
 		$baseArray['mainContent'] = ChowChooserEngine::load_template("addOrderItem", $swapArray);
+		
 		echo ChowChooserEngine::load_template("base", $baseArray);
 	}
 	
@@ -119,7 +128,7 @@ class OrderCreation {
 		$info = mysqli_fetch_assoc($lobbyAndRestaurantInfo);
 		
 		
-		return "Ordering for " . $info['restaurantName'] . " will end at " . $info['ordering_end_time'];
+		return "Ordering for " . $info['restaurantName'] . " will end at " . date_format(new Datetime($info['ordering_end_time']),"M j, Y H:i:s");
 		//~ $output = "";
 		//~ $i = 0;
 		//~ foreach ($lobbyAndRestaurantInfo as $r) {

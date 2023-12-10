@@ -90,7 +90,8 @@ class ChowChooserEngine {
 					echo $user->editUser();
 					break;
             case "joinLobby":
-               $_SESSION['user']->joinLobby($_GET['inviteCode']);
+               $inviteCode = $_GET['inviteCode'];
+               $this->swapArray['errorMsg'] = $_SESSION['user']->joinLobby($inviteCode);
                $this->main_menu();
                break;
 				case "createLobby":
@@ -224,14 +225,18 @@ class ChowChooserEngine {
 	}
 
 	function main_menu(): void {
-		$swapArray['userId'] = $_SESSION['user']->getId();
-		$swapArray['loginLogoutForm'] = $this->load_template("logoutForm");
-		$swapArray['userName'] = $_SESSION['user']->getUsername();
-        $swapArray['title'] = "Main Menu";
-   
-        
+		$this->swapArray['userId'] = $_SESSION['user']->getId();
+		$this->swapArray['loginLogoutForm'] = $this->load_template("logoutForm");
+		$this->swapArray['userName'] = $_SESSION['user']->getUsername();
+		$this->swapArray['title'] = "Main Menu";
+		if (key_exists('errorMsg', $this->swapArray))
+			$swapArray['errorMsg'] = $this->swapArray['errorMsg'];
+		else
+			$swapArray['errorMsg'] = "";
+
+
 		$all_user_lobbies = Lobby::getUsersLobbies($_SESSION['user']->getId());
-		$swapArray['lobbies'] = $all_user_lobbies;
+		$this->swapArray['lobbies'] = $all_user_lobbies;
 		//~ foreach ($all_user_lobbies as $lobby) {
 			
 			
@@ -267,9 +272,9 @@ class ChowChooserEngine {
 			//~ $swapArray['lobbies'] .= $this->load_template("lobbyRow", $rowSwap);
 		//~ }
         
-		$swapArray['mainContent'] = $this->load_template("main_menu", $swapArray);
-		$swapArray['backButton'] = "";
-		echo $this->load_template("base", $swapArray);
+		$this->swapArray['mainContent'] = $this->load_template("main_menu", $this->swapArray);
+		$this->swapArray['backButton'] = "";
+		echo $this->load_template("base", $this->swapArray);
 		
 		return;
 	}
@@ -345,7 +350,7 @@ class ChowChooserEngine {
 
 				// placed here because could be null, but guaranteed to be not null
 				// if lobby is in voting phase
-				$swapArray['votingEndTime'] = $lobby->getVotingEndTime();
+				$swapArray['votingEndTime'] = date_format(new Datetime($lobby->getVotingEndTime()),"M j, Y H:i:s");
 
 				$tableContentSwapValue = '';
 
@@ -378,6 +383,11 @@ class ChowChooserEngine {
 				$swapArray['tableContent'] = $tableContentSwapValue;
 				$swapArray['topRestaurant'] = $lobby->getWinningRestaurant()->name;
 				$swapArray['lobbyName'] = $lobby->getName();
+				
+				$timerSwap['countDownTimeStart'] = date_format(new Datetime($lobby->getVotingEndTime()),"M j, Y H:i:s");
+				$timerSwap['elementToUpdate'] = 'orderEndTimeHolder';
+				$timerSwap['countDownEndText'] = 'None, voting has concluded!';
+				$swapArray['countDownTimer'] = $this->load_template('countDownTimer', $timerSwap);
 				echo $this->load_template('base', [
 										'title' => "Voting for " . $lobby->getName(),
 										'mainContent' => $this->load_template('lobby_voting', $swapArray), 
@@ -459,8 +469,12 @@ class ChowChooserEngine {
             $swapArray['totalPrice'] = number_format(round($subtotal * 1.06, 2), 2);
             // required for placing orders
             $swapArray['lobbyId'] = $lobby->getId();
-            $swapArray['orderingEndTime'] = $lobby->getOrderingEndTime();
-
+            
+            $swapArray['orderingEndTime'] = $timerSwap['countDownTimeStart'] = date_format(new Datetime($lobby->getOrderingEndTime()),"M j, Y H:i:s");;
+            $timerSwap['countDownTimeStart'] = $timerSwap['countDownTimeStart'] = date_format(new Datetime($lobby->getOrderingEndTime()),"M j, Y H:i:s");;
+            $timerSwap['elementToUpdate'] = 'orderEndTimeHolder';
+            $timerSwap['countDownEndText'] = 'None, ordering has concluded!';
+			$swapArray['countDownTimer'] = $this->load_template('countDownTimer', $timerSwap);
             echo $this->load_template('base', [
 										'title' => "Ordering for " . $lobby->getName(),
 										'mainContent' => $this->load_template('lobby_ordering', $swapArray), 
@@ -537,6 +551,7 @@ class ChowChooserEngine {
             $swapArray['totalPrice'] = number_format(round($subtotal * 1.06, 2), 2);
             // required for placing orders
             $swapArray['lobbyId'] = $lobby->getId();
+            
 
 				//echo $this->load_template("lobby_completed", $swapArray);
 				echo $this->load_template('base', [
