@@ -335,11 +335,14 @@ class ChowChooserEngine {
 			$swapArray['adminView'] = "<br><h2>You are the admin!";
 			// as long as status is not complete, show invite code
 			if ($statusId != 3) {
-				$swapArray['adminView'] .= " Lobby invite code: ".$inviteCode;
+				//<span id="myText" style="cursor: pointer; text-decoration: underline; color: blue;">Click me</span>
+				$swapArray['adminView'] .= ' Lobby invite code: <span id="myText" style="cursor: pointer; text-decoration: underline; color: blue;">'.$inviteCode.'</span>';
 			}
 			$swapArray['adminView'] .= "</h2><br>";
+			$swapArray['copyToClipboard'] = $this->load_template("copyToClipboard");
 		} else {
 			$swapArray['adminView'] = "";
+			$swapArray['copyToClipboard'] = "";
 		}
 
 		switch ($statusId) {
