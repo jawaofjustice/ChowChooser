@@ -320,10 +320,22 @@ class ChowChooserEngine {
 		$lobby = Lobby::readLobby($_GET['lobby']);
 		$userId = $_SESSION['user']->getId();
 		$userIsAdmin = $userId == $lobby->getAdminId();
-
+		$statusId = $lobby->getStatusId();
 		$swapArray['orderingEndTime'] = $lobby->getOrderingEndTime();
 
-		switch ($lobby->getStatusId()) {
+		if ($userIsAdmin) {
+			$inviteCode = $lobby->getInviteCode();
+			$swapArray['adminView'] = "<br><h2>You are the admin!";
+			// as long as status is not complete, show invite code
+			if ($statusId != 3) {
+				$swapArray['adminView'] .= " Lobby invite code: ".$inviteCode;
+			}
+			$swapArray['adminView'] .= "</h2><br>";
+		} else {
+			$swapArray['adminView'] = "";
+		}
+
+		switch ($statusId) {
 			
 			case '1':
 				

@@ -31,6 +31,10 @@ class Lobby {
         $this->invite_code = $invite_code;
     }
 
+   public function getInviteCode(): string {
+      return $this->invite_code;
+   }
+
    /**
    * Reads a lobby from the database by ID.
    */
