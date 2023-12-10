@@ -9,15 +9,16 @@
 	
 	<tr>
 		<td colspan="2">
-			<span class="warningMessage">{{warningMessage}}</span>
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2">
 			{{lobbyInfo}}
 		</td>
 	</tr>
 	
+	<tr>
+		<td colspan="2">
+			<span class="warningMessage">{{warningMessage}}</span>
+			<h3 id="heading3">Remaining time: <p id="orderEndTimeHolder">Loading...</p></h3>
+		</td>
+	</tr>
 	<tr>
 		<td>
 			<table class="orderSoFar">
@@ -66,3 +67,5 @@
 		</td>
 	</tr>
 </table>
+
+{{countDownTimer}}
