@@ -234,9 +234,9 @@ class ChowChooserEngine {
 		$this->swapArray['userName'] = $_SESSION['user']->getUsername();
 		$this->swapArray['title'] = "Main Menu";
 		if (key_exists('errorMsg', $this->swapArray))
-			$swapArray['errorMsg'] = $this->swapArray['errorMsg'];
+			$this->swapArray['errorMsg'] = $this->swapArray['errorMsg'];
 		else
-			$swapArray['errorMsg'] = "";
+			$this->swapArray['errorMsg'] = "";
 
 
 		$all_user_lobbies = Lobby::getUsersLobbies($_SESSION['user']->getId());
