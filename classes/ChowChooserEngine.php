@@ -125,6 +125,10 @@ class ChowChooserEngine {
 										'backButton' => $this->load_template('backButton', ["backLink" => "?"])
 										]);
 					break;
+				case "deleteLobby":
+					Lobby::deleteLobby($_GET['lobbyId']);
+					$this->main_menu();
+					break;
 				case "resetPassword":
 					echo $user->resetPassword();
 					break;

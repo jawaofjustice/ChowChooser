@@ -355,6 +355,32 @@ class Lobby {
       $longCode = sha1(rand(0, 20_000));
       return strtoupper(substr($longCode, 34));
    }
+
+   public static function deleteLobby(int $id) {
+      //echo("delete lobby: ".$id);
+      $db = new Database();
+
+      $statement = $db->mysqli->prepare("DELETE FROM lobby_restaurant WHERE lobby_id = (?)");
+      $statement->bind_param('i', $id);
+      $statement->execute();
+
+      $statement = $db->mysqli->prepare("DELETE FROM lobby_user WHERE lobby_id = (?)");
+      $statement->bind_param('i', $id);
+      $statement->execute();
+
+      $statement = $db->mysqli->prepare("DELETE FROM order_item WHERE lobby_id = (?)");
+      $statement->bind_param('i', $id);
+      $statement->execute();
+
+      $statement = $db->mysqli->prepare("DELETE FROM vote WHERE lobby_id = (?)");
+      $statement->bind_param('i', $id);
+      $statement->execute();
+
+      $statement = $db->mysqli->prepare("DELETE FROM lobby WHERE id = (?)");
+      $statement->bind_param('i', $id);
+      $statement->execute();
+   }
+
 	public static function getUsersLobbies(int $id) {
 		$db = new Database();
 		$statement = $db->mysqli->prepare("select distinct l.*, lu.user_id, u.username, s.description 
