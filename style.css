@@ -440,3 +440,8 @@ input[type=datetime-local] {
 	margin-top: 8px;
 	
 }
+
+p {
+	margin: 0px;
+	display: inline;
+}
