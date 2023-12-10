@@ -24,7 +24,7 @@ class OrderCreation {
 	function viewAddOrderItem() {
 		
 		$swapArray['lobbyId'] = $this->lobbyId;
-		$swapArray['pageTitle'] = "Add an item to your order!";	
+		$swapArray['pageTitle'] = "Add an Item to Your Order!";	
 		$swapArray['userId'] = $this->userId;
 		$swapArray['warningMessage'] = "";
 		//$swapArray['warningMessage'] = "This is a sample warning message!";
