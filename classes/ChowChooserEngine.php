@@ -90,7 +90,8 @@ class ChowChooserEngine {
 					echo $user->editUser();
 					break;
             case "joinLobby":
-               $_SESSION['user']->joinLobby($_GET['inviteCode']);
+               $inviteCode = $_GET['inviteCode'];
+               $this->swapArray['errorMsg'] = $_SESSION['user']->joinLobby($inviteCode);
                $this->main_menu();
                break;
 				case "createLobby":
@@ -224,14 +225,18 @@ class ChowChooserEngine {
 	}
 
 	function main_menu(): void {
-		$swapArray['userId'] = $_SESSION['user']->getId();
-		$swapArray['loginLogoutForm'] = $this->load_template("logoutForm");
-		$swapArray['userName'] = $_SESSION['user']->getUsername();
-        $swapArray['title'] = "Main Menu";
-   
-        
+		$this->swapArray['userId'] = $_SESSION['user']->getId();
+		$this->swapArray['loginLogoutForm'] = $this->load_template("logoutForm");
+		$this->swapArray['userName'] = $_SESSION['user']->getUsername();
+		$this->swapArray['title'] = "Main Menu";
+		if (key_exists('errorMsg', $this->swapArray))
+		$swapArray['errorMsg'] = $this->swapArray['errorMsg'];
+		else
+		$swapArray['errorMsg'] = "";
+
+
 		$all_user_lobbies = Lobby::getUsersLobbies($_SESSION['user']->getId());
-		$swapArray['lobbies'] = $all_user_lobbies;
+		$this->swapArray['lobbies'] = $all_user_lobbies;
 		//~ foreach ($all_user_lobbies as $lobby) {
 			
 			
@@ -267,9 +272,9 @@ class ChowChooserEngine {
 			//~ $swapArray['lobbies'] .= $this->load_template("lobbyRow", $rowSwap);
 		//~ }
         
-		$swapArray['mainContent'] = $this->load_template("main_menu", $swapArray);
-		$swapArray['backButton'] = "";
-		echo $this->load_template("base", $swapArray);
+		$this->swapArray['mainContent'] = $this->load_template("main_menu", $this->swapArray);
+		$this->swapArray['backButton'] = "";
+		echo $this->load_template("base", $this->swapArray);
 		
 		return;
 	}
