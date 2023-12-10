@@ -377,7 +377,9 @@ h2 {
 	display: block;
 	min-width: 40px;
 	float: left;
-	font-size: 20px;
+	font-size: 32px;
+	height: 48px;
+	line-height: 48px;
 /*
 	
 	
@@ -436,4 +438,5 @@ input[type=datetime-local] {
 
 .searchResultHeader {
 	margin-top: 8px;
+	
 }
