@@ -352,7 +352,7 @@ class Lobby {
    * @return string The invite code: six uppercase hexadecimal characters.
    */
    private static function generateInviteCode(): string {
-      $longCode = sha1(rand(0, 20));
+      $longCode = sha1(rand(0, 20_000));
       return strtoupper(substr($longCode, 34));
    }
 	public static function getUsersLobbies(int $id) {
