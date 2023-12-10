@@ -233,9 +233,7 @@ class ChowChooserEngine {
 		$this->swapArray['loginLogoutForm'] = $this->load_template("logoutForm");
 		$this->swapArray['userName'] = $_SESSION['user']->getUsername();
 		$this->swapArray['title'] = "Main Menu";
-		if (key_exists('errorMsg', $this->swapArray))
-			$this->swapArray['errorMsg'] = $this->swapArray['errorMsg'];
-		else
+		if (!key_exists('errorMsg', $this->swapArray))
 			$this->swapArray['errorMsg'] = "";
 
 
