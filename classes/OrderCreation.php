@@ -42,7 +42,7 @@ class OrderCreation {
 		$output = "";
 		
 		if(isset($_POST['searchText'])) {
-			$output .= "<br />Results for search \"" . $_POST['searchText'] . "\": <br />";
+			$output .= "<div class=\"searchResultHeader\">Results for search \"" . $_POST['searchText'] . "\": <br /></div>";
 		}
 		
 		return $output;

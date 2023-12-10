@@ -425,3 +425,7 @@ input[type=datetime-local] {
 .menuToPickFrom {
 	min-width: 428px;
 }
+
+.searchResultHeader {
+	margin-top: 8px;
+}
