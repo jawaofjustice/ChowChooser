@@ -126,7 +126,11 @@ class ChowChooserEngine {
 										]);
 					break;
 				case "deleteLobby":
-					Lobby::deleteLobby($_GET['lobbyId']);
+					$lobby = Lobby::readLobby($_GET['lobbyId']);
+					if($_SESSION['user']->getId() == $lobby->getAdminId())
+						Lobby::deleteLobby($lobby->getId());
+					else
+						Lobby::deleteUserFromLobby($_SESSION['user']->getId(), $lobby->getId());
 					$this->main_menu();
 					break;
 				case "resetPassword":

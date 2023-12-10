@@ -381,6 +381,15 @@ class Lobby {
       $statement->execute();
    }
 
+   public static function deleteUserFromLobby(int $userId, int $lobbyId) {
+      $db = new Database();
+
+      $statement = $db->mysqli->prepare("DELETE FROM lobby_user WHERE user_id = (?) AND lobby_id = (?)");
+      $statement->bind_param('ii', $userId, $lobbyId);
+      $statement->execute();
+
+   }
+
 	public static function getUsersLobbies(int $id) {
 		$db = new Database();
 		$statement = $db->mysqli->prepare("select distinct l.*, lu.user_id, u.username, s.description 
