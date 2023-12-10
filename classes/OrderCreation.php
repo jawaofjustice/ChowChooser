@@ -25,7 +25,6 @@ class OrderCreation {
 		
 		$swapArray['lobbyId'] = $this->lobbyId;
 		$lobby = Lobby::readLobby($this->lobbyId);
-		$swapArray['pageTitle'] = "Add an Item to Your Order!";	
 		$swapArray['userId'] = $this->userId;
 		$swapArray['warningMessage'] = "";
 		//$swapArray['warningMessage'] = "This is a sample warning message!";
@@ -38,7 +37,8 @@ class OrderCreation {
 		$timerSwap['elementToUpdate'] = 'orderEndTimeHolder';
 		$timerSwap['countDownEndText'] = 'None, ordering is now complete!';
 		$swapArray['countDownTimer'] = ChowChooserEngine::load_template('countDownTimer', $timerSwap);
-		
+		$swapArray['title'] = "Build Your Order!";
+		$baseArray['title'] = "Build Your Order";
 		$baseArray['loginLogoutForm'] = ChowChooserEngine::load_template("logoutForm");
 		$baseArray['backButton'] = ChowChooserEngine::load_template("backButton", ["backLink" => "?action=showlobby&lobby=".$this->lobbyId]);
 		
