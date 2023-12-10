@@ -128,6 +128,7 @@ class ChowChooserEngine {
 					break;
 				case "deleteLobby":
 					Lobby::deleteLobby($_GET['lobbyId']);
+					$this->swapArray['errorMsg'] = "Lobby Deleted";
 					$this->main_menu();
 					break;
 				case "resetPassword":
