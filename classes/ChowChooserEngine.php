@@ -366,6 +366,11 @@ class ChowChooserEngine {
 				$swapArray['tableContent'] = $tableContentSwapValue;
 				$swapArray['topRestaurant'] = $lobby->getWinningRestaurant()->name;
 				$swapArray['lobbyName'] = $lobby->getName();
+				
+				$timerSwap['countDownTimeStart'] = $lobby->getOrderingEndTime();
+				$timerSwap['elementToUpdate'] = 'orderEndTimeHolder';
+				$timerSwap['countDownEndText'] = 'None, voting has concluded!';
+				$swapArray['countDownTimer'] = $this->load_template('countDownTimer', $timerSwap);
 				echo $this->load_template('base', [
 										'title' => "Voting for " . $lobby->getName(),
 										'mainContent' => $this->load_template('lobby_voting', $swapArray), 
@@ -448,7 +453,10 @@ class ChowChooserEngine {
             // required for placing orders
             $swapArray['lobbyId'] = $lobby->getId();
             $swapArray['orderingEndTime'] = $lobby->getOrderingEndTime();
-
+            $timerSwap['countDownTimeStart'] = $lobby->getOrderingEndTime();
+            $timerSwap['elementToUpdate'] = 'orderEndTimeHolder';
+            $timerSwap['countDownEndText'] = 'None, ordering has concluded!';
+			$swapArray['countDownTimer'] = $this->load_template('countDownTimer', $timerSwap);
             echo $this->load_template('base', [
 										'title' => "Ordering for " . $lobby->getName(),
 										'mainContent' => $this->load_template('lobby_ordering', $swapArray), 
@@ -525,6 +533,7 @@ class ChowChooserEngine {
             $swapArray['totalPrice'] = number_format(round($subtotal * 1.06, 2), 2);
             // required for placing orders
             $swapArray['lobbyId'] = $lobby->getId();
+            
 
 				//echo $this->load_template("lobby_completed", $swapArray);
 				echo $this->load_template('base', [
