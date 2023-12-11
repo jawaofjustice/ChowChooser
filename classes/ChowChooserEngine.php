@@ -90,11 +90,11 @@ class ChowChooserEngine {
 					$restaurantLabels = "";
 					$restaurantCheckboxes = "";
 					foreach (Restaurant::readAllRestaurants() as $restaurant) {
-						$restaurantLabels .= '<label for="restaurant'.$restaurant->id.'">'
+						$restaurantLabels .= '<label for="restaurant'.$restaurant->getId().'">'
 							.$restaurant->getName() . "</label><br />";
 						$restaurantCheckboxes .= '<input type="checkbox"'
-							.'name="selectedRestaurant'.$restaurant->id.'"'
-							.'value="'.$restaurant->id.'"><br />';
+							.'name="selectedRestaurant'.$restaurant->getId().'"'
+							.'value="'.$restaurant->getId().'"><br />';
 					}
 
 					// user is navigating to the page, hasn't submitted the form
