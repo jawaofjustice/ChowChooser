@@ -35,7 +35,7 @@ class ChowChooserEngine {
 				return;
 			}
 			$_SESSION['user'] = $user;
-			$this->main_menu();
+			$this->mainMenu();
 			return;
 		} else if (isset($_POST['logout'])) {
 			session_unset();
@@ -57,7 +57,7 @@ class ChowChooserEngine {
 		// logged in and have not submitted an action,
 		// such as when they log in -> close the tab -> open the tab
 		if (array_key_exists('user', $_SESSION) && !$actionKeyExists) {
-			$this->main_menu();
+			$this->mainMenu();
 			return;
 		}
 
@@ -77,14 +77,14 @@ class ChowChooserEngine {
 
 		} else if ($orderKeyExists && !$actionKeyExists) {
 			// orderKey exists but no actionKey mean swe're going to the view order page
-			$this->view_order($orderKey);
+			$this->viewOrder($orderKey);
 
 		} else if ($actionKeyExists) {
 			// if we have an action key, we're going to now check if it's value is start_new:
 			switch ($actionKey) {
 				case "start_new": 
 					// if it is, we're going to generate an orderKey and make a new order, then direct user to view that order
-					$this->start_new_order();
+					$this->startNewOrder();
 					break;
 				case "editUser":
 					echo $user->editUser();
@@ -92,7 +92,7 @@ class ChowChooserEngine {
             case "joinLobby":
                $inviteCode = $_GET['inviteCode'];
                $this->swapArray['errorMsg'] = $_SESSION['user']->joinLobby($inviteCode);
-               $this->main_menu();
+               $this->mainMenu();
                break;
 				case "createLobby":
 					$restaurantLabels = "";
@@ -111,7 +111,7 @@ class ChowChooserEngine {
 					$this->swapArray['errorMsg'] = "";
 
 					if (isset($_POST['formSubmitted'])) {
-						$this->create_lobby();
+						$this->createLobby();
 						// redirect to main menu as per POST-Redirect-GET
 						// design pattern in order to prevent duplicate
 						// form requests on refresh
@@ -133,7 +133,7 @@ class ChowChooserEngine {
 					else
 						Lobby::deleteUserFromLobby($_SESSION['user']->getId(), $lobby->getId());
 					$this->swapArray['errorMsg'] = "Lobby ".$lobby->getName()." Deleted";
-					$this->main_menu();
+					$this->mainMenu();
 					break;
 				case "resetPassword":
 					echo $user->resetPassword();
@@ -159,11 +159,11 @@ class ChowChooserEngine {
 				   if (isset($_POST['deleteOrderRequest'])) {
 					  Order::deleteOrderById($_POST['orderId']);
 				   }
-					$this->view_lobby();
+					$this->viewLobby();
 					break;
 				case "main":
 					//easy way to navigate to main menu
-					$this->main_menu();
+					$this->mainMenu();
 					break;
 				case "vote":
 					$user = $_SESSION['user'];
@@ -203,7 +203,7 @@ class ChowChooserEngine {
 		echo $this->load_template("base", $swapArray);
 	}
 
-	private function view_order(string $orderKey) {
+	private function viewOrder(string $orderKey) {
 		if($orderKey == "") { // if the user presses "join" with no key entered, this will put them back to the welcome page with a warning
 			$warning = "You must supply a lobby code to join a lobby!";
 			$this->welcome($warning);
@@ -233,7 +233,7 @@ class ChowChooserEngine {
 		}
 	}
 
-	private function main_menu(): void {
+	private function mainMenu(): void {
 		$this->swapArray['userId'] = $_SESSION['user']->getId();
 		$this->swapArray['loginLogoutForm'] = $this->load_template("logoutForm");
 		$this->swapArray['userName'] = $_SESSION['user']->getUsername();
@@ -286,11 +286,11 @@ class ChowChooserEngine {
 		return;
 	}
 
-	private function start_new_order() {
-		echo $this->view_order($this->generate_key());
+	private function startNewOrder() {
+		echo $this->viewOrder($this->generateKey());
 	}
 
-	private function generate_key() {
+	private function generateKey() {
 		global $KEY_SALT;
 		return md5($KEY_SALT.md5(date("Y-m-d h:i:sa"))); # the string after this date function is just specifying a format for how the date will output
 	}
@@ -312,7 +312,7 @@ class ChowChooserEngine {
 	}
 
 
-	private function example_query() {
+	private function exampleQuery() {
 		$response = $this->db->query("describe lobby;");
 		$results = $response->fetch_assoc();
 
@@ -320,7 +320,7 @@ class ChowChooserEngine {
 		echo "Here's our db results: ".print_r($results);
 	}
 
-	private function view_lobby() {
+	private function viewLobby() {
 
 		$swapArray = $this->swapArray;
 		$swapArray['lobbyId'] = $_GET['lobby'];
@@ -581,7 +581,7 @@ class ChowChooserEngine {
 
 	}
 
-	private function create_lobby() {
+	private function createLobby() {
 		$lobbyName = $_POST["lobbyName"];
 		$doSkipVoting = empty($_POST["skipVoting"]);
 		$orderingEndTime = $_POST["orderingEndTime"];
