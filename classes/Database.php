@@ -6,7 +6,7 @@ require_once "classes/Credentials.php";
 */
 class Database {
 	private Database $db;
-	private mysqli $mysqli;
+	public mysqli $mysqli;
 
 	public function __construct() {
 		$creds = new Credentials();
