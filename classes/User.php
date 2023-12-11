@@ -125,7 +125,7 @@ class User {
    /**
    * Adds this user as a member of a lobby via invite code.
    *
-   * @return string An error message, if any.
+   * @return string An error message, if an error occurred.
    */
    public function joinLobby(string $inviteCode): string {
       $db = new Database();
