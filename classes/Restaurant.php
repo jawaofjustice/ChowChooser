@@ -86,7 +86,7 @@ class Restaurant {
       $this->votesByLobby = $result['votes'];
     }
 
-    public function getVotesByLobby($lobbyId): int {
+    public function getVotesByLobby(int $lobbyId): int {
         return $this->votesByLobby;
     }
 

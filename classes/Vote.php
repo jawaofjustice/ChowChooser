@@ -36,10 +36,6 @@ class Vote {
         //Check whether the user has voted before
         if (Vote::readVote($userId, $lobbyId) > 0) {
 
-            //do not write to database
-            //tell user that they have already voted in this lobby
-            //echo("y'already voted, son! (southern accent)");
-            
             if (Vote::readVote($userId, $lobbyId) == $restaurantId) {
 
                 $statement = $db->mysqli->prepare("DELETE FROM vote WHERE user_id = (?) AND lobby_id = (?)");
@@ -55,28 +51,6 @@ class Vote {
 
         }
 
-        //print_r(Vote::getRestaurantsAndVotes($lobbyId));
-
-    }
-
-    public static function getRestaurantsAndVotes($lobbyId): array {
-        $db = new Database();
-
-        $statement = $db->mysqli->prepare("SELECT r.name, COUNT(v.restaurant_id) Votes
-                                            FROM vote v join restaurant r on v.restaurant_id = r.id
-                                            WHERE v.lobby_id = (?)
-                                            GROUP BY r.name
-                                            ORDER BY Votes DESC");
-                                            
-        $statement->bind_param("i", $lobbyId);
-        $statement->execute();
-
-        $results = array();
-        foreach ($statement->get_result() as $row) {
-            $results[] = $row;
-        }
-
-        return $results;
     }
 
     public static function readVotesForRestaurant(int $restaurantId, int $lobbyId): int {
@@ -112,7 +86,7 @@ class Vote {
     }
 
    /**
-   * Returns whether or not a user has voted in a lobby.
+   * Returns whether or not a user is currently voting in a lobby.
    */
     static function userHasVoted(int $userId, int $lobbyId): bool {
 		$db = new Database();

@@ -1,24 +1,15 @@
 <?php
 
-
-//~ -Area to show order so far and total price
-//~ -Selectable list of food items with prices
-//~ -Category drop-down input to filter food list
-//~ -Add button for food item
-//~ -Submit button takes you back to view lobby and writes to database
-
 class OrderCreation {
 	public $db;
 	public $lobbyId;
 	public $userId;
 
-	function __construct($lobbyId) {
-		//$this->db = Database::connect();
+	function __construct(int $lobbyId) {
 		$db = new Database();
 		$this->db = $db->mysqli;
 		$this->lobbyId = $lobbyId; // for testing purposes
 		$this->userId = $_SESSION['user']->getId();
-		//$this->viewAddOrderItem();
 	}
 	
 	function viewAddOrderItem() {
@@ -27,7 +18,6 @@ class OrderCreation {
 		$lobby = Lobby::readLobby($this->lobbyId);
 		$swapArray['userId'] = $this->userId;
 		$swapArray['warningMessage'] = "";
-		//$swapArray['warningMessage'] = "This is a sample warning message!";
 		$swapArray['lobbyInfo'] = $this->readLobbyInfo();
 		$swapArray['menuList'] = $this->buildMenu();
 		$swapArray['existingOrderItems'] = $this->buildCurrentOrder();
@@ -47,7 +37,7 @@ class OrderCreation {
 		echo ChowChooserEngine::load_template("base", $baseArray);
 	}
 	
-	function buildSearchResultHeader() {
+	function buildSearchResultHeader(): string {
 		$output = "";
 		
 		if(isset($_POST['searchText'])) {
@@ -57,7 +47,7 @@ class OrderCreation {
 		return $output;
 	}
 	
-	function buildCurrentOrder() {
+	function buildCurrentOrder(): string {
 		
 		
 		
@@ -75,10 +65,6 @@ class OrderCreation {
 		$query->execute();
 		$response = $query->get_result();
 		
-		//
-		
-		
-		
 		$output = "";
 		$i = 0;
 		$subtotal = 0;
@@ -87,7 +73,6 @@ class OrderCreation {
 			
 			foreach ($response as $r) {
 				$i++;
-				//$output .= "Result " . $i . ": " . print_r($r, 1). "<br />";
 				$swap['orderLineItemId'] = "orderLineItem". $i;
 				$swap['orderLineItemContents'] = $r['quantity'] . " x " . $r['name'] . " - $" . $r['price'];
 				$swap['foodId'] = $r['id'];
@@ -109,8 +94,6 @@ class OrderCreation {
 	
 	
 	function readLobbyInfo() {
-		// queries lobby and restaurant info for display 
-		//l.*, lb.*, r.*
 		$queryString = "select 
 							r.name as restaurantName, l.*
 							from lobby l 
@@ -129,16 +112,9 @@ class OrderCreation {
 		
 		
 		return "Ordering for " . $info['restaurantName'] . " will end at " . date_format(new Datetime($info['ordering_end_time']),"M j, Y H:i:s");
-		//~ $output = "";
-		//~ $i = 0;
-		//~ foreach ($lobbyAndRestaurantInfo as $r) {
-			//~ $i++;
-			//~ $output .= "Result " . $i . ": " . print_r($r, 1). "<br />";
-		//~ }
-		//~ return $output;
 	}
 	
-	function buildMenu() {
+	function buildMenu(): string {
 		// first check for our filters and build an array
 		$searchFilterSuffix = "";
 		$bindParamsSuffix = "";
@@ -155,10 +131,6 @@ class OrderCreation {
 			$searchFilterSuffix = substr($searchFilterSuffix, 0, -3).");";
 		}
 		
-		//echo "Search Suffix: " . $searchFilterSuffix;
-		
-		
-		//~ //queries for food offered by this restaurant
 		$queryString = "select 
 							f.*
 							from lobby_restaurant lb
@@ -169,9 +141,6 @@ class OrderCreation {
 							where lb.lobby_id = (?) " . $searchFilterSuffix;
 							
 		$query = $this->db->prepare($queryString);
-		//~ echo "Our bind params list looks like: " . 'i'.$bindParamsSuffix;
-		//~ echo "<br /><br />Our query string looks like: " . $queryString."<br /><br />";
-		//~ echo "Our array of actual values for our search looks like: " . print_r($bindParamsValuesSuffix ,1);
 		
 		$query->bind_param('i'.$bindParamsSuffix, ...$bindParamsValuesSuffix);
 		
@@ -186,7 +155,6 @@ class OrderCreation {
 			$i = 0;
 			foreach ($response as $r) {
 				$i++;
-				//$output .= "Result " . $i . ": " . print_r($r, 1). "<br />";
 				$swap['menuItemId'] = "menuItem". $i;
 				$swap['menuItemContents'] = $r['name'] . " - $" . $r['price'];
 				$swap['foodId'] = $r['id'];
@@ -246,12 +214,11 @@ class OrderCreation {
 		
 	}
 	
-	function processAddOrderItem() {
+	/**
+	* Increments the quantity of an order by one.
+	*/
+	function processAddOrderItem(): void {
 		
-		/*
-			This is where we'll save our new order item to the database:
-			
-		*/
 		if(isset($_GET['foodId']) && isset($_GET['lobbyId'])) {
 				
 			$foodId = $_GET['foodId'];
@@ -268,7 +235,6 @@ class OrderCreation {
 				$query->bind_param('iiii', $qty, $this->userId, $lobbyId, $foodId);
 				
 				$query->execute();
-				//$response = $query->get_result();
 			} else {
 				
 				// if not we will add this as a new row
@@ -278,22 +244,19 @@ class OrderCreation {
 				$query->bind_param('iiii', $qty, $this->userId, $this->lobbyId, $foodId);
 				
 				$query->execute();
-				//$response = $query->get_result();
 				
 			}
 		}
 		
-		//$this->viewAddOrderItem();
 		header('Location: ?action=viewPlaceOrderSample&lobbyId='.$lobbyId);
 
 	}
 	
-	function processRemoveOrderItem() {
+	/**
+	* Decrements the quantity of an order. Deletes the order if decrementing to zero.
+	*/
+	function processRemoveOrderItem(): void {
 		
-		/*
-			This is where we'll save our new order item to the database:
-			
-		*/
 		if(isset($_GET['foodId']) && isset($_GET['lobbyId'])) {
 				
 			$foodId = $_GET['foodId'];
@@ -327,7 +290,6 @@ class OrderCreation {
 			}
 		}
 		
-		//$this->viewAddOrderItem();
 		header('Location: ?action=viewPlaceOrderSample&lobbyId='.$lobbyId);
 
 	}

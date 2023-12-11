@@ -9,7 +9,6 @@ class Order {
    private int $user_id;
    private int $quantity;
 
-   //, $id, $admin_id, $name, $status_id
    function __construct(
       Database $db,
       int $id,
@@ -44,7 +43,12 @@ class Order {
       }
    }
 
-   public static function readOrder(int $id) {
+	/**
+   * Reads a record from the database by ID.
+   *
+   * @return Order An `Order` instance.
+   */
+   public static function readOrder(int $id): Order {
       $db = new Database();
       $statement = $db->mysqli->prepare("select * from order_item where id = (?)");
       $statement->bind_param('i', $id);
@@ -69,6 +73,11 @@ class Order {
       );
    }
 
+	/**
+   * Reads all orders associated with a lobby.
+   *
+   * @return array<Order> A collection of `Order` instances.
+   */
    public static function readLobbyOrders(int $lobbyId): array {
       $db = new Database();
       $statement = $db->mysqli->prepare("select * from order_item where lobby_id = (?)");
@@ -89,8 +98,9 @@ class Order {
    }
 
    /**
-   * Reads orders placed by a user in a specified lobby.
-   * @return array An array of `Order` instances.
+   * Reads orders placed by a specified user in a specified lobby.
+	*
+   * @return array<Order> An array of `Order` instances.
    */
    public static function readUserOrdersByLobby(int $userId, int $lobbyId): array {
       $db = new Database();
