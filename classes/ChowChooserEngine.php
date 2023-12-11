@@ -9,10 +9,10 @@ require_once "classes/Vote.php";
 require_once "classes/Order.php";
 
 class ChowChooserEngine {
-	public $db;
-	private $swapArray;
+	public Database $db;
+	private array $swapArray;
 
-	function __construct() {
+	public function __construct() {
 
 		// direct user to the welcome page if:
 		// 1) User is not logged in, and
@@ -184,7 +184,7 @@ class ChowChooserEngine {
 		}
 	}
 
-	function welcome($warning = null) {
+	private function welcome(string $warning = null) {
 		
 		$swapArray['warningMessage'] = "" . $warning == "" ? "" : $warning;
 
@@ -203,7 +203,7 @@ class ChowChooserEngine {
 		echo $this->load_template("base", $swapArray);
 	}
 
-	function view_order($orderKey) {
+	private function view_order(string $orderKey) {
 		if($orderKey == "") { // if the user presses "join" with no key entered, this will put them back to the welcome page with a warning
 			$warning = "You must supply a lobby code to join a lobby!";
 			$this->welcome($warning);
@@ -233,7 +233,7 @@ class ChowChooserEngine {
 		}
 	}
 
-	function main_menu(): void {
+	private function main_menu(): void {
 		$this->swapArray['userId'] = $_SESSION['user']->getId();
 		$this->swapArray['loginLogoutForm'] = $this->load_template("logoutForm");
 		$this->swapArray['userName'] = $_SESSION['user']->getUsername();
@@ -286,16 +286,16 @@ class ChowChooserEngine {
 		return;
 	}
 
-	function start_new_order() {
+	private function start_new_order() {
 		echo $this->view_order($this->generate_key());
 	}
 
-	function generate_key() {
+	private function generate_key() {
 		global $KEY_SALT;
 		return md5($KEY_SALT.md5(date("Y-m-d h:i:sa"))); # the string after this date function is just specifying a format for how the date will output
 	}
 
-	public static function load_template($fileName, $swapArray = null) {
+	public static function load_template(string $fileName, array $swapArray = null) {
 		$fileLocation = "templates/" . $fileName . ".html";
 		$file = fopen($fileLocation, "r") or die("Could not load file!");
 		$contents = fread($file, filesize($fileLocation));
@@ -312,7 +312,7 @@ class ChowChooserEngine {
 	}
 
 
-	function example_query() {
+	private function example_query() {
 		$response = $this->db->query("describe lobby;");
 		$results = $response->fetch_assoc();
 
@@ -320,7 +320,7 @@ class ChowChooserEngine {
 		echo "Here's our db results: ".print_r($results);
 	}
 
-	function view_lobby() {
+	private function view_lobby() {
 
 		$swapArray = $this->swapArray;
 		$swapArray['lobbyId'] = $_GET['lobby'];

@@ -59,7 +59,7 @@ class Vote {
 
     }
 
-    public static function getRestaurantsAndVotes($lobbyId): array {
+    public static function getRestaurantsAndVotes(int $lobbyId): array {
         $db = new Database();
 
         $statement = $db->mysqli->prepare("SELECT r.name, COUNT(v.restaurant_id) Votes
@@ -114,7 +114,7 @@ class Vote {
    /**
    * Returns whether or not a user has voted in a lobby.
    */
-    static function userHasVoted(int $userId, int $lobbyId): bool {
+    public static function userHasVoted(int $userId, int $lobbyId): bool {
 		$db = new Database();
 
 		$statement = $db->mysqli->prepare("SELECT * FROM vote WHERE lobby_id = (?) AND user_id = (?)");

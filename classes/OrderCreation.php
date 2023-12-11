@@ -8,20 +8,18 @@
 //~ -Submit button takes you back to view lobby and writes to database
 
 class OrderCreation {
-	public $db;
-	public $lobbyId;
-	public $userId;
+	private mysqli $db;
+	private int $lobbyId;
+	private int $userId;
 
-	function __construct($lobbyId) {
-		//$this->db = Database::connect();
+	public function __construct(int $lobbyId) {
 		$db = new Database();
 		$this->db = $db->mysqli;
 		$this->lobbyId = $lobbyId; // for testing purposes
 		$this->userId = $_SESSION['user']->getId();
-		//$this->viewAddOrderItem();
 	}
 	
-	function viewAddOrderItem() {
+	public function viewAddOrderItem() {
 		
 		$swapArray['lobbyId'] = $this->lobbyId;
 		$lobby = Lobby::readLobby($this->lobbyId);
@@ -47,7 +45,7 @@ class OrderCreation {
 		echo ChowChooserEngine::load_template("base", $baseArray);
 	}
 	
-	function buildSearchResultHeader() {
+	private function buildSearchResultHeader() {
 		$output = "";
 		
 		if(isset($_POST['searchText'])) {
@@ -57,7 +55,7 @@ class OrderCreation {
 		return $output;
 	}
 	
-	function buildCurrentOrder() {
+	private function buildCurrentOrder() {
 		
 		
 		
@@ -108,7 +106,7 @@ class OrderCreation {
 	
 	
 	
-	function readLobbyInfo() {
+	private function readLobbyInfo() {
 		// queries lobby and restaurant info for display 
 		//l.*, lb.*, r.*
 		$queryString = "select 
@@ -138,7 +136,7 @@ class OrderCreation {
 		//~ return $output;
 	}
 	
-	function buildMenu() {
+	private function buildMenu() {
 		// first check for our filters and build an array
 		$searchFilterSuffix = "";
 		$bindParamsSuffix = "";
@@ -208,7 +206,7 @@ class OrderCreation {
 	}
 	
 	
-	function userHasOrderedItem(int $lobbyId, int $foodId): bool  {
+	private function userHasOrderedItem(int $lobbyId, int $foodId): bool  {
 		// first we check to see if this is already added to this order and try to increment up if possible
 		$queryString = "select * from order_item where user_id = ? and lobby_id = ? and food_id  = ? limit 1;";
 		$query = $this->db->prepare($queryString);
@@ -226,7 +224,7 @@ class OrderCreation {
 	/**
 	* Retrieve the quantity of a food item as ordered by a user.
 	*/
-	function readQuantity(int $lobbyId, int $foodId): int {
+	private function readQuantity(int $lobbyId, int $foodId): int {
 	
 		$queryString = "select quantity from order_item where user_id = ? and lobby_id = ? and food_id  = ? limit 1;";
 		$query = $this->db->prepare($queryString);
@@ -246,7 +244,7 @@ class OrderCreation {
 		
 	}
 	
-	function processAddOrderItem() {
+	public function processAddOrderItem() {
 		
 		/*
 			This is where we'll save our new order item to the database:
@@ -288,7 +286,7 @@ class OrderCreation {
 
 	}
 	
-	function processRemoveOrderItem() {
+	public function processRemoveOrderItem() {
 		
 		/*
 			This is where we'll save our new order item to the database:

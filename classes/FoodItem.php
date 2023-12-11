@@ -1,8 +1,8 @@
 <?php
 class FoodItem {
-	 private $id;
-    private $name;
-    private $price;
+	private int $id;
+    private string $name;
+    private mixed $price;
 
     public function __construct($id, $name, $price) {
         $this->id = $id;
@@ -15,16 +15,6 @@ class FoodItem {
             return $this->$property;
         }
     }
-
-    public function __set($property, $value) {
-        if (property_exists($this, $property)) {
-            $this->$property = $value;
-        }
-    }
-
-	public function __toString() {
-		return $this->name.",".$this->price;
-	}
 
    /**
    * Reads a food item from the database by ID.

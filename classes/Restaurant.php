@@ -3,11 +3,11 @@
 class Restaurant {
 
     private Database $db;
-    private $id;
-    private $name;
+    private int $id;
+    private string $name;
     private int $votesByLobby;
 
-    public function __construct(Database $db, $id, $name) {
+    public function __construct(Database $db, int $id, string $name) {
         $this->db = $db;
         $this->id = $id;
         $this->name = $name;
@@ -86,7 +86,7 @@ class Restaurant {
       $this->votesByLobby = $result['votes'];
     }
 
-    public function getVotesByLobby($lobbyId): int {
+    public function getVotesByLobby(int $lobbyId): int {
         return $this->votesByLobby;
     }
 

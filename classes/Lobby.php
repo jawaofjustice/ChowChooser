@@ -11,7 +11,7 @@ class Lobby {
     private int $status_id;
     private string $invite_code;
 
-   function __construct(
+   public function __construct(
       Database $db,
       int $id,
       int $admin_id,
