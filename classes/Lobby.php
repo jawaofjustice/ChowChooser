@@ -11,7 +11,7 @@ class Lobby {
     private int $status_id;
     private string $invite_code;
 
-   function __construct(
+   public function __construct(
       Database $db,
       int $id,
       int $admin_id,
@@ -30,108 +30,49 @@ class Lobby {
         $this->status_id = $status_id;
         $this->invite_code = $invite_code;
     }
+    
+    public function getId(): int {
+        return $this->id;
+    }
+
+    public function getAdminId(): int {
+        return $this->admin_id;
+    }
+
+    public function getName(): string {
+        return $this->name;
+    }
+
+    public function getVotingEndTime(): string|null {
+        return $this->votingEndTime;
+    }
+
+    public function getOrderingEndTime(): string {
+        return $this->orderingEndTime;
+    }
+
+    public function getStatusId(): int {
+        return $this->status_id;
+    }
 
    public function getInviteCode(): string {
       return $this->invite_code;
    }
 
    /**
-   * Reads a lobby from the database by ID.
-   */
-    public static function readLobby(int $id): Lobby {
-        $db = new Database();
-
-        $statement = $db->mysqli->prepare("select * from lobby where lobby.id = (?)");
-		$statement->bind_param('s', $id);
-		$statement->execute();
-
-        $lobbyArray = mysqli_fetch_assoc($statement->get_result());
-        
-        // Create new lobby object
-        $lobby = new Lobby($db, $lobbyArray['id'], $lobbyArray['admin_id'], $lobbyArray['name'], $lobbyArray['voting_end_time'], $lobbyArray['ordering_end_time'], $lobbyArray['status_id'], $lobbyArray['invite_code']);
-
-        // Make timestamp and date format
-        date_default_timezone_set('America/New_York');
-        $date = date('Y-m-d H:i:s');
-        //echo($date);
-
-        // Check if current time is over voting end time
-      $voteEndTime = $lobby->getVotingEndTime();
-
-      // the effective vote end time accounts for NULL voting_end_time
-      if (is_null($voteEndTime)) {
-         $effectiveVoteEndTime = null;
-      } else {
-         $effectiveVoteEndTime = new DateTime($voteEndTime);
-      }
-
-        if(new DateTime($date) > $effectiveVoteEndTime) {
-
-            // Check if current time is over ordering end time
-            if(new DateTime($date) > new DateTime($lobby->getOrderingEndTime())) {
-                // This lobby is completed
-                $lobby->updateStatusId(3);
-            } else {
-                // in ordering phase
-                $lobby->getWinningRestaurant();
-                $lobby->deleteLoserRestaurants();
-                $lobby->updateStatusId(2);
-            }
-
-        } else {
-            // in voting phase
-            $lobby->updateStatusId(1);
-        }
-
-        //Check whether the status_id in the database is correct or not
-        if($lobby->getStatusId() != $lobbyArray['status_id']) {
-
-            $statusId = $lobby->getStatusId();
-            $id = $lobby->getId();
-
-            //Update the row in the database
-            $statement = $db->mysqli->prepare('UPDATE lobby SET status_id = (?) WHERE id = (?)');
-            $statement->bind_param('ii', $statusId, $id);
-            $statement->execute();
-
-        }
-
-        return $lobby;
-        
-    }
-
-   /**
-   * Reads all restaurants associated with this lobby.
+   * Updates the status of a lobby.
    *
-   * @return array<Restaurant> A collection of `Restaurant` instances.
+   * @param int The new status ID.
    */
-    public function getRestaurants(): Array {
-
-        // fetch the restaurants assosiated with the lobby
-        $statement = $this->db->mysqli->prepare('SELECT restaurant_id
-                                                    FROM lobby_restaurant
-                                                    WHERE lobby_id = (?)');
-        $statement->bind_param('i', $this->id);
-        $statement->execute();
-
-        // create an object for each restaurant and populate the restaurants array with them
-        $restaurants = array();
-        foreach ($statement->get_result() as $restaurant) {
-            array_push($restaurants, Restaurant::readRestaurant($restaurant['restaurant_id']));
-        }
-
-        // set the votesByLobby in each restaurant using the votes table (method contained in restaurant class)
-        foreach($restaurants as $restaurant) {
-            $restaurant->setVotesByLobby($this->id);
-        }
-
-        // order the array of restaurants by how many votes they have
-        usort($restaurants, function($a, $b){
-            return $b->getVotesByLobby($this->id) - $a->getVotesByLobby($this->id);
-        });
-
-        return $restaurants;
-    }
+   public function updateStatusId(int $status_id): void {
+      $statement = $this->db->mysqli->prepare('
+         UPDATE lobby
+         SET status_id = (?)
+         WHERE id = (?)');
+      $statement->bind_param('ii', $status_id, $this->id);
+      $statement->execute();
+      $this->status_id = $status_id;
+   }
 
    /**
    * Reads the most popularly voted restaurant associated with this lobby.
@@ -212,7 +153,6 @@ class Lobby {
       return Restaurant::readRestaurant($winningRestaurantId);
    }
 
-
    /**
    * Deletes all records relating this lobby with any non-winning restaurants.
    */
@@ -226,45 +166,103 @@ class Lobby {
       $statement->bind_param('ii', $this->id, $winningRestaurantId);
       $statement->execute();
    }
-    
-    public function getId(): int {
-        return $this->id;
-    }
 
-    public function getAdminId(): int {
-        return $this->admin_id;
-    }
+   /**
+   * Reads all restaurants associated with this lobby.
+   *
+   * @return array<Restaurant> A collection of `Restaurant` instances.
+   */
+    public function getRestaurants(): Array {
 
-    public function getName(): string {
-        return $this->name;
-    }
+        // fetch the restaurants assosiated with the lobby
+        $statement = $this->db->mysqli->prepare('SELECT restaurant_id
+                                                    FROM lobby_restaurant
+                                                    WHERE lobby_id = (?)');
+        $statement->bind_param('i', $this->id);
+        $statement->execute();
 
-    public function getVotingEndTime(): string|null {
-        return $this->votingEndTime;
-    }
+        // create an object for each restaurant and populate the restaurants array with them
+        $restaurants = array();
+        foreach ($statement->get_result() as $restaurant) {
+            array_push($restaurants, Restaurant::readRestaurant($restaurant['restaurant_id']));
+        }
 
-    public function getOrderingEndTime(): string {
-        return $this->orderingEndTime;
-    }
+        // set the votesByLobby in each restaurant using the votes table (method contained in restaurant class)
+        foreach($restaurants as $restaurant) {
+            $restaurant->setVotesByLobby($this->id);
+        }
 
-    public function getStatusId(): int {
-        return $this->status_id;
+        // order the array of restaurants by how many votes they have
+        usort($restaurants, function($a, $b){
+            return $b->getVotesByLobby($this->id) - $a->getVotesByLobby($this->id);
+        });
+
+        return $restaurants;
     }
 
    /**
-   * Updates the status of a lobby.
-   *
-   * @param int The new status ID.
+   * Reads a lobby from the database by ID.
    */
-   public function updateStatusId(int $status_id): void {
-      $statement = $this->db->mysqli->prepare('
-         UPDATE lobby
-         SET status_id = (?)
-         WHERE id = (?)');
-      $statement->bind_param('ii', $status_id, $this->id);
-      $statement->execute();
-      $this->status_id = $status_id;
-   }
+    public static function readLobby(int $id): Lobby {
+        $db = new Database();
+
+        $statement = $db->mysqli->prepare("select * from lobby where lobby.id = (?)");
+		$statement->bind_param('s', $id);
+		$statement->execute();
+
+        $lobbyArray = mysqli_fetch_assoc($statement->get_result());
+        
+        // Create new lobby object
+        $lobby = new Lobby($db, $lobbyArray['id'], $lobbyArray['admin_id'], $lobbyArray['name'], $lobbyArray['voting_end_time'], $lobbyArray['ordering_end_time'], $lobbyArray['status_id'], $lobbyArray['invite_code']);
+
+        // Make timestamp and date format
+        date_default_timezone_set('America/New_York');
+        $date = date('Y-m-d H:i:s');
+
+      $voteEndTime = $lobby->getVotingEndTime();
+
+      // the effective vote end time accounts for NULL voting_end_time
+      if (is_null($voteEndTime)) {
+         $effectiveVoteEndTime = null;
+      } else {
+         $effectiveVoteEndTime = new DateTime($voteEndTime);
+      }
+
+        // Check if current time is over voting end time
+        if(new DateTime($date) > $effectiveVoteEndTime) {
+
+            // Check if current time is over ordering end time
+            if(new DateTime($date) > new DateTime($lobby->getOrderingEndTime())) {
+                // Set lobby phase to "complete"
+                $lobby->updateStatusId(3);
+            } else {
+                // in ordering phase
+                $lobby->getWinningRestaurant();
+                $lobby->deleteLoserRestaurants();
+                $lobby->updateStatusId(2);
+            }
+
+        } else {
+            // in voting phase
+            $lobby->updateStatusId(1);
+        }
+
+        //Check whether the status_id in the database is correct or not
+        if($lobby->getStatusId() != $lobbyArray['status_id']) {
+
+            $statusId = $lobby->getStatusId();
+            $id = $lobby->getId();
+
+            //Update the row in the database
+            $statement = $db->mysqli->prepare('UPDATE lobby SET status_id = (?) WHERE id = (?)');
+            $statement->bind_param('ii', $statusId, $id);
+            $statement->execute();
+
+        }
+
+        return $lobby;
+        
+    }
 
    /**
    * Create a new record in the database's `lobby` table.
@@ -360,8 +358,10 @@ class Lobby {
       return strtoupper(substr($longCode, 34));
    }
 
-   public static function deleteLobby(int $id) {
-      //echo("delete lobby: ".$id);
+   /**
+   * Deletes a lobby from the database along with all its relations.
+   */
+   public static function deleteLobby(int $id): void {
       $db = new Database();
 
       $statement = $db->mysqli->prepare("DELETE FROM lobby_restaurant WHERE lobby_id = (?)");
@@ -385,7 +385,10 @@ class Lobby {
       $statement->execute();
    }
 
-   public static function deleteUserFromLobby(int $userId, int $lobbyId) {
+   /**
+   * Removes a user as a member of a lobby.
+   */
+   public static function deleteUserFromLobby(int $userId, int $lobbyId): void {
       $db = new Database();
 
       $statement = $db->mysqli->prepare("DELETE FROM lobby_user WHERE user_id = (?) AND lobby_id = (?)");
@@ -394,27 +397,23 @@ class Lobby {
 
    }
 
-	public static function getUsersLobbies(int $id) {
+	public static function getUsersLobbies(int $id): string {
 		$db = new Database();
 		$statement = $db->mysqli->prepare("select distinct l.*, lu.user_id, u.username, s.description 
 			from lobby as l inner join lobby_user as lu on l.id = lu.lobby_id inner join status as s 
 			on l.status_id=s.id inner join user as u on lu.user_id=u.id where lu.user_id = (?)");
-        /* $statement = $this->mysqli->prepare("select * from lobby where lobby.admin_id = (?)"); */
 		$statement->bind_param('s', $id);
 		$statement->execute();
 
 		$all_user_lobbies="";
 
-
-		/* $lobbies = mysqli_fetch_assoc($statement->get_result()); */
 		foreach ($statement->get_result() as $lobby) {
-			// If the user is the lobby admin, put a star after their user ID
 			if ($lobby['admin_id']==$lobby['user_id'])
 				$adminIcon = "and administrated ";
 			else
 				$adminIcon = "";
 
-			// Display end of phase information based on the current phase
+			// Display lobby information based on the current phase
 			if ($lobby['description']=="Voting")
 				$phase_end_message="Voting ends at ".$lobby['voting_end_time'];
 			else if ($lobby['description']=="Ordering")
@@ -425,7 +424,6 @@ class Lobby {
 				$phase_end_message="ERROR: Invalid lobby status";
 
 			// Append each lobby to a list of lobbies for the user
-			//$all_user_lobbies.='<a href="index.php?action=showlobby&lobby='.$lobby['id'].'">'.$lobby['name']."</a>"." User: ".$lobby['username'].$adminIcon." ".$phase_end_message."<br>";
 			$swapArray['lobbyId'] = $lobby['id'];
 			$swapArray['lobbyName'] = $lobby['name'];
 			$swapArray['lobbyUsername'] = $_SESSION['user']->getUsername() == $lobby['username'] ? "You" : $lobby['username'];

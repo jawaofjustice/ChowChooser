@@ -5,10 +5,10 @@ require_once "classes/Credentials.php";
 * Creates and stores a MySQLi instance that interfaces with the database.
 */
 class Database {
-	public $db;
-	public $mysqli;
+	private Database $db;
+	public mysqli $mysqli;
 
-	function __construct() {
+	public function __construct() {
 		$creds = new Credentials();
 		$this->mysqli = new mysqli($creds->host,$creds->username,$creds->password,$creds->database);
 		if ($this->mysqli->connect_errno) {
@@ -17,12 +17,6 @@ class Database {
 		}
 	}
 	
-	public function __get($property) {
-		if (property_exists($this, $property)) {
-            return $this->$property;
-        }
-	}
-
 }
 
 ?>

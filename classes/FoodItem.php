@@ -1,30 +1,22 @@
 <?php
 class FoodItem {
-	 private $id;
-    private $name;
-    private $price;
+	private int $id;
+    private string $name;
+    private mixed $price;
 
-    public function __construct($id, $name, $price) {
+    public function __construct(int $id, string $name, mixed $price) {
         $this->id = $id;
         $this->name = $name;
         $this->price = $price;
     }
 
-    public function __get($property) {
-        if (property_exists($this, $property)) {
-            return $this->$property;
-        }
-    }
+   public function getPrice(): mixed {
+      return $this->price;
+   }
 
-    public function __set($property, $value) {
-        if (property_exists($this, $property)) {
-            $this->$property = $value;
-        }
-    }
-
-	public function __toString() {
-		return $this->name.",".$this->price;
-	}
+   public function getName(): string {
+      return $this->name;
+   }
 
    /**
    * Reads a food item from the database by ID.

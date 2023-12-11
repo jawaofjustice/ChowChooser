@@ -1,0 +1,25 @@
+<div>
+
+	<script type="text/javascript">
+
+	document.getElementById('myText').addEventListener('click', function() {
+		var textToCopy = "I'm inviting you to my ChowChooser Lobby! The lobby code is: " + document.getElementById('myText').innerText;
+
+		// Create a temporary textarea element to copy the text
+		var tempTextArea = document.createElement('textarea');
+		tempTextArea.value = textToCopy;
+		document.body.appendChild(tempTextArea);
+
+		// Select and copy the text
+		tempTextArea.select();
+		document.execCommand('copy');
+
+		// Remove the temporary textarea
+		document.body.removeChild(tempTextArea);
+
+		// Alert or provide a message to indicate the text has been copied
+		alert('Text copied to clipboard: ' + textToCopy);
+	});
+	</script>
+
+</div>

@@ -23,13 +23,59 @@ class User {
 		return $this->id;
 	}
 
-	public function getEmail(): string {
-		return $this->email;
-	}
-
 	public function getUsername(): string {
 		return $this->username;
 	}
+
+   /**
+   * Adds this user as a member of a lobby via invite code.
+   *
+   * @return string An error message, if an error occurred.
+   */
+   public function joinLobby(string $inviteCode): string {
+      $db = new Database();
+      $lobby = Lobby::readLobbyByInviteCode($inviteCode);
+
+      // if there is no matching lobby, do nothing
+      if (is_null($lobby)) {
+         return "No lobby exists with that invite code.";
+      }
+
+      $lobbyId = $lobby->getId();
+
+      if ($this->isInLobby($lobbyId)) {
+         return "You are already a member of lobby ".$lobby->getName().".";
+      }
+
+      $statement = $db->mysqli->prepare("
+         insert into lobby_user
+         (lobby_id, user_id) values
+         ( (?), (?) );");
+      $statement->bind_param('ii', $lobbyId, $this->id);
+      $statement->execute();
+
+      return "";
+   }
+
+   /**
+   * Returns whether or not a user is a member of a lobby.
+   */
+   private function isInLobby(int $lobbyId): bool {
+      $db = new Database();
+      $statement = $db->mysqli->prepare("
+         SELECT *
+         FROM lobby_user
+         WHERE lobby_id = (?) and user_id = (?)");
+      $statement->bind_param('ii', $lobbyId, $this->id);
+      $statement->execute();
+
+      $result = mysqli_fetch_assoc($statement->get_result());
+
+      if (is_null($result)) {
+         return false;
+      }
+      return true;
+   }
 
    /**
    * Reads a user based on email and password.
@@ -100,79 +146,6 @@ class User {
       $statement->execute();
 
       return User::readUserByCredentials($email);
-	}
-
-   /**
-   * Returns whether or not a user is a member of a lobby.
-   */
-   private function isInLobby(int $lobbyId): bool {
-      $db = new Database();
-      $statement = $db->mysqli->prepare("
-         SELECT *
-         FROM lobby_user
-         WHERE lobby_id = (?) and user_id = (?)");
-      $statement->bind_param('ii', $lobbyId, $this->id);
-      $statement->execute();
-
-      $result = mysqli_fetch_assoc($statement->get_result());
-
-      if (is_null($result)) {
-         return false;
-      }
-      return true;
-   }
-
-   /**
-   * Adds this user as a member of a lobby via invite code.
-   *
-   * @return string An error message, if any.
-   */
-   public function joinLobby(string $inviteCode): string {
-      $db = new Database();
-      $lobby = Lobby::readLobbyByInviteCode($inviteCode);
-
-      // if there is no matching lobby, do nothing
-      if (is_null($lobby)) {
-         return "No lobby exists with that invite code.";
-      }
-
-      $lobbyId = $lobby->getId();
-
-      if ($this->isInLobby($lobbyId)) {
-         return "You are already a member of lobby ".$lobby->getName().".";
-      }
-
-      $statement = $db->mysqli->prepare("
-         insert into lobby_user
-         (lobby_id, user_id) values
-         ( (?), (?) );");
-      $statement->bind_param('ii', $lobbyId, $this->id);
-      $statement->execute();
-
-      return "";
-   }
-
-   /**
-   * Reads all lobbies that this user is a member of.
-   *
-   * @return array<Lobby> A collection of `Lobby` instances.
-   */
-	public function readLobbies(): array {
-      $db = new Database();
-		$statement = $db->mysqli->prepare("select distinct l.*, lu.user_id, u.username, s.description 
-			from lobby as l inner join lobby_user as lu on l.id = lu.lobby_id inner join status as s 
-			on l.status_id=s.id inner join user as u on lu.user_id=u.id where lu.user_id = (?)");
-		$statement->bind_param('s', $this->id);
-		$statement->execute();
-
-		$all_user_lobbies = array();
-
-      foreach ($statement->get_result() as $l) {
-         $lobby = new Lobby($db, $l['id'], $l['admin_id'], $l['name'], $l['voting_end_time'], $l['ordering_end_time'], $l['status_id'], $l['invite_code']);
-         array_push($all_user_lobbies, $lobby);
-      }
-
-      return $all_user_lobbies;
 	}
 
 }
