@@ -53,7 +53,10 @@ class Vote {
 
     }
 
-    public static function readVotesForRestaurant(int $restaurantId, int $lobbyId): int {
+   /**
+   * Retrieves then number of votes placed for a restaurant in a lobby.
+   */
+    public static function readNumVotesForRestaurant(int $restaurantId, int $lobbyId): int {
         $db = new Database();
 
         $statement = $db->mysqli->prepare("SELECT COUNT(id) FROM vote WHERE restaurant_id = (?) AND lobby_id = (?)");

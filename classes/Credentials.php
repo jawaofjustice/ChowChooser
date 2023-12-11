@@ -1,9 +1,9 @@
 <?php
 class Credentials {
-	private string $host;
-	private string $username;
-	private string $password;
-	private string $database;
+	public string $host;
+	public string $username;
+	public string $password;
+	public string $database;
 
 	public function __construct() {
 		$this->host = "localhost";
@@ -12,10 +12,5 @@ class Credentials {
 		$this->database = "chow_chooser";
 	}
 
-	public function __get($property) {
-		if (property_exists($this, $property)) {
-            return $this->$property;
-        }
-	}
 }
 ?>

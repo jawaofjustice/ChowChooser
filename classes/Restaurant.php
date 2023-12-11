@@ -4,7 +4,7 @@ class Restaurant {
 
     private Database $db;
     private int $id;
-    private string $name;
+    public string $name;
     private int $votesByLobby;
 
     public function __construct(Database $db, int $id, string $name) {
@@ -12,12 +12,6 @@ class Restaurant {
         $this->id = $id;
         $this->name = $name;
     }
-
-    public function __get($property) {
-		if (property_exists($this, $property)) {
-            return $this->$property;
-        }
-	}
 
 	public function getId(): int {
 		return $this->id;

@@ -37,40 +37,8 @@ class Order {
       return $this->user_id;
    }
 
-   public function __get($property) {
-      if (property_exists($this, $property)) {
-          return $this->$property;
-      }
-   }
-
-	/**
-   * Reads a record from the database by ID.
-   *
-   * @return Order An `Order` instance.
-   */
-   public static function readOrder(int $id): Order {
-      $db = new Database();
-      $statement = $db->mysqli->prepare("select * from order_item where id = (?)");
-      $statement->bind_param('i', $id);
-      $statement->execute();
-
-      $orderArray = mysqli_fetch_assoc($statement->get_result());
-
-      $db = $orderArray['db'];
-      $id = $orderArray['id'];
-      $quantity = $orderArray['quantity'];
-      $user_id = $orderArray['user_id'];
-      $lobby_id = $orderArray['lobby_id'];
-      $food_id = $orderArray['food_id'];
-
-      return new Order(
-         $db,
-         $id,
-         $quantity,
-         $user_id,
-         $lobby_id,
-         $food_id,
-      );
+   public function getQuantity(): int {
+      return $this->quantity;
    }
 
 	/**
