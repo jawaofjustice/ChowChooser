@@ -426,12 +426,16 @@ class ChowChooserEngine {
 				   
 				//$orderDisplay .= '<th>Quantity</th><th>Food</th><th>Order price</th>';
 				$subtotal = 0.0;
+				$i = 0;
+				$userSubtotal = 0.0;
+				$previousUser=null;
 				foreach ($orders as $order) {
 					
 					
 					$food = FoodItem::readFoodItem($order->getFoodId());
 					$orderPrice = $food->price * $order->quantity;
 					$subtotal += $orderPrice;
+					$userSubtotal += $orderPrice;
 					$username = "";
 					if ($userIsAdmin) {
 					  $username = User::readUserById($order->getUserId())->getUsername();
@@ -458,9 +462,37 @@ class ChowChooserEngine {
 					$rowSwap['orderQty'] = $order->quantity;
 					$rowSwap['orderPrice'] = $orderPrice;
 					$rowSwap['orderId'] = $order->id;
-
-					$orderTableRows .= $this->load_template('lobbyOrderRow', $rowSwap); 
 					
+					if($previousUser == null || $previousUser != $order->getUserId()) {
+						$orderTableRows .= "<tr><td colspan=\"5\"><h3>Summary for $username</h3></td></tr>";
+					}
+					$previousUser = $order->getUserId();
+					$orderTableRows .= $this->load_template('lobbyOrderRow', $rowSwap); 
+					if ($userIsAdmin) {
+						if (isset($orders[$i+1])) {
+							if ($order->getUserId() != $orders[$i+1]->getUserId()) {
+								$userTaxes = number_format(round($subtotal * 0.06, 2), 2);
+								$userTotal = number_format(round($subtotal * 1.06, 2), 2);
+								$orderTableRows .= "<tr><td colspan=\"5\">Subtotal: $$userSubtotal<br /> Taxes: $$userTaxes <br />Total: $$userTotal<br /><br /></td></tr>";
+								$userSubtotal = 0.0;
+							}
+						} else {
+							$userTaxes = number_format(round($subtotal * 0.06, 2), 2);
+							$userTotal = number_format(round($subtotal * 1.06, 2), 2);
+							$orderTableRows .= "<tr><td colspan=\"5\">Subtotal: $$userSubtotal<br /> Taxes: $$userTaxes <br />Total: $$userTotal<br /></td></tr>";
+							$userSubtotal = 0.0;
+						}
+					}
+					/*
+					
+					var is null
+					row 1: dev
+					row 2: dev
+					
+					var is dev
+					row 3: quat
+					*/
+					$i++;
 				}
            // $orderDisplay .= "</table>";
             if (empty($orders)) {
@@ -477,8 +509,8 @@ class ChowChooserEngine {
             // required for placing orders
             $swapArray['lobbyId'] = $lobby->getId();
             
-            $swapArray['orderingEndTime'] = $timerSwap['countDownTimeStart'] = date_format(new Datetime($lobby->getOrderingEndTime()),"M j, Y H:i:s");;
-            $timerSwap['countDownTimeStart'] = $timerSwap['countDownTimeStart'] = date_format(new Datetime($lobby->getOrderingEndTime()),"M j, Y H:i:s");;
+            $swapArray['orderingEndTime'] = date_format(new Datetime($lobby->getOrderingEndTime()),"M j, Y H:i:s");
+            $timerSwap['countDownTimeStart'] = date_format(new Datetime($lobby->getOrderingEndTime()),"M j, Y H:i:s");
             $timerSwap['elementToUpdate'] = 'orderEndTimeHolder';
             $timerSwap['countDownEndText'] = 'None, ordering has concluded!';
 			$swapArray['countDownTimer'] = $this->load_template('countDownTimer', $timerSwap);

@@ -71,7 +71,7 @@ class Order {
 
    public static function readLobbyOrders(int $lobbyId): array {
       $db = new Database();
-      $statement = $db->mysqli->prepare("select * from order_item where lobby_id = (?)");
+      $statement = $db->mysqli->prepare("select * from order_item where lobby_id = (?) order by user_id");
       $statement->bind_param('i', $lobbyId);
       $statement->execute();
 
