@@ -461,9 +461,7 @@ class ChowChooserEngine {
 			case '3': // COMPLETED
 
 				// display the name of the restaurant that wins the voting phase
-			$winningRestaurantId = array_values($lobby->getRestaurants())[0]->getId();
-			$restaurant = Restaurant::readRestaurant($winningRestaurantId);
-			$swapArray['restaurant'] = $restaurant->getName();
+			$swapArray['restaurant'] = $lobby->getWinningRestaurant()->getName();
 
             // display orders from all users if you are the lobby admin,
             // otherwise just display your own
@@ -486,7 +484,7 @@ class ChowChooserEngine {
             $adminColumnHeader = $userIsAdmin ? "<th>User</th>" : "";
             foreach ($orders as $order) {
                $food = FoodItem::readFoodItem($order->getFoodId());
-               $orderPrice = $food->price * $order->quantity;
+               $orderPrice = $food->getPrice() * $order->getQuantity();
                $subtotal += $orderPrice;
                $username = "";
 				if ($userIsAdmin) {
@@ -496,9 +494,9 @@ class ChowChooserEngine {
 				$rowSwap = Array();
 				$rowSwap['adminColumn'] = $userIsAdmin ? "<td>".$username."</td>" : "";
 				$rowSwap['foodName'] = $food->getName();
-				$rowSwap['orderQty'] = $order->quantity;
+				$rowSwap['orderQty'] = $order->getQuantity();
 				$rowSwap['orderPrice'] = $orderPrice;
-				$rowSwap['orderId'] = $order->id;
+				$rowSwap['orderId'] = $order->getId();
 
 				$orderTableRows .= $this->load_template('lobbyCompleteRow', $rowSwap); 
             }
