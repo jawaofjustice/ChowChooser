@@ -12,7 +12,7 @@ class OrderCreation {
 		$this->userId = $_SESSION['user']->getId();
 	}
 	
-	public function viewAddOrderItem() {
+	public function viewAddOrderItem(): void {
 		
 		$swapArray['lobbyId'] = $this->lobbyId;
 		$lobby = Lobby::readLobby($this->lobbyId);
@@ -31,7 +31,6 @@ class OrderCreation {
 		$baseArray['loginLogoutForm'] = ChowChooserEngine::load_template("logoutForm");
 		$baseArray['backButton'] = ChowChooserEngine::load_template("backButton", ["backLink" => "?action=showlobby&lobby=".$this->lobbyId]);
 		
-		
 		$baseArray['mainContent'] = ChowChooserEngine::load_template("addOrderItem", $swapArray);
 		
 		echo ChowChooserEngine::load_template("base", $baseArray);
@@ -48,8 +47,6 @@ class OrderCreation {
 	}
 	
 	private function buildCurrentOrder(): string {
-		
-		
 		
 		//queries for food currently from this user in this lobby
 		$queryString = "select 
@@ -90,9 +87,6 @@ class OrderCreation {
 		return $output;
 	}
 	
-	
-	
-	
 	private function readLobbyInfo() {
 		$queryString = "select 
 							r.name as restaurantName, l.*
@@ -110,7 +104,6 @@ class OrderCreation {
 		$lobbyAndRestaurantInfo = $query->get_result();
 		$info = mysqli_fetch_assoc($lobbyAndRestaurantInfo);
 		
-		
 		return "Ordering for " . $info['restaurantName'] . " will end at " . date_format(new Datetime($info['ordering_end_time']),"M j, Y H:i:s");
 	}
 	
@@ -120,7 +113,6 @@ class OrderCreation {
 		$bindParamsSuffix = "";
 		$bindParamsValuesSuffix = array($this->lobbyId);
 		if(isset($_POST['searchText'])) {
-			//echo "This search text was submitted: " . $_POST['searchText'];
 			$searchFilterSuffix .= " and (";
 			$terms = explode(" ", $_POST['searchText']);
 			foreach ($terms as $t) {
@@ -144,12 +136,9 @@ class OrderCreation {
 		
 		$query->bind_param('i'.$bindParamsSuffix, ...$bindParamsValuesSuffix);
 		
-				
-		
 		$query->execute();
 		$response = $query->get_result();
 		
-		//
 		$output = "";
 		if(mysqli_num_rows($response) > 0) {
 			$i = 0;
@@ -160,7 +149,6 @@ class OrderCreation {
 				$swap['foodId'] = $r['id'];
 				$swap['lobbyId'] = $this->lobbyId;
 				
-
 				$output .= ChowChooserEngine::load_template('menuItem', $swap);
 			}
 		} else {
@@ -174,7 +162,6 @@ class OrderCreation {
 		
 		return $output;
 	}
-	
 	
 	private function userHasOrderedItem(int $lobbyId, int $foodId): bool  {
 		// first we check to see if this is already added to this order and try to increment up if possible
@@ -274,7 +261,6 @@ class OrderCreation {
 					$query->bind_param('iiii', $qty, $this->userId, $lobbyId, $foodId);
 					
 					$query->execute();
-					//$response = $query->get_result();
 				} else { // otherwise we assume qty = 1 and delete the row
 					$queryString = "delete from order_item where user_id = ? and lobby_id = ? and food_id = ?;";
 					$query = $this->db->prepare($queryString);
@@ -282,10 +268,7 @@ class OrderCreation {
 					$query->bind_param('iii', $this->userId, $lobbyId, $foodId);
 					
 					$query->execute();
-					//$response = $query->get_result();
 				}
-				
-			
 				
 			}
 		}

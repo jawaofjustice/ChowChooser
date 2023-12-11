@@ -58,8 +58,6 @@ class ChowChooserEngine {
 			return;
 		}
 
-
-
 		// login form changes to logout form if user is logged in
 		if (!isset($_SESSION['user'])) {
 			$swapArray['loginLogoutForm'] = $this->load_template("loginForm");
@@ -336,7 +334,6 @@ class ChowChooserEngine {
 					
 					$tableContentSwapValue .= $this->load_template('lobbyVotingRow', $rowSwap);
 				}
-
 
 				$swapArray['tableContent'] = $tableContentSwapValue;
 				$swapArray['topRestaurant'] = $lobby->getWinningRestaurant()->getName();
