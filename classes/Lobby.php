@@ -4,31 +4,30 @@ class Lobby {
 
     private Database $db;
     private int $id;
-    private int $admin_id;
+    private int $adminId;
     private string $name;
     private string|null $votingEndTime;
     private string $orderingEndTime;
-    private int $status_id;
-    private string $invite_code;
+    private int $statusId;
+    private string $inviteCode;
 
    public function __construct(
-      Database $db,
       int $id,
-      int $admin_id,
+      int $adminId,
       string $name,
       string|null $votingEndTime,
       string $orderingEndTime,
-      int $status_id,
-      string $invite_code
+      int $statusId,
+      string $inviteCode
    ) {
         $this->db = new Database();
         $this->id = $id;
-        $this->admin_id = $admin_id;
+        $this->adminId = $adminId;
         $this->name = $name;
         $this->votingEndTime = $votingEndTime;
         $this->orderingEndTime = $orderingEndTime;
-        $this->status_id = $status_id;
-        $this->invite_code = $invite_code;
+        $this->statusId = $statusId;
+        $this->inviteCode = $inviteCode;
     }
     
     public function getId(): int {
@@ -36,7 +35,7 @@ class Lobby {
     }
 
     public function getAdminId(): int {
-        return $this->admin_id;
+        return $this->adminId;
     }
 
     public function getName(): string {
@@ -52,11 +51,11 @@ class Lobby {
     }
 
     public function getStatusId(): int {
-        return $this->status_id;
+        return $this->statusId;
     }
 
    public function getInviteCode(): string {
-      return $this->invite_code;
+      return $this->inviteCode;
    }
 
    /**
@@ -64,14 +63,14 @@ class Lobby {
    *
    * @param int The new status ID.
    */
-   public function updateStatusId(int $status_id): void {
+   public function updateStatusId(int $statusId): void {
       $statement = $this->db->mysqli->prepare('
          UPDATE lobby
          SET status_id = (?)
          WHERE id = (?)');
-      $statement->bind_param('ii', $status_id, $this->id);
+      $statement->bind_param('ii', $statusId, $this->id);
       $statement->execute();
-      $this->status_id = $status_id;
+      $this->statusId = $statusId;
    }
 
    /**
@@ -213,7 +212,7 @@ class Lobby {
         $lobbyArray = mysqli_fetch_assoc($statement->get_result());
         
         // Create new lobby object
-        $lobby = new Lobby($db, $lobbyArray['id'], $lobbyArray['admin_id'], $lobbyArray['name'], $lobbyArray['voting_end_time'], $lobbyArray['ordering_end_time'], $lobbyArray['status_id'], $lobbyArray['invite_code']);
+        $lobby = new Lobby($lobbyArray['id'], $lobbyArray['admin_id'], $lobbyArray['name'], $lobbyArray['voting_end_time'], $lobbyArray['ordering_end_time'], $lobbyArray['status_id'], $lobbyArray['invite_code']);
 
         // Make timestamp and date format
         date_default_timezone_set('America/New_York');
@@ -281,15 +280,15 @@ class Lobby {
    ): int {
       $db = new Database();
       // skip to "ordering" status if skipping the voting phase
-      $status_id = is_null($votingEndTime) ? 2 : 1;
-      $admin_id = $_SESSION['user']->getId();
+      $statusId = is_null($votingEndTime) ? 2 : 1;
+      $adminId = $_SESSION['user']->getId();
 
-      $invite_code = Lobby::generateInviteCode();
+      $inviteCode = Lobby::generateInviteCode();
       $statement = $db->mysqli->prepare("
          insert into lobby
          (name, voting_end_time, ordering_end_time, admin_id, status_id, invite_code) values
          ( (?), (?), (?), (?), (?), (?) );");
-      $statement->bind_param('sssiis', $lobbyName, $votingEndTime, $orderingEndTime, $admin_id, $status_id, $invite_code);
+      $statement->bind_param('sssiis', $lobbyName, $votingEndTime, $orderingEndTime, $adminId, $statusId, $inviteCode);
       $statement->execute();
 
       // read the ID of the lobby we just created
@@ -299,7 +298,7 @@ class Lobby {
       $statement = $db->mysqli->prepare('
          INSERT INTO lobby_user (lobby_id, user_id)
          VALUES ( (?), (?) )');
-      $statement->bind_param('ii', $lobbyId, $admin_id);
+      $statement->bind_param('ii', $lobbyId, $adminId);
       $statement->execute();
 
       foreach ($restaurants as $restaurant) {
@@ -339,7 +338,6 @@ class Lobby {
       }
 
       return new Lobby(
-         $db,
          $result['id'],
          $result['admin_id'],
          $result['name'],

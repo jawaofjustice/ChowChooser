@@ -4,25 +4,25 @@ class Order {
 
    private Database $db;
    private int $id;
-   private int $food_id;
-   private int $lobby_id;
-   private int $user_id;
+   private int $foodId;
+   private int $lobbyId;
+   private int $userId;
    private int $quantity;
 
    function __construct(
       Database $db,
       int $id,
       int $quantity,
-      int $user_id,
-      int $lobby_id,
-      int $food_id
+      int $userId,
+      int $lobbyId,
+      int $foodId
    ) {
       $this->db = new Database();
       $this->id = $id;
       $this->quantity = $quantity;
-      $this->user_id = $user_id;
-      $this->lobby_id = $lobby_id;
-      $this->food_id = $food_id;
+      $this->userId = $userId;
+      $this->lobbyId = $lobbyId;
+      $this->foodId = $foodId;
    }
 
    public function getId(): int {
@@ -30,11 +30,11 @@ class Order {
    }
 
    public function getFoodId(): int {
-      return $this->food_id;
+      return $this->foodId;
    }
 
    public function getUserId(): int {
-      return $this->user_id;
+      return $this->userId;
    }
 
    public function getQuantity(): int {
@@ -56,10 +56,10 @@ class Order {
       foreach ($statement->get_result() as $order) {
          $id = $order['id'];
          $quantity = $order['quantity'];
-         $user_id = $order['user_id'];
-         $lobby_id = $order['lobby_id'];
-         $food_id = $order['food_id'];
-         array_push($orders, new Order($db, $id, $quantity, $user_id, $lobby_id, $food_id));
+         $userId = $order['user_id'];
+         $lobbyId = $order['lobby_id'];
+         $foodId = $order['food_id'];
+         array_push($orders, new Order($db, $id, $quantity, $userId, $lobbyId, $foodId));
       }
 
       return $orders;
@@ -79,10 +79,10 @@ class Order {
       foreach ($statement->get_result() as $order) {
          $id = $order['id'];
          $quantity = $order['quantity'];
-         $user_id = $order['user_id'];
-         $lobby_id = $order['lobby_id'];
-         $food_id = $order['food_id'];
-         array_push($orders, new Order($db, $id, $quantity, $user_id, $lobby_id, $food_id));
+         $userId = $order['user_id'];
+         $lobbyId = $order['lobby_id'];
+         $foodId = $order['food_id'];
+         array_push($orders, new Order($db, $id, $quantity, $userId, $lobbyId, $foodId));
       }
       return $orders;
    }

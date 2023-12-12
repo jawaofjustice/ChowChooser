@@ -9,7 +9,7 @@ require_once "classes/Vote.php";
 require_once "classes/Order.php";
 
 class ChowChooserEngine {
-	public Database $db;
+
 	private array $swapArray;
 
 	public function __construct() {
@@ -22,8 +22,6 @@ class ChowChooserEngine {
 			$this->welcome();
 			return;
 		}
-
-		$this->db = new Database();
 
 		if (isset($_POST['login'])) {
 			$user = User::readUserByCredentials($_POST['email'], $_POST['password']);
@@ -70,17 +68,9 @@ class ChowChooserEngine {
 			// no action or orderKey means we're going to the welcome page
 			$this->welcome();
 
-		} else if ($orderKeyExists && !$actionKeyExists) {
-			// orderKey exists but no actionKey mean swe're going to the view order page
-			$this->viewOrder($orderKey);
-
 		} else if ($actionKeyExists) {
 			// if we have an action key, we're going to now check if it's value is start_new:
 			switch ($actionKey) {
-				case "start_new": 
-					// if it is, we're going to generate an orderKey and make a new order, then direct user to view that order
-					$this->startNewOrder();
-					break;
             case "joinLobby":
                $inviteCode = $_GET['inviteCode'];
                $this->swapArray['errorMsg'] = $_SESSION['user']->joinLobby($inviteCode);
@@ -132,9 +122,6 @@ class ChowChooserEngine {
 					} else {
 						header("location: ?action=main");
 					}
-					break;
-				case "resetPassword":
-					echo $user->resetPassword();
 					break;
 				case "viewPlaceOrderSample":
 					$order = new OrderCreation($_GET['lobbyId']);
@@ -197,30 +184,6 @@ class ChowChooserEngine {
 		echo $this->load_template("base", $swapArray);
 	}
 
-	private function viewOrder(string $orderKey) {
-		if($orderKey == "") { // if the user presses "join" with no key entered, this will put them back to the welcome page with a warning
-			$warning = "You must supply a lobby code to join a lobby!";
-			$this->welcome($warning);
-		} else {
-			echo "<a href=\"?\"><input type=\"button\" value=\"Back\" /></a><br /><br />";
-			echo "This is our view function! We're looking at order " . $orderKey . "!\n";
-
-			//Hardcoded food items
-			$foodItems = [new foodItem("taco", 2.50), new foodItem("side of rice", 0.99), new foodItem("burger", 8.79), new foodItem("test", 1)];
-
-			$foodItemsString = "";
-
-			// display each food item in HTML
-			if ($foodItems != null) {
-				foreach ($foodItems as $i) {
-					$foodItemsString .= "<tr><td>".$i->description."</td><td>".$i->price."</td></tr>";
-				}
-			}
-
-			echo $this->load_template("view_order", ["foodItemsString" => $foodItemsString]);
-		}
-	}
-
 	/**
 	* Displays the "main menu" page.
 	*/
@@ -239,16 +202,6 @@ class ChowChooserEngine {
 		echo $this->load_template("base", $this->swapArray);
 		
 		return;
-	}
-
-	private function startNewOrder() {
-		echo $this->viewOrder($this->generateKey());
-	}
-
-	private function generateKey() {
-		global $KEY_SALT;
-		$dateFormat = "Y-m-d h:i:sa";
-		return md5($KEY_SALT.md5(date($dateFormat)));
 	}
 
 	/**
@@ -478,7 +431,7 @@ class ChowChooserEngine {
             if ($userIsAdmin) {
                $orders = Order::readLobbyOrders($lobby->getId());
             } else {
-               $orders = Order::readLobbyOrders(
+               $orders = Order::readUserOrdersByLobby(
                   $userId,
                   $lobby->getId()
                );
