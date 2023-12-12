@@ -23,3 +23,4 @@ At the end, the lobby admin can view everyone's orders as well as the group's cu
 ### Diagrams
 
 + [Relational database diagram](Documentation/erd.png)
++ [UML class diagram](Documentation/umldiagram.png)
