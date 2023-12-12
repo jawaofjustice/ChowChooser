@@ -1,0 +1,5 @@
+# SRS 1.4: Product Scope
+
+The purpose of ChowChooser is to make it easier for groups of people to choose a restaurant and order their food. Office employees often want to share a meal together, either to celebrate a special occasion or just as an opportunity to get to know the other members of their team a little better. It can be very tedious to gather everyone’s order, and typically the restaurant chosen is not everyone’s first choice.
+
+With ChowChooser, every employee that wants to share a meal together votes on their choice of restaurant, and whichever restaurant gets the most votes is the one that everyone goes to. That way, no one feels excluded from the decision process of choosing a restaurant. Then everyone enters their order on the ChowChooser website, which is a lot more efficient than having someone stop at everyone’s desk and collect their orders. Paying for the meal can also be coordinated, which saves a lot of time compared to waiting for everyone to pay their bills individually at a restaurant.

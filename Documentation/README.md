@@ -1,8 +1,8 @@
 # ChowChooser: Documentation
 
-+ [SRS 1.4: Product Scope]("./srs14.md")
-+ [SRS 2.2: Product Functions]("./srs22.md")
++ [SRS 1.4: Product Scope]("Documentation/srs14.md")
++ [SRS 2.2: Product Functions]("Documentation/srs22.md")
 
 ## Diagrams
 
-+ [Relational database diagram]("./erd.png")
++ [Relational database diagram]("Documentation/erd.png")
