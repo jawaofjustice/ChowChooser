@@ -17,6 +17,8 @@ At the end, the lobby admin can view everyone's orders as well as the group's cu
 ## Documentation
 
 + [Software requirements specification (SRS)](Documentation/srs.md)
++ [GitHub Issues (all issues, newest first)](https://github.com/jawaofjustice/ChowChooser/issues?q=is%3Aissue)
+  + Our primary _project management documentation_ where we created, categorized, and assigned project objectives throughout the semester
 
 ### Diagrams
 
