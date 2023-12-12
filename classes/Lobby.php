@@ -415,9 +415,9 @@ class Lobby {
 
 			// Display lobby information based on the current phase
 			if ($lobby['description']=="Voting")
-				$phase_end_message="Voting ends at ".$lobby['voting_end_time'];
+				$phase_end_message="Voting ends at ".date_format(new Datetime($lobby['voting_end_time']),"M j, Y H:i:s");
 			else if ($lobby['description']=="Ordering")
-				$phase_end_message="Ordering ends at ".$lobby['ordering_end_time'];
+				$phase_end_message="Ordering ends at ".date_format(new Datetime($lobby['ordering_end_time']),"M j, Y H:i:s");
 			else if ($lobby['description']=="Completed")
 				$phase_end_message="Everyone has finished ordering. Enjoy your meal!";
 			else
