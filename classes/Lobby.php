@@ -414,7 +414,7 @@ class Lobby {
 	public static function getUsersLobbies(int $id): string {
 		$db = new Database();
 		$statement = $db->mysqli->prepare("SELECT DISTINCT l.*, lu.user_id, u.username, s.description 
-			                                 FROM lobby AS l INNER JOIN lobby_user AS lu ON l.id = lu.lobby_id INNER JOIN STATUS AS s 
+			                                 FROM lobby AS l INNER JOIN lobby_user AS lu ON l.id = lu.lobby_id INNER JOIN status AS s 
 			                                 ON l.status_id=s.id INNER JOIN user AS u ON lu.user_id=u.id WHERE lu.user_id = (?)");
 		$statement->bind_param('s', $id);
 		$statement->execute();
