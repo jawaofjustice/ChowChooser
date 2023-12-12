@@ -7,29 +7,29 @@ class Vote {
     private int $restaurantId;
     private int $userId;
 
-   public function __construct(
-      Database $db,
-      int $lobbyId,
-      int $restaurantId,
-      int $userId
-   ) {
+    public function __construct(
+        Database $db,
+        int $lobbyId,
+        int $restaurantId,
+        int $userId
+    ) {
         $this->db = new Database();
         $this->lobbyId = $lobbyId;
         $this->restaurantId = $restaurantId;
         $this->userId = $userId;
     }
 
-   /**
-   * Toggles a user's vote for a restaurant in a lobby.
-   *
-   * If this vote already exists, it will be deleted.
-   * Otherwise, the vote will be recorded.
-   */
-   public static function toggleVote(
-      int $userId,
-      int $restaurantId,
-      int $lobbyId
-   ): void {
+    /**
+    * Toggles a user's vote for a restaurant in a lobby.
+    *
+    * If this vote already exists, it will be deleted.
+    * Otherwise, the vote will be recorded.
+    */
+    public static function toggleVote(
+        int $userId,
+        int $restaurantId,
+        int $lobbyId
+    ): void {
         $db = new Database();
 
         //Check whether the user has voted before
@@ -52,9 +52,9 @@ class Vote {
 
     }
 
-   /**
-   * Retrieves then number of votes placed for a restaurant in a lobby.
-   */
+    /**
+    * Retrieves then number of votes placed for a restaurant in a lobby.
+    */
     public static function readNumVotesForRestaurant(int $restaurantId, int $lobbyId): int {
         $db = new Database();
 
@@ -66,11 +66,11 @@ class Vote {
         return $voteNum['COUNT(id)'];
     }
 
-   /**
-   * Retrieve a user's vote from a specific lobby.
-   *
-   * @return int ID of the restaurant that the user has voted for. Returns zero if the user has not voted in this lobby.
-   */
+    /**
+    * Retrieve a user's vote from a specific lobby.
+    *
+    * @return int ID of the restaurant that the user has voted for. Returns zero if the user has not voted in this lobby.
+    */
     public static function readVote(int $userId, int $lobbyId): int {
         $db = new Database();
 
@@ -87,9 +87,9 @@ class Vote {
         return 0;
     }
 
-   /**
-   * Returns whether or not a user is currently voting in a lobby.
-   */
+    /**
+    * Returns whether or not a user is currently voting in a lobby.
+    */
     public static function userHasVoted(int $userId, int $lobbyId): bool {
 		$db = new Database();
 

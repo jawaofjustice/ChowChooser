@@ -1,6 +1,6 @@
 <?php
 class FoodItem {
-	private int $id;
+    private int $id;
     private string $name;
     private mixed $price;
 
@@ -10,17 +10,17 @@ class FoodItem {
         $this->price = $price;
     }
 
-   public function getPrice(): mixed {
-      return $this->price;
-   }
+    public function getPrice(): mixed {
+        return $this->price;
+    }
 
-   public function getName(): string {
-      return $this->name;
-   }
+    public function getName(): string {
+        return $this->name;
+    }
 
-   /**
-   * Reads a food item from the database by ID.
-   */
+    /**
+    * Reads a food item from the database by ID.
+    */
 	public static function readFoodItem(int $id): FoodItem {
 		$db = new Database();
 		$statement = $db->mysqli->prepare("select * from food where id = (?)");

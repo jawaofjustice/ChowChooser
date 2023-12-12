@@ -70,11 +70,13 @@ class ChowChooserEngine {
 
 			// We will route according to the action key
 			switch ($actionKey) {
-            case "joinLobby":
-               $inviteCode = $_GET['inviteCode'];
-               $this->swapArray['errorMsg'] = $_SESSION['user']->joinLobby($inviteCode);
-               $this->mainMenu();
-               break;
+
+				case "joinLobby":
+					$inviteCode = $_GET['inviteCode'];
+					$this->swapArray['errorMsg'] = $_SESSION['user']->joinLobby($inviteCode);
+					$this->mainMenu();
+					break;
+
 				case "createLobby":
 					$restaurantLabels = "";
 					$restaurantCheckboxes = "";
@@ -107,6 +109,7 @@ class ChowChooserEngine {
 										'backButton' => $this->load_template('backButton', ["backLink" => "?"])
 										]);
 					break;
+
 				case "deleteLobby":
 					// are we in this lobby?
 					if (Lobby::readIfUserIsInLobby($_SESSION['user']->getId(), $_GET['lobbyId'])) {
@@ -122,40 +125,47 @@ class ChowChooserEngine {
 						header("location: ?action=main");
 					}
 					break;
+
 				case "viewPlaceOrderSample":
 					$order = new OrderCreation($_GET['lobbyId']);
 					$order->viewAddOrderItem();
 					break;
+
 				case "processAddOrderItem":
 					$order = new OrderCreation($_GET['lobbyId']);
 					$order->processAddOrderItem();
 					break;
+
 				case "processRemoveOrderItem":
 					$order = new OrderCreation($_GET['lobbyId']);
 					$order->processRemoveOrderItem();
 					break;
+
 				case "createAccount":
 					$this->createAccount();
 					header("Location: ".$_SERVER['PHP_SELF']);
 					break;
+
 				case "showlobby":
 				   if (isset($_POST['deleteOrderRequest'])) {
 					  Order::deleteOrderById($_POST['orderId']);
 				   }
 					$this->viewLobby();
 					break;
+
 				case "main":
 					//easy way to navigate to main menu
 					$this->mainMenu();
 					break;
+
 				case "vote":
 					$user = $_SESSION['user'];
 					Vote::toggleVote($user->getId(), $_POST['restaurantId'], $_POST['lobbyId']);
 					// redirection as per Post/Redirect/Get design pattern
 					header("Location: ".$_SERVER['PHP_SELF']."?action=showlobby&lobby=".$_POST['lobbyId']);
 					break;
-				default: 
 
+				default: 
 					// we cannot handle actions without an order key, show welcome / error page
 					echo $_POST['action'].'<br>'.$_GET['action'].'<br>';
 					echo "this is an error page :(";
@@ -184,12 +194,14 @@ class ChowChooserEngine {
 		$swapArray['backButton'] = "";
 		$swapArray['title'] = "Welcome!";
 		echo $this->load_template("base", $swapArray);
+
 	}
 
 	/**
 	* Displays the "main menu" page.
 	*/
 	private function mainMenu(): void {
+
 		$this->swapArray['userId'] = $_SESSION['user']->getId();
 		$this->swapArray['loginLogoutForm'] = $this->load_template("logoutForm");
 		$this->swapArray['userName'] = $_SESSION['user']->getUsername();
@@ -204,6 +216,7 @@ class ChowChooserEngine {
 		echo $this->load_template("base", $this->swapArray);
 		
 		return;
+
 	}
 
 	/**
@@ -213,6 +226,7 @@ class ChowChooserEngine {
 	* @param array $swapArray An array of text/HTML to inject into the template.
 	*/
 	public static function load_template(string $fileName, array $swapArray = null) {
+
 		$fileLocation = "templates/" . $fileName . ".html";
 		$file = fopen($fileLocation, "r") or die("Could not load file!");
 		$contents = fread($file, filesize($fileLocation));
@@ -226,6 +240,7 @@ class ChowChooserEngine {
 		}
 
 		return $contents;
+
 	}
 
 	/**
@@ -259,13 +274,6 @@ class ChowChooserEngine {
 		switch ($statusId) {
 			
 			case '1': // VOTING PHASE
-				/*
-				HTML TABLE ROW FORMAT
-
-				<form action="?action=vote&lobby=1&restaurantId=1" method="post">
-					<input type="submit" value="Hardcoded value for looby=1$restaurantId=1"/>
-				</form>
-				*/
 
 				$swapArray['votingEndTime'] = date_format(new Datetime($lobby->getVotingEndTime()),"M j, Y H:i:s");
 
@@ -328,18 +336,14 @@ class ChowChooserEngine {
 				   );
 				}
 
-				
-				
 				$orderTableRows = "";
 				$adminColumnHeader = "";
-			//	$adminColumnHeader = $userIsAdmin ? "<th>User</th>" : "";
 				   
 				$subtotal = 0.0;
 				$i = 0;
 				$userSubtotal = 0.0;
 				$previousUser=null;
 				foreach ($orders as $order) {
-					
 					
 					$food = FoodItem::readFoodItem($order->getFoodId());
 					$orderPrice = $food->getPrice() * $order->getQuantity();
@@ -351,21 +355,15 @@ class ChowChooserEngine {
 					}
 					$rowSwap = Array();
 					$rowSwap['adminColumn'] = "";
-				//	$rowSwap['adminColumn'] = $userIsAdmin ? "<td>".$username."</td>" : "";
 					$rowSwap['foodName'] = $food->getName();
 					$rowSwap['orderQty'] = $order->getQuantity();
 					$rowSwap['orderPrice'] = number_format($orderPrice, 2);
-
-					//~ $rowSwap['orderId'] = $order->id;
-
 					$rowSwap['orderId'] = $order->getId();
-
-					//~ $orderTableRows .= $this->load_template('lobbyOrderRow', $rowSwap); 
-
 					
-					if(( $previousUser == null || $previousUser != $order->getUserId()) && $userIsAdmin) {
+					if (( $previousUser == null || $previousUser != $order->getUserId()) && $userIsAdmin) {
 						$orderTableRows .= "<tr><td colspan=\"5\"><h3>Summary for $username</h3></td></tr>";
 					}
+
 					$previousUser = $order->getUserId();
 					$orderTableRows .= $this->load_template('lobbyOrderRow', $rowSwap); 
 					if ($userIsAdmin) {
@@ -385,135 +383,137 @@ class ChowChooserEngine {
 							$userSubtotal = 0.0;
 						}
 					}
-					/*
-					
-					var is null
-					row 1: dev
-					row 2: dev
-					
-					var is dev
-					row 3: quat
-					*/
 					$i++;
 				}
 
-            if (empty($orders)) {
-                $swapArray['orderItems'] = "<div class=\"centeredWarning\"><h3>You have no orders in this lobby!</h3></div>";
-            } else {
-                $swapArray['orderItems'] = $this->load_template('lobbyOrderTable', ["orderTableRows" => $orderTableRows, "adminColumnHeader" => $adminColumnHeader]);
-            }
+				if (empty($orders)) {
+					$swapArray['orderItems'] = "<div class=\"centeredWarning\"><h3>You have no orders in this lobby!</h3></div>";
+				} else {
+					$swapArray['orderItems'] = $this->load_template('lobbyOrderTable', ["orderTableRows" => $orderTableRows, "adminColumnHeader" => $adminColumnHeader]);
+				}
 
-            $swapArray['lobbyName'] = $lobby->getName();
-            $swapArray['subtotal'] = number_format($subtotal, 2);
-            $swapArray['taxes'] = number_format(round($subtotal * 0.06, 2), 2);
-            $swapArray['totalPrice'] = number_format(round($subtotal * 1.06, 2), 2);
-            // required for placing orders
-            $swapArray['lobbyId'] = $lobby->getId();
-            
-            
-            $timerSwap['countDownTimeStart'] = date_format(new Datetime($lobby->getOrderingEndTime()),"M j, Y H:i:s");
-            $timerSwap['elementToUpdate'] = 'orderEndTimeHolder';
-            $timerSwap['countDownEndText'] = 'None, ordering has concluded!';
-			$swapArray['countDownTimer'] = $this->load_template('countDownTimer', $timerSwap);
-            echo $this->load_template('base', [
-										'title' => "Ordering for " . $lobby->getName(),
-										'mainContent' => $this->load_template('lobby_ordering', $swapArray), 
-										'loginLogoutForm' => $this->load_template('logoutForm'),
-										'backButton' => $this->load_template('backButton', ["backLink" => "?"])
-										]);
-				break;
+				$swapArray['lobbyName'] = $lobby->getName();
+				$swapArray['subtotal'] = number_format($subtotal, 2);
+				$swapArray['taxes'] = number_format(round($subtotal * 0.06, 2), 2);
+				$swapArray['totalPrice'] = number_format(round($subtotal * 1.06, 2), 2);
+				
+				// required for placing orders
+				$swapArray['lobbyId'] = $lobby->getId();
+				
+				
+				$timerSwap['countDownTimeStart'] = date_format(new Datetime($lobby->getOrderingEndTime()),"M j, Y H:i:s");
+				$timerSwap['elementToUpdate'] = 'orderEndTimeHolder';
+				$timerSwap['countDownEndText'] = 'None, ordering has concluded!';
+				$swapArray['countDownTimer'] = $this->load_template('countDownTimer', $timerSwap);
+				echo $this->load_template('base', [
+											'title' => "Ordering for " . $lobby->getName(),
+											'mainContent' => $this->load_template('lobby_ordering', $swapArray), 
+											'loginLogoutForm' => $this->load_template('logoutForm'),
+											'backButton' => $this->load_template('backButton', ["backLink" => "?"])
+											]);
+					break;
 
 			case '3': // COMPLETED
 
 				// display the name of the restaurant that wins the voting phase
-			$swapArray['restaurant'] = $lobby->getWinningRestaurant()->getName();
+				$swapArray['restaurant'] = $lobby->getWinningRestaurant()->getName();
 
-            // display orders from all users if you are the lobby admin,
-            // otherwise just display your own
-            if ($userIsAdmin) {
-               $orders = Order::readLobbyOrders($lobby->getId());
-            } else {
-               $orders = Order::readUserOrdersByLobby(
-                  $userId,
-                  $lobby->getId()
-               );
-            }
-
-            $orderDisplay = '<table style="text-align: left">';
-            if ($userIsAdmin) {
-               $orderDisplay .= "<th>Username</th>";
-            }
-            $orderDisplay .= '<th>Quantity</th><th>Food</th><th>Order price</th>';
-            $subtotal = 0.0;
-            $orderTableRows = "";
-            $adminColumnHeader = "";
-            //$adminColumnHeader = $userIsAdmin ? "<th>User</th>" : "";
-            $i = 0;
-			$userSubtotal = 0.0;
-			$previousUser=null;
-            foreach ($orders as $order) {
-               $food = FoodItem::readFoodItem($order->getFoodId());
-               $orderPrice = $food->getPrice() * $order->getQuantity();
-               $subtotal += $orderPrice;
-               $userSubtotal += $orderPrice;
-               $username = "";
+				// display orders from all users if you are the lobby admin,
+				// otherwise just display your own
 				if ($userIsAdmin) {
-				  $username = User::readUserById($order->getUserId())->getUsername();
+					$orders = Order::readLobbyOrders($lobby->getId());
+				} else {
+					$orders = Order::readUserOrdersByLobby(
+						$userId,
+						$lobby->getId()
+					);
 				}
+
+				$orderDisplay = '<table style="text-align: left">';
+
+				if ($userIsAdmin) {
+					$orderDisplay .= "<th>Username</th>";
+				}
+
+				$orderDisplay .= '<th>Quantity</th><th>Food</th><th>Order price</th>';
+				$subtotal = 0.0;
+				$orderTableRows = "";
+				$adminColumnHeader = "";
+				$i = 0;
+				$userSubtotal = 0.0;
+				$previousUser=null;
+
+				foreach ($orders as $order) {
+
+					$food = FoodItem::readFoodItem($order->getFoodId());
+					$orderPrice = $food->getPrice() * $order->getQuantity();
+					$subtotal += $orderPrice;
+					$userSubtotal += $orderPrice;
+					$username = "";
+
+					if ($userIsAdmin) {
+					$username = User::readUserById($order->getUserId())->getUsername();
+					}
                   
-				$rowSwap = Array();
-				$rowSwap['adminColumn'] = "";
-				//$rowSwap['adminColumn'] = $userIsAdmin ? "<td>".$username."</td>" : "";
-				$rowSwap['foodName'] = $food->getName();
-				$rowSwap['orderQty'] = $order->getQuantity();
-				$rowSwap['orderPrice'] = number_format($orderPrice, 2);
-				$rowSwap['orderId'] = $order->getId();
+					$rowSwap = Array();
+					$rowSwap['adminColumn'] = "";
+					//$rowSwap['adminColumn'] = $userIsAdmin ? "<td>".$username."</td>" : "";
+					$rowSwap['foodName'] = $food->getName();
+					$rowSwap['orderQty'] = $order->getQuantity();
+					$rowSwap['orderPrice'] = number_format($orderPrice, 2);
+					$rowSwap['orderId'] = $order->getId();
 
-				if(($previousUser == null || $previousUser != $order->getUserId()) && $userIsAdmin) {
-					$orderTableRows .= "<tr><td colspan=\"5\"><h3>Summary for $username</h3></td></tr>";
-				}
-				$previousUser = $order->getUserId();
-				$orderTableRows .= $this->load_template('lobbyOrderRow', $rowSwap); 
-				if ($userIsAdmin) {
-					if (isset($orders[$i+1])) {
-						if ($order->getUserId() != $orders[$i+1]->getUserId()) {
+					if(($previousUser == null || $previousUser != $order->getUserId()) && $userIsAdmin) {
+						$orderTableRows .= "<tr><td colspan=\"5\"><h3>Summary for $username</h3></td></tr>";
+					}
+
+					$previousUser = $order->getUserId();
+					$orderTableRows .= $this->load_template('lobbyOrderRow', $rowSwap); 
+
+					if ($userIsAdmin) {
+
+						if (isset($orders[$i+1])) {
+
+							if ($order->getUserId() != $orders[$i+1]->getUserId()) {
+								$userTaxes = number_format(round($userSubtotal * 0.06, 2), 2);
+								$userTotal = number_format(round($userSubtotal * 1.06, 2), 2);
+								$userSubtotal = number_format($userSubtotal, 2);
+								$orderTableRows .= "<tr><td colspan=\"5\">Subtotal: $$userSubtotal<br /> Taxes: $$userTaxes <br />Total: $$userTotal<br /><br /></td></tr>";
+								$userSubtotal = 0.0;
+							}
+
+						} else {
 							$userTaxes = number_format(round($userSubtotal * 0.06, 2), 2);
 							$userTotal = number_format(round($userSubtotal * 1.06, 2), 2);
 							$userSubtotal = number_format($userSubtotal, 2);
-							$orderTableRows .= "<tr><td colspan=\"5\">Subtotal: $$userSubtotal<br /> Taxes: $$userTaxes <br />Total: $$userTotal<br /><br /></td></tr>";
+							$orderTableRows .= "<tr><td colspan=\"5\">Subtotal: $$userSubtotal<br /> Taxes: $$userTaxes <br />Total: $$userTotal<br /></td></tr>";
 							$userSubtotal = 0.0;
 						}
-					} else {
-						$userTaxes = number_format(round($userSubtotal * 0.06, 2), 2);
-						$userTotal = number_format(round($userSubtotal * 1.06, 2), 2);
-						$userSubtotal = number_format($userSubtotal, 2);
-						$orderTableRows .= "<tr><td colspan=\"5\">Subtotal: $$userSubtotal<br /> Taxes: $$userTaxes <br />Total: $$userTotal<br /></td></tr>";
-						$userSubtotal = 0.0;
 					}
+					$i++;
+            	}
+
+				$orderDisplay .= "</table>";
+
+				if (empty($orders)) {
+					$swapArray['orderItems'] = "<div class=\"centeredWarning\"><h3>You have no orders in this lobby!</h3></div>";
+				} else {
+					$swapArray['orderItems'] = $this->load_template('lobbyOrderTable', ["orderTableRows" => $orderTableRows, "adminColumnHeader" => $adminColumnHeader]);
 				}
-				$i++;
-            }
-            $orderDisplay .= "</table>";
 
-            if (empty($orders)) {
-                $swapArray['orderItems'] = "<div class=\"centeredWarning\"><h3>You have no orders in this lobby!</h3></div>";
-            } else {
-                $swapArray['orderItems'] = $this->load_template('lobbyOrderTable', ["orderTableRows" => $orderTableRows, "adminColumnHeader" => $adminColumnHeader]);
-            }
-
-            $swapArray['lobbyName'] = $lobby->getName();
-            $swapArray['subtotal'] = $subtotal;
-            $swapArray['taxes'] = number_format(round($subtotal * 0.06, 2), 2);
-            $swapArray['totalPrice'] = number_format(round($subtotal * 1.06, 2), 2);
-            // required for placing orders
-            $swapArray['lobbyId'] = $lobby->getId();
-            
-				echo $this->load_template('base', [
-									'title' => "Ordering for " . $lobby->getName(),
-									'mainContent' => $this->load_template('lobby_completed', $swapArray), 
-									'loginLogoutForm' => $this->load_template('logoutForm'),
-									'backButton' => $this->load_template('backButton', ["backLink" => "?"])
-									]);
+				$swapArray['lobbyName'] = $lobby->getName();
+				$swapArray['subtotal'] = $subtotal;
+				$swapArray['taxes'] = number_format(round($subtotal * 0.06, 2), 2);
+				$swapArray['totalPrice'] = number_format(round($subtotal * 1.06, 2), 2);
+				// required for placing orders
+				$swapArray['lobbyId'] = $lobby->getId();
+				
+					echo $this->load_template('base', [
+										'title' => "Ordering for " . $lobby->getName(),
+										'mainContent' => $this->load_template('lobby_completed', $swapArray), 
+										'loginLogoutForm' => $this->load_template('logoutForm'),
+										'backButton' => $this->load_template('backButton', ["backLink" => "?"])
+										]);
 				break;
 
 			default:
@@ -531,6 +531,7 @@ class ChowChooserEngine {
 	* Enforces certain rules before creating a new lobby.
 	*/
 	private function createLobby(): void {
+
 		$lobbyName = $_POST["lobbyName"];
 		$doSkipVoting = empty($_POST["skipVoting"]);
 		$orderingEndTime = $_POST["orderingEndTime"];
@@ -545,12 +546,15 @@ class ChowChooserEngine {
 		// user must select at least one restaurant
 		$noRestaurantIsSelected = true;
 		$selectedRestaurants = array();
+
 		foreach ($_POST as $key => $restaurantId) {
+
 			if (str_starts_with($key, "selectedRestaurant")) {
 				$noRestaurantIsSelected = false;
 				$restaurant = Restaurant::readRestaurant($restaurantId);
 				array_push($selectedRestaurants, $restaurant);
 			}
+
 		}
 
 		// error message appears if one of the following is true:
@@ -559,8 +563,8 @@ class ChowChooserEngine {
 		// (3) ordering end time is empty
 		// (4) no restaurant has been selected
 		if (empty($lobbyName) || (is_null($votingEndTime) && !key_exists('skipVoting', $_POST)) || empty($orderingEndTime) || $noRestaurantIsSelected) {
+
 			$this->swapArray["errorMsg"] = "Please enter data in all fields.";
-			//echo $this->load_template("create_lobby", $this->swapArray);
 			echo $this->load_template('base', [
 										'title' => "Create a Lobby",
 										'mainContent' => $this->load_template('create_lobby', $this->swapArray), 

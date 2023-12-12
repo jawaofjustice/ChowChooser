@@ -2,14 +2,14 @@
 
 class Lobby {
 
-    private Database $db;
-    private int $id;
-    private int $adminId;
-    private string $name;
-    private string|null $votingEndTime;
-    private string $orderingEndTime;
-    private int $statusId;
-    private string $inviteCode;
+   private Database $db;
+   private int $id;
+   private int $adminId;
+   private string $name;
+   private string|null $votingEndTime;
+   private string $orderingEndTime;
+   private int $statusId;
+   private string $inviteCode;
 
    public function __construct(
       int $id,
@@ -20,39 +20,39 @@ class Lobby {
       int $statusId,
       string $inviteCode
    ) {
-        $this->db = new Database();
-        $this->id = $id;
-        $this->adminId = $adminId;
-        $this->name = $name;
-        $this->votingEndTime = $votingEndTime;
-        $this->orderingEndTime = $orderingEndTime;
-        $this->statusId = $statusId;
-        $this->inviteCode = $inviteCode;
-    }
+      $this->db = new Database();
+      $this->id = $id;
+      $this->adminId = $adminId;
+      $this->name = $name;
+      $this->votingEndTime = $votingEndTime;
+      $this->orderingEndTime = $orderingEndTime;
+      $this->statusId = $statusId;
+      $this->inviteCode = $inviteCode;
+   }
     
-    public function getId(): int {
-        return $this->id;
-    }
+   public function getId(): int {
+      return $this->id;
+   }
 
-    public function getAdminId(): int {
-        return $this->adminId;
-    }
+   public function getAdminId(): int {
+      return $this->adminId;
+   }
 
-    public function getName(): string {
-        return $this->name;
-    }
+   public function getName(): string {
+      return $this->name;
+   }
 
-    public function getVotingEndTime(): string|null {
-        return $this->votingEndTime;
-    }
+   public function getVotingEndTime(): string|null {
+      return $this->votingEndTime;
+   }
 
-    public function getOrderingEndTime(): string {
-        return $this->orderingEndTime;
-    }
+   public function getOrderingEndTime(): string {
+      return $this->orderingEndTime;
+   }
 
-    public function getStatusId(): int {
-        return $this->statusId;
-    }
+   public function getStatusId(): int {
+      return $this->statusId;
+   }
 
    public function getInviteCode(): string {
       return $this->inviteCode;
@@ -80,28 +80,28 @@ class Lobby {
    */
    public function getWinningRestaurant(): Restaurant {
       // determine the winning restaurant and make it the edit the lobby-restaurant table
-        $statement = $this->db->mysqli->prepare("SELECT restaurant_id restaurant, COUNT(restaurant_id) votes 
-                                                    FROM chow_chooser.vote
-                                                    WHERE lobby_id = (?)
-                                                    GROUP BY restaurant_id
-                                                    HAVING COUNT(restaurant_id) = (
-                                                        SELECT COUNT(restaurant_id)
-                                                        FROM chow_chooser.vote
-                                                        WHERE lobby_id = (?)
-                                                        GROUP BY restaurant_id
-                                                        ORDER BY COUNT(restaurant_id) DESC
-                                                        LIMIT 1
-                                                    )
-                                                    order by votes desc");
-        $statement->bind_param('ii', $this->id, $this->id);
-        $statement->execute();
+      $statement = $this->db->mysqli->prepare("SELECT restaurant_id restaurant, COUNT(restaurant_id) votes 
+                                                FROM chow_chooser.vote
+                                                WHERE lobby_id = (?)
+                                                GROUP BY restaurant_id
+                                                HAVING COUNT(restaurant_id) = (
+                                                   SELECT COUNT(restaurant_id)
+                                                   FROM chow_chooser.vote
+                                                   WHERE lobby_id = (?)
+                                                   GROUP BY restaurant_id
+                                                   ORDER BY COUNT(restaurant_id) DESC
+                                                   LIMIT 1
+                                                )
+                                                ORDER BY votes DESC");
+         $statement->bind_param('ii', $this->id, $this->id);
+         $statement->execute();
 
       // populate an array with the results because there will be
       // more than one result if there is a tie
       $voteArray = array();
-        foreach ($statement->get_result() as $votesForRestaurant) {
+         foreach ($statement->get_result() as $votesForRestaurant) {
             array_push($voteArray, $votesForRestaurant);
-        }
+         }
 
       // single winner with no ties -> return the winner
       if (count($voteArray) == 1) {
@@ -118,8 +118,8 @@ class Lobby {
       // deal with a tie, so start by getting the vote of the admin,
       // which will be the tie-breaker (if it exists)
       $statement = $this->db->mysqli->prepare("SELECT restaurant_id 
-         FROM vote JOIN lobby ON vote.lobby_id = lobby.id
-         WHERE lobby.admin_id = vote.user_id AND lobby_id = (?)");
+                                                FROM vote JOIN lobby ON vote.lobby_id = lobby.id
+                                                WHERE lobby.admin_id = vote.user_id AND lobby_id = (?)");
       $statement->bind_param('i', $this->id);
       $statement->execute();
 
@@ -171,52 +171,54 @@ class Lobby {
    *
    * @return array<Restaurant> A collection of `Restaurant` instances.
    */
-    public function getRestaurants(): Array {
+   public function getRestaurants(): Array {
 
-        // fetch the restaurants assosiated with the lobby
-        $statement = $this->db->mysqli->prepare('SELECT restaurant_id
+      // fetch the restaurants assosiated with the lobby
+      $statement = $this->db->mysqli->prepare('SELECT restaurant_id
                                                     FROM lobby_restaurant
                                                     WHERE lobby_id = (?)');
-        $statement->bind_param('i', $this->id);
-        $statement->execute();
+      $statement->bind_param('i', $this->id);
+      $statement->execute();
 
-        // create an object for each restaurant and populate the restaurants array with them
-        $restaurants = array();
-        foreach ($statement->get_result() as $restaurant) {
-            array_push($restaurants, Restaurant::readRestaurant($restaurant['restaurant_id']));
-        }
+      // create an object for each restaurant and populate the restaurants array with them
+      $restaurants = array();
+      foreach ($statement->get_result() as $restaurant) {
+         array_push($restaurants, Restaurant::readRestaurant($restaurant['restaurant_id']));
+      }
 
-        // set the votesByLobby in each restaurant using the votes table (method contained in restaurant class)
-        foreach($restaurants as $restaurant) {
-            $restaurant->setVotesByLobby($this->id);
-        }
+      // set the votesByLobby in each restaurant using the votes table (method contained in restaurant class)
+      foreach($restaurants as $restaurant) {
+         $restaurant->setVotesByLobby($this->id);
+      }
 
-        // order the array of restaurants by how many votes they have
-        usort($restaurants, function($a, $b){
-            return $b->getVotesByLobby($this->id) - $a->getVotesByLobby($this->id);
-        });
+      // order the array of restaurants by how many votes they have
+      usort($restaurants, function($a, $b){
+         return $b->getVotesByLobby($this->id) - $a->getVotesByLobby($this->id);
+      });
 
-        return $restaurants;
-    }
+      return $restaurants;
+
+   }
 
    /**
    * Reads a lobby from the database by ID.
    */
-    public static function readLobby(int $id): Lobby {
-        $db = new Database();
+   public static function readLobby(int $id): Lobby {
 
-        $statement = $db->mysqli->prepare("select * from lobby where lobby.id = (?)");
+      $db = new Database();
+
+      $statement = $db->mysqli->prepare("select * from lobby where lobby.id = (?)");
 		$statement->bind_param('s', $id);
 		$statement->execute();
 
-        $lobbyArray = mysqli_fetch_assoc($statement->get_result());
+      $lobbyArray = mysqli_fetch_assoc($statement->get_result());
         
-        // Create new lobby object
-        $lobby = new Lobby($lobbyArray['id'], $lobbyArray['admin_id'], $lobbyArray['name'], $lobbyArray['voting_end_time'], $lobbyArray['ordering_end_time'], $lobbyArray['status_id'], $lobbyArray['invite_code']);
+      // Create new lobby object
+      $lobby = new Lobby($lobbyArray['id'], $lobbyArray['admin_id'], $lobbyArray['name'], $lobbyArray['voting_end_time'], $lobbyArray['ordering_end_time'], $lobbyArray['status_id'], $lobbyArray['invite_code']);
 
-        // Make timestamp and date format
-        date_default_timezone_set('America/New_York');
-        $date = date('Y-m-d H:i:s');
+      // Make timestamp and date format
+      date_default_timezone_set('America/New_York');
+      $date = date('Y-m-d H:i:s');
 
       $voteEndTime = $lobby->getVotingEndTime();
 
@@ -227,27 +229,27 @@ class Lobby {
          $effectiveVoteEndTime = new DateTime($voteEndTime);
       }
 
-        // Check if current time is over voting end time
-        if(new DateTime($date) > $effectiveVoteEndTime) {
+      // Check if current time is over voting end time
+      if(new DateTime($date) > $effectiveVoteEndTime) {
 
-            // Check if current time is over ordering end time
-            if(new DateTime($date) > new DateTime($lobby->getOrderingEndTime())) {
-                // Set lobby phase to "complete"
-                $lobby->updateStatusId(3);
-            } else {
-                // in ordering phase
-                $lobby->getWinningRestaurant();
-                $lobby->deleteLoserRestaurants();
-                $lobby->updateStatusId(2);
-            }
+         // Check if current time is over ordering end time
+         if(new DateTime($date) > new DateTime($lobby->getOrderingEndTime())) {
+            // Set lobby phase to "complete"
+            $lobby->updateStatusId(3);
+         } else {
+            // in ordering phase
+            $lobby->getWinningRestaurant();
+            $lobby->deleteLoserRestaurants();
+            $lobby->updateStatusId(2);
+         }
 
-        } else {
+         } else {
             // in voting phase
             $lobby->updateStatusId(1);
-        }
+         }
 
-        //Check whether the status_id in the database is correct or not
-        if($lobby->getStatusId() != $lobbyArray['status_id']) {
+         //Check whether the status_id in the database is correct or not
+         if($lobby->getStatusId() != $lobbyArray['status_id']) {
 
             $statusId = $lobby->getStatusId();
             $id = $lobby->getId();
@@ -259,9 +261,9 @@ class Lobby {
 
         }
 
-        return $lobby;
+      return $lobby;
         
-    }
+   }
 
    /**
    * Create a new record in the database's `lobby` table.
@@ -404,16 +406,16 @@ class Lobby {
       
       if ($result->num_rows > 0) {
 		  return true;
-	  }
-	  return false;
+	   }
+	   return false;
    }
    
 
 	public static function getUsersLobbies(int $id): string {
 		$db = new Database();
-		$statement = $db->mysqli->prepare("select distinct l.*, lu.user_id, u.username, s.description 
-			from lobby as l inner join lobby_user as lu on l.id = lu.lobby_id inner join status as s 
-			on l.status_id=s.id inner join user as u on lu.user_id=u.id where lu.user_id = (?)");
+		$statement = $db->mysqli->prepare("SELECT DISTINCT l.*, lu.user_id, u.username, s.description 
+			                                 FROM lobby AS l INNER JOIN lobby_user AS lu ON l.id = lu.lobby_id INNER JOIN STATUS AS s 
+			                                 ON l.status_id=s.id INNER JOIN user AS u ON lu.user_id=u.id WHERE lu.user_id = (?)");
 		$statement->bind_param('s', $id);
 		$statement->execute();
 
