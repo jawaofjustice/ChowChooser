@@ -443,7 +443,7 @@ class ChowChooserEngine {
             }
 
             $swapArray['lobbyName'] = $lobby->getName();
-            $swapArray['subtotal'] = $subtotal;
+            $swapArray['subtotal'] = number_format($subtotal, 2);
             $swapArray['taxes'] = number_format(round($subtotal * 0.06, 2), 2);
             $swapArray['totalPrice'] = number_format(round($subtotal * 1.06, 2), 2);
             // required for placing orders
