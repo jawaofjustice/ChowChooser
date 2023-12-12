@@ -34,16 +34,11 @@ class ChowChooserEngine {
 			return;
 		} else if (isset($_POST['logout'])) {
 			session_unset();
-      }
+      	}
 
-		$orderKey = "";
 		$actionKey = "";
-		$orderKeyExists = key_exists("orderKey", $_POST) || key_exists("orderKey", $_GET);
 		$actionKeyExists = key_exists("action", $_POST) || key_exists("action", $_GET);
 
-		if ($orderKeyExists) {
-			$orderKey = key_exists("orderKey", $_POST) ? $_POST['orderKey'] : $_GET['orderKey'];
-		}
 		if ($actionKeyExists) {
 			$actionKey = key_exists("action", $_POST) ? $_POST['action'] : $_GET['action'];
 		}
@@ -64,12 +59,16 @@ class ChowChooserEngine {
 			$swapArray['userId'] = $_SESSION['user']->getUsername();
 		}
 		$this->swapArray = $swapArray;
-		if(!$orderKeyExists && !$actionKeyExists) {
-			// no action or orderKey means we're going to the welcome page
-			$this->welcome();
 
-		} else if ($actionKeyExists) {
-			// if we have an action key, we're going to now check if it's value is start_new:
+		if ($actionKeyExists) {
+
+			// if there is not a user logged in but there is an action key, we will direct to welcome
+			if(!isset($_SESSION['user'])) {
+				$this->welcome();
+				return;
+			}
+
+			// We will route according to the action key
 			switch ($actionKey) {
             case "joinLobby":
                $inviteCode = $_GET['inviteCode'];
@@ -164,7 +163,10 @@ class ChowChooserEngine {
 			}
 
 		} else {
-			// for debug's sake we'll make an error page that we can only reach when all other checks fail in case we've borked logic
+
+			// if there is no action key go to home page
+			$this->welcome();
+			
 		}
 	}
 
