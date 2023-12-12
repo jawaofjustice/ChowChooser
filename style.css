@@ -365,7 +365,12 @@ h2 {
   text-decoration: none;
   display: block;
 }
-
+.largeCenteredButtonHolder {
+	display: block;
+	text-decoration: none;
+    width: 400px;
+	margin: 0px auto;
+}
 .thinTable {
 	border: 2px solid #F99716;
 }

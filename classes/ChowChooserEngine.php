@@ -278,7 +278,7 @@ class ChowChooserEngine {
 		$userId = $_SESSION['user']->getId();
 		$userIsAdmin = $userId == $lobby->getAdminId();
 		$statusId = $lobby->getStatusId();
-		$swapArray['orderingEndTime'] = $lobby->getOrderingEndTime();
+		$swapArray['orderingEndTime'] = date_format(new Datetime($lobby->getOrderingEndTime()),"M j, Y H:i:s");
 
 		if ($userIsAdmin) {
 			$inviteCode = $lobby->getInviteCode();
@@ -370,7 +370,8 @@ class ChowChooserEngine {
 				
 				
 				$orderTableRows = "";
-				$adminColumnHeader = $userIsAdmin ? "<th>User</th>" : "";
+				$adminColumnHeader = "";
+			//	$adminColumnHeader = $userIsAdmin ? "<th>User</th>" : "";
 				   
 				$subtotal = 0.0;
 				$i = 0;
@@ -388,10 +389,11 @@ class ChowChooserEngine {
 					  $username = User::readUserById($order->getUserId())->getUsername();
 					}
 					$rowSwap = Array();
-					$rowSwap['adminColumn'] = $userIsAdmin ? "<td>".$username."</td>" : "";
+					$rowSwap['adminColumn'] = "";
+				//	$rowSwap['adminColumn'] = $userIsAdmin ? "<td>".$username."</td>" : "";
 					$rowSwap['foodName'] = $food->getName();
 					$rowSwap['orderQty'] = $order->getQuantity();
-					$rowSwap['orderPrice'] = $orderPrice;
+					$rowSwap['orderPrice'] = number_format($orderPrice, 2);
 
 					//~ $rowSwap['orderId'] = $order->id;
 
@@ -400,7 +402,7 @@ class ChowChooserEngine {
 					//~ $orderTableRows .= $this->load_template('lobbyOrderRow', $rowSwap); 
 
 					
-					if($previousUser == null || $previousUser != $order->getUserId()) {
+					if(( $previousUser == null || $previousUser != $order->getUserId()) && $userIsAdmin) {
 						$orderTableRows .= "<tr><td colspan=\"5\"><h3>Summary for $username</h3></td></tr>";
 					}
 					$previousUser = $order->getUserId();
@@ -408,14 +410,16 @@ class ChowChooserEngine {
 					if ($userIsAdmin) {
 						if (isset($orders[$i+1])) {
 							if ($order->getUserId() != $orders[$i+1]->getUserId()) {
-								$userTaxes = number_format(round($subtotal * 0.06, 2), 2);
-								$userTotal = number_format(round($subtotal * 1.06, 2), 2);
+								$userTaxes = number_format(round($userSubtotal * 0.06, 2), 2);
+								$userTotal = number_format(round($userSubtotal * 1.06, 2), 2);
+								$userSubtotal = number_format($userSubtotal, 2);
 								$orderTableRows .= "<tr><td colspan=\"5\">Subtotal: $$userSubtotal<br /> Taxes: $$userTaxes <br />Total: $$userTotal<br /><br /></td></tr>";
 								$userSubtotal = 0.0;
 							}
 						} else {
-							$userTaxes = number_format(round($subtotal * 0.06, 2), 2);
-							$userTotal = number_format(round($subtotal * 1.06, 2), 2);
+							$userTaxes = number_format(round($userSubtotal * 0.06, 2), 2);
+							$userTotal = number_format(round($userSubtotal * 1.06, 2), 2);
+							$userSubtotal = number_format($userSubtotal, 2);
 							$orderTableRows .= "<tr><td colspan=\"5\">Subtotal: $$userSubtotal<br /> Taxes: $$userTaxes <br />Total: $$userTotal<br /></td></tr>";
 							$userSubtotal = 0.0;
 						}
@@ -445,7 +449,7 @@ class ChowChooserEngine {
             // required for placing orders
             $swapArray['lobbyId'] = $lobby->getId();
             
-            $swapArray['orderingEndTime'] = date_format(new Datetime($lobby->getOrderingEndTime()),"M j, Y H:i:s");
+            
             $timerSwap['countDownTimeStart'] = date_format(new Datetime($lobby->getOrderingEndTime()),"M j, Y H:i:s");
             $timerSwap['elementToUpdate'] = 'orderEndTimeHolder';
             $timerSwap['countDownEndText'] = 'None, ordering has concluded!';
@@ -481,24 +485,52 @@ class ChowChooserEngine {
             $orderDisplay .= '<th>Quantity</th><th>Food</th><th>Order price</th>';
             $subtotal = 0.0;
             $orderTableRows = "";
-            $adminColumnHeader = $userIsAdmin ? "<th>User</th>" : "";
+            $adminColumnHeader = "";
+            //$adminColumnHeader = $userIsAdmin ? "<th>User</th>" : "";
+            $i = 0;
+			$userSubtotal = 0.0;
+			$previousUser=null;
             foreach ($orders as $order) {
                $food = FoodItem::readFoodItem($order->getFoodId());
                $orderPrice = $food->getPrice() * $order->getQuantity();
                $subtotal += $orderPrice;
+               $userSubtotal += $orderPrice;
                $username = "";
 				if ($userIsAdmin) {
 				  $username = User::readUserById($order->getUserId())->getUsername();
 				}
                   
 				$rowSwap = Array();
-				$rowSwap['adminColumn'] = $userIsAdmin ? "<td>".$username."</td>" : "";
+				$rowSwap['adminColumn'] = "";
+				//$rowSwap['adminColumn'] = $userIsAdmin ? "<td>".$username."</td>" : "";
 				$rowSwap['foodName'] = $food->getName();
 				$rowSwap['orderQty'] = $order->getQuantity();
-				$rowSwap['orderPrice'] = $orderPrice;
+				$rowSwap['orderPrice'] = number_format($orderPrice, 2);
 				$rowSwap['orderId'] = $order->getId();
 
-				$orderTableRows .= $this->load_template('lobbyCompleteRow', $rowSwap); 
+				if(($previousUser == null || $previousUser != $order->getUserId()) && $userIsAdmin) {
+					$orderTableRows .= "<tr><td colspan=\"5\"><h3>Summary for $username</h3></td></tr>";
+				}
+				$previousUser = $order->getUserId();
+				$orderTableRows .= $this->load_template('lobbyOrderRow', $rowSwap); 
+				if ($userIsAdmin) {
+					if (isset($orders[$i+1])) {
+						if ($order->getUserId() != $orders[$i+1]->getUserId()) {
+							$userTaxes = number_format(round($userSubtotal * 0.06, 2), 2);
+							$userTotal = number_format(round($userSubtotal * 1.06, 2), 2);
+							$userSubtotal = number_format($userSubtotal, 2);
+							$orderTableRows .= "<tr><td colspan=\"5\">Subtotal: $$userSubtotal<br /> Taxes: $$userTaxes <br />Total: $$userTotal<br /><br /></td></tr>";
+							$userSubtotal = 0.0;
+						}
+					} else {
+						$userTaxes = number_format(round($userSubtotal * 0.06, 2), 2);
+						$userTotal = number_format(round($userSubtotal * 1.06, 2), 2);
+						$userSubtotal = number_format($userSubtotal, 2);
+						$orderTableRows .= "<tr><td colspan=\"5\">Subtotal: $$userSubtotal<br /> Taxes: $$userTaxes <br />Total: $$userTotal<br /></td></tr>";
+						$userSubtotal = 0.0;
+					}
+				}
+				$i++;
             }
             $orderDisplay .= "</table>";
 

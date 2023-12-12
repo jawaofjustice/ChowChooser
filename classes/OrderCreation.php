@@ -70,6 +70,7 @@ class OrderCreation {
 			
 			foreach ($response as $r) {
 				$i++;
+				$r['price'] = number_format($r['price'], 2);
 				$swap['orderLineItemId'] = "orderLineItem". $i;
 				$swap['orderLineItemContents'] = $r['quantity'] . " x " . $r['name'] . " - $" . $r['price'];
 				$swap['foodId'] = $r['id'];
@@ -77,7 +78,7 @@ class OrderCreation {
 				$subtotal += $r['quantity'] * $r['price'];
 				$output .= ChowChooserEngine::load_template('orderLineItem', $swap);
 			}
-			$output .= "<br /> Subtotal: $" . $subtotal;
+			$output .= "<br /> Subtotal: $" . number_format($subtotal, 2);
 			$output .= "<br /> Taxes: $" . number_format(round($subtotal * 0.06, 2), 2);
 			$output .= "<br /> Total: $" . number_format(round($subtotal * 1.06, 2), 2);
 			
