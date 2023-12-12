@@ -62,12 +62,6 @@ class ChowChooserEngine {
 
 		if ($actionKeyExists) {
 
-			// if there is not a user logged in but there is an action key, we will direct to welcome
-			if(!isset($_SESSION['user'])) {
-				$this->welcome();
-				return;
-			}
-
 			// We will route according to the action key
 			switch ($actionKey) {
 
