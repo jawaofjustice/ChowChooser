@@ -396,6 +396,20 @@ class Lobby {
       $statement->execute();
 
    }
+   
+   public static function readIfUserIsInLobby(int $userId, int $lobbyId): bool {
+	  $db = new Database();
+      $statement = $db->mysqli->prepare("SELECT * FROM lobby_user WHERE user_id = (?) AND lobby_id = (?)");
+      $statement->bind_param('ii', $userId, $lobbyId);
+      $statement->execute();
+      $result = $statement->get_result();
+      
+      if ($result->num_rows > 0) {
+		  return true;
+	  }
+	  return false;
+   }
+   
 
 	public static function getUsersLobbies(int $id): string {
 		$db = new Database();

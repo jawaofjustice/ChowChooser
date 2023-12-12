@@ -119,13 +119,19 @@ class ChowChooserEngine {
 										]);
 					break;
 				case "deleteLobby":
-					$lobby = Lobby::readLobby($_GET['lobbyId']);
-					if($_SESSION['user']->getId() == $lobby->getAdminId())
-						Lobby::deleteLobby($lobby->getId());
-					else
-						Lobby::deleteUserFromLobby($_SESSION['user']->getId(), $lobby->getId());
-					$this->swapArray['errorMsg'] = "Lobby ".$lobby->getName()." Deleted";
-					$this->mainMenu();
+					// are we in this lobby?
+					if (Lobby::readIfUserIsInLobby($_SESSION['user']->getId(), $_GET['lobbyId'])) {
+						$lobby = Lobby::readLobby($_GET['lobbyId']);
+						
+						if($_SESSION['user']->getId() == $lobby->getAdminId())
+							Lobby::deleteLobby($lobby->getId());
+						else
+							Lobby::deleteUserFromLobby($_SESSION['user']->getId(), $lobby->getId());
+						$this->swapArray['errorMsg'] = "Lobby ".$lobby->getName()." Deleted";
+						$this->mainMenu();
+					} else {
+						header("location: ?action=main");
+					}
 					break;
 				case "resetPassword":
 					echo $user->resetPassword();
